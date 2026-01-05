@@ -1,0 +1,9 @@
+<div class="not-found-area ptb-100 dotted-bg bg-fbecd7">
+    <div class="container" *ngFor="let content of notFound;">
+        <div class="not-found-content text-center">
+            <img [src]="content.image" alt="error-image">
+            <h4>{{content.title}}</h4>
+            <a routerLink="/" class="default-btn">{{content.buttonText}}</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,185 @@
+.video-area {
+    .shape {
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: -1;
+        position: absolute;
+    }
+}
+.video-box {
+    border-radius: 5px;
+    text-align: center;
+    position: relative;
+    background: {
+        position: center center;
+        repeat: no-repeat;
+        size: cover;
+    };
+    padding: {
+        top: 210px;
+        bottom: 210px;
+    };
+    .video-btn {
+        z-index: 1;
+        width: 85px;
+        height: 85px;
+        font-size: 50px;
+        border-radius: 50%;
+        position: relative;
+        display: inline-block;
+        color: var(--whiteColor);
+        background-color: var(--primaryColor);
+
+        &::before {
+            top: -20px;
+            z-index: -1;
+            left: -20px;
+            content: "";
+            right: -20px;
+            bottom: -20px;
+            border-radius: 50%;
+            position: absolute;
+            animation: ripple 5s linear infinite;
+            background: rgba(255, 64, 87, 0.28);
+            border: solid 1px var(--primaryColor);
+        }
+        i {
+            transform: translateY(-50%);
+            position: absolute;
+            right: 0;
+            top: 50%;
+            left: 0;
+        }
+    }
+}
+.video-popup {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    position: fixed;
+    text-align: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.5);
+
+    .popup-inner {
+        width: 720px;
+        padding: 20px;
+        position: relative;
+        border-radius: 5px;
+        background-color: var(--whiteColor);
+        margin: {
+            left: auto;
+            right: auto;
+        };
+        iframe {
+            width: 100%;
+            height: 426px;
+            border-radius: 5px;
+        }
+        .close-btn {
+            top: -15px;
+            width: 35px;
+            right: -10px;
+            border: none;
+            height: 35px;
+            font-size: 20px;
+            line-height: 37px;
+            border-radius: 50%;
+            position: absolute;
+            transition: var(--transition);
+            background-color: var(--whiteColor);
+
+            &:hover {
+                background-color: red;
+                color: var(--whiteColor);
+            }
+        }
+    }
+}
+@keyframes ripple {
+    0% {
+        transform: scale(1);
+    }
+    75% {
+        transform: scale(1.5);
+        opacity: .6;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+/* Max width 767px */
+@media only screen and (max-width : 767px) {
+
+    .video-popup {
+        .popup-inner {
+            width: 300px;
+            padding: 10px;
+            
+            iframe {
+                width: 100%;
+                height: 177px;
+            }
+            .close-btn {
+                width: 30px;
+                right: -5px;
+                height: 30px;
+                font-size: 18px;
+                line-height: 31px;
+            }
+        }
+    }
+    .video-box {
+        padding: {
+            top: 150px;
+            bottom: 150px;
+        };
+        .video-btn {
+            width: 65px;
+            height: 65px;
+            font-size: 40px;
+
+            i {
+                margin-top: 1px;
+            }
+        }
+    }
+
+}
+
+/* Min width 576px to Max width 767px */
+@media only screen and (min-width : 576px) and (max-width : 767px) {
+
+    .video-popup {
+        .popup-inner {
+            width: 400px;
+            
+            iframe {
+                width: 100%;
+                height: 238px;
+            }
+            .close-btn {
+                right: -10px;
+            }
+        }
+    }
+
+}
+
+/* Min width 768px to Max width 991px */
+@media only screen and (min-width : 768px) and (max-width : 991px) {}
+
+/* Min width 992px to Max width 1199px */
+@media only screen and (min-width : 992px) and (max-width : 1199px) {}
+
+/* Min width 1200px to Max width 1399px */
+@media only screen and (min-width: 1200px) and (max-width: 1399px) {}
+
+/* Min width 1600px */
+@media only screen and (min-width: 1600px) {}

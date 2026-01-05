@@ -1,0 +1,257 @@
+@import "../../common/courses/courses.component.scss";
+
+.toledo-grid-sorting {
+    margin-bottom: 25px;
+
+    .result-count {
+        p {
+            .count {
+                font-weight: 600;
+                color: var(--blackColor);
+            }
+        }
+    }
+    .ordering {
+        label {
+            color: var(--paragraphColor);
+            margin-right: 5px;
+        }
+        select {
+            height: 45px;
+            width: 215px;
+            cursor: pointer;
+            line-height: 45px;
+            padding: 0 0 0 10px;
+            background: #f8f8f8;
+            display: inline-block;
+            color: var(--blackColor);
+            transition: var(--transition);
+            border-color: var(--borderColor);
+            font: {
+                size: var(--fontSize);
+                weight: 500;
+            };
+            &:hover {
+                border-color: var(--primaryColor);
+                background-color: transparent;
+            }
+        }
+    }
+}
+
+// Sidebar
+.courses-widget-area {
+    .widget {
+        padding: 30px;
+        border-radius: 5px;
+        margin-bottom: 25px;
+        background-color: #f7f7f7;
+
+        .widget-title {
+            font-size: 22px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .list {
+            li {
+                margin-bottom: 13px;
+                color: var(--bodyColor);
+
+                .form-check {
+                    margin-bottom: 0;
+
+                    .form-check-input {
+                        &[type=checkbox] {
+                            box-shadow: unset;
+                            border-radius: 50%;
+                            margin-top: 0.21em;
+                        }
+                        &:checked {
+                            background-color: var(--primaryColor);
+                            border-color: var(--primaryColor);
+                        }
+                    }
+                    .form-check-label {
+                        cursor: pointer;
+                    }
+                }
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+        .ratings-list {
+            li {
+                margin-bottom: 13px;
+                color: var(--bodyColor);
+
+                .form-check {
+                    margin-bottom: 0;
+
+                    .form-check-input {
+                        &[type=checkbox] {
+                            box-shadow: unset;
+                            border-radius: 50%;
+                            margin-top: 0.18em;
+                        }
+                        &:checked {
+                            background-color: var(--primaryColor);
+                            border-color: var(--primaryColor);
+                        }
+                    }
+                    .form-check-label {
+                        cursor: pointer;
+
+                        i {
+                            line-height: 1;
+                            color: #ffc107;
+                            margin-right: 2px;
+                        }
+                    }
+                }
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+}
+
+/* Max width 767px */
+@media only screen and (max-width : 767px) {
+
+    .toledo-grid-sorting {
+        margin-bottom: 25px;
+    
+        .ordering {
+            margin-top: 13px;
+
+            select {
+                padding: 0 0 0 5px;
+                line-height: 40px;
+                font-size: 14px;
+                height: 40px;
+            }
+        }
+    }
+    
+    // Sidebar
+    .courses-widget-area {
+        margin-top: 25px;
+
+        .widget {
+            padding: 15px;
+    
+            .widget-title {
+                font-size: 18px;
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+            }
+            .list {
+                li {
+                    margin-bottom: 9px;
+    
+                    .form-check {
+                        .form-check-input {
+                            &[type=checkbox] {
+                                margin-top: 0.22em;
+                            }
+                        }
+                    }
+                }
+            }
+            .ratings-list {
+                li {
+                    margin-bottom: 9px;
+    
+                    .form-check {
+                        .form-check-input {
+                            &[type=checkbox] {
+                                margin-top: 0.17em;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+/* Min width 576px to Max width 767px */
+@media only screen and (min-width : 576px) and (max-width : 767px) {}
+
+/* Min width 768px to Max width 991px */
+@media only screen and (min-width : 768px) and (max-width : 991px) {
+
+    .toledo-grid-sorting {
+        .ordering {
+            select {
+                height: 40px;
+                font-size: 15px;
+                line-height: 42px;
+            }
+        }
+    }
+
+    // Sidebar
+    .courses-widget-area {
+        margin-top: 25px;
+
+        .widget {
+            padding: 22px;
+    
+            .widget-title {
+                font-size: 20px;
+                margin-bottom: 15px;
+                padding-bottom: 12px;
+            }
+            .list {
+                li {
+                    margin-bottom: 11px;
+                }
+            }
+            .ratings-list {
+                li {
+                    margin-bottom: 11px;
+                }
+            }
+        }
+    }
+
+}
+
+/* Min width 992px to Max width 1199px */
+@media only screen and (min-width : 992px) and (max-width : 1199px) {
+
+    // Sidebar
+    .courses-widget-area {
+        .widget {
+            padding: 20px;
+
+            .widget-title {
+                padding-bottom: 12px;
+            }
+        }
+    }
+
+}
+
+/* Min width 1200px to Max width 1399px */
+@media only screen and (min-width: 1200px) and (max-width: 1399px) {
+
+    // Sidebar
+    .courses-widget-area {
+        .widget {
+            padding: 20px;
+        }
+    }
+
+}
+
+/* Min width 1600px */
+@media only screen and (min-width: 1600px) {}

@@ -1,0 +1,1027 @@
+<!-- Default Courses Section -->
+<div
+    class="courses-area ptb-100"
+    [ngClass]="{'d-none': router.url === '/index-2' || router.url === '/index-3'}"
+>
+    <div class="container">
+        <div class="courses-tabs">
+            <div class="d-lg-flex align-items-center justify-content-between">
+                <div class="section-title">
+                    <h2 class="mb-0">Our Popular Online Courses</h2>
+                </div>
+                <ul class="nav nav-tabs d-block border-0">
+                    <li class="nav-item d-inline-block" [ngClass]="{'active': currentTab === 'tab1'}">
+                        <button type="button" class="nav-link shadow-none border-0 mb-0 rounded-0" (click)="switchTab($event, 'tab1')">
+                            All
+                        </button>
+                    </li>
+                    <li class="nav-item d-inline-block" [ngClass]="{'active': currentTab === 'tab2'}">
+                        <button type="button" class="nav-link shadow-none border-0 mb-0 rounded-0" (click)="switchTab($event, 'tab2')">
+                            Digital
+                        </button>
+                    </li>
+                    <li class="nav-item d-inline-block" [ngClass]="{'active': currentTab === 'tab3'}">
+                        <button type="button" class="nav-link shadow-none border-0 mb-0 rounded-0" (click)="switchTab($event, 'tab3')">
+                            Marketing
+                        </button>
+                    </li>
+                    <li class="nav-item d-inline-block" [ngClass]="{'active': currentTab === 'tab4'}">
+                        <button type="button" class="nav-link shadow-none border-0 mb-0 rounded-0" (click)="switchTab($event, 'tab4')">
+                            Programming
+                        </button>
+                    </li>
+                    <li class="nav-item d-inline-block" [ngClass]="{'active': currentTab === 'tab5'}">
+                        <button type="button" class="nav-link shadow-none border-0 mb-0 rounded-0" (click)="switchTab($event, 'tab5')">
+                            Art & Crafts
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane fade" id="tab1" *ngIf="currentTab === 'tab1'">
+                    <div class="row">
+                        <div class="col-xl-6 col-sm-6 col-md-12">
+                            <div class="single-course-box">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div
+                                            class="image position-relative"
+                                            style="background-image: url(../../../../assets/images/courses/course1.jpg);"
+                                        >
+                                            <img src="assets/images/courses/course1.jpg" alt="course-image">
+                                            <a routerLink="/course-details" class="link-btn"></a>
+                                            <span class="price">$58</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="content">
+                                            <div class="meta justify-content-between align-items-center d-flex">
+                                                <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                                    <img src="assets/images/users/user3.jpg" width="40" height="40" class="rounded-circle" alt="user-image">
+                                                    Sydney Phelps
+                                                </a>
+                                                <div class="rating">
+                                                    <i class='bx bxs-star'></i>
+                                                    (5.0)
+                                                </div>
+                                            </div>
+                                            <h3>
+                                                <a routerLink="/course-details">
+                                                    Successful Negotiation: Master Your Negotiating
+                                                </a>
+                                            </h3>
+                                            <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                                <li>
+                                                    <i class="flaticon-open-book"></i>
+                                                    18 Lessons
+                                                </li>
+                                                <li>
+                                                    <i class="flaticon-young-man"></i>
+                                                    27 Students
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-sm-6 col-md-12">
+                            <div class="single-course-box">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div
+                                            class="image position-relative"
+                                            style="background-image: url(../../../../assets/images/courses/course2.jpg);"
+                                        >
+                                            <img src="assets/images/courses/course2.jpg" alt="course-image">
+                                            <a routerLink="/course-details" class="link-btn"></a>
+                                            <span class="price">$88</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="content">
+                                            <div class="meta justify-content-between align-items-center d-flex">
+                                                <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                                    <img src="assets/images/users/user4.jpg" width="40" height="40" class="rounded-circle" alt="user-image">
+                                                    Sergio Osborn
+                                                </a>
+                                                <div class="rating">
+                                                    <i class='bx bxs-star'></i>
+                                                    (5.0)
+                                                </div>
+                                            </div>
+                                            <h3>
+                                                <a routerLink="/course-details">
+                                                    Java Programming Master Class for Software
+                                                </a>
+                                            </h3>
+                                            <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                                <li>
+                                                    <i class="flaticon-open-book"></i>
+                                                    28 Lessons
+                                                </li>
+                                                <li>
+                                                    <i class="flaticon-young-man"></i>
+                                                    37 Students
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-sm-6 col-md-12">
+                            <div class="single-course-box">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div
+                                            class="image position-relative"
+                                            style="background-image: url(../../../../assets/images/courses/course3.jpg);"
+                                        >
+                                            <img src="assets/images/courses/course3.jpg" alt="course-image">
+                                            <a routerLink="/course-details" class="link-btn"></a>
+                                            <span class="price">$98</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="content">
+                                            <div class="meta justify-content-between align-items-center d-flex">
+                                                <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                                    <img src="assets/images/users/user5.jpg" width="40" height="40" class="rounded-circle" alt="user-image">
+                                                    Stewart Burgess
+                                                </a>
+                                                <div class="rating">
+                                                    <i class='bx bxs-star'></i>
+                                                    (5.0)
+                                                </div>
+                                            </div>
+                                            <h3>
+                                                <a routerLink="/course-details">
+                                                    Machine Learning A-Z™: Hands-On Python & R
+                                                </a>
+                                            </h3>
+                                            <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                                <li>
+                                                    <i class="flaticon-open-book"></i>
+                                                    22 Lessons
+                                                </li>
+                                                <li>
+                                                    <i class="flaticon-young-man"></i>
+                                                    67 Students
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-sm-6 col-md-12">
+                            <div class="single-course-box">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div
+                                            class="image position-relative"
+                                            style="background-image: url(../../../../assets/images/courses/course4.jpg);"
+                                        >
+                                            <img src="assets/images/courses/course4.jpg" alt="course-image">
+                                            <a routerLink="/course-details" class="link-btn"></a>
+                                            <span class="price">$99</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="content">
+                                            <div class="meta justify-content-between align-items-center d-flex">
+                                                <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                                    <img src="assets/images/users/user6.jpg" width="40" height="40" class="rounded-circle" alt="user-image">
+                                                    Cornell Byrd
+                                                </a>
+                                                <div class="rating">
+                                                    <i class='bx bxs-star'></i>
+                                                    (5.0)
+                                                </div>
+                                            </div>
+                                            <h3>
+                                                <a routerLink="/course-details">
+                                                    Node.js for Beginners Go From Zero Hero Nede.js
+                                                </a>
+                                            </h3>
+                                            <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                                <li>
+                                                    <i class="flaticon-open-book"></i>
+                                                    33 Lessons
+                                                </li>
+                                                <li>
+                                                    <i class="flaticon-young-man"></i>
+                                                    77 Students
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab2" *ngIf="currentTab === 'tab2'">
+                    <div class="row">
+                        <div class="col-xl-6 col-sm-6 col-md-12">
+                            <div class="single-course-box">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div
+                                            class="image position-relative"
+                                            style="background-image: url(../../../../assets/images/courses/course1.jpg);"
+                                        >
+                                            <img src="assets/images/courses/course1.jpg" alt="course-image">
+                                            <a routerLink="/course-details" class="link-btn"></a>
+                                            <span class="price">$58</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="content">
+                                            <div class="meta justify-content-between align-items-center d-flex">
+                                                <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                                    <img src="assets/images/users/user3.jpg" width="40" height="40" class="rounded-circle" alt="user-image">
+                                                    Sydney Phelps
+                                                </a>
+                                                <div class="rating">
+                                                    <i class='bx bxs-star'></i>
+                                                    (5.0)
+                                                </div>
+                                            </div>
+                                            <h3>
+                                                <a routerLink="/course-details">
+                                                    Successful Negotiation: Master Your Negotiating
+                                                </a>
+                                            </h3>
+                                            <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                                <li>
+                                                    <i class="flaticon-open-book"></i>
+                                                    18 Lessons
+                                                </li>
+                                                <li>
+                                                    <i class="flaticon-young-man"></i>
+                                                    27 Students
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab3" *ngIf="currentTab === 'tab3'">
+                    <div class="row">
+                        <div class="col-xl-6 col-sm-6 col-md-12">
+                            <div class="single-course-box">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div
+                                            class="image position-relative"
+                                            style="background-image: url(../../../../assets/images/courses/course2.jpg);"
+                                        >
+                                            <img src="assets/images/courses/course2.jpg" alt="course-image">
+                                            <a routerLink="/course-details" class="link-btn"></a>
+                                            <span class="price">$88</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="content">
+                                            <div class="meta justify-content-between align-items-center d-flex">
+                                                <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                                    <img src="assets/images/users/user4.jpg" width="40" height="40" class="rounded-circle" alt="user-image">
+                                                    Sergio Osborn
+                                                </a>
+                                                <div class="rating">
+                                                    <i class='bx bxs-star'></i>
+                                                    (5.0)
+                                                </div>
+                                            </div>
+                                            <h3>
+                                                <a routerLink="/course-details">
+                                                    Java Programming Master Class for Software
+                                                </a>
+                                            </h3>
+                                            <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                                <li>
+                                                    <i class="flaticon-open-book"></i>
+                                                    28 Lessons
+                                                </li>
+                                                <li>
+                                                    <i class="flaticon-young-man"></i>
+                                                    37 Students
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab4" *ngIf="currentTab === 'tab4'">
+                    <div class="row">
+                        <div class="col-xl-6 col-sm-6 col-md-12">
+                            <div class="single-course-box">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div
+                                            class="image position-relative"
+                                            style="background-image: url(../../../../assets/images/courses/course3.jpg);"
+                                        >
+                                            <img src="assets/images/courses/course3.jpg" alt="course-image">
+                                            <a routerLink="/course-details" class="link-btn"></a>
+                                            <span class="price">$98</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="content">
+                                            <div class="meta justify-content-between align-items-center d-flex">
+                                                <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                                    <img src="assets/images/users/user5.jpg" width="40" height="40" class="rounded-circle" alt="user-image">
+                                                    Stewart Burgess
+                                                </a>
+                                                <div class="rating">
+                                                    <i class='bx bxs-star'></i>
+                                                    (5.0)
+                                                </div>
+                                            </div>
+                                            <h3>
+                                                <a routerLink="/course-details">
+                                                    Machine Learning A-Z™: Hands-On Python & R
+                                                </a>
+                                            </h3>
+                                            <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                                <li>
+                                                    <i class="flaticon-open-book"></i>
+                                                    22 Lessons
+                                                </li>
+                                                <li>
+                                                    <i class="flaticon-young-man"></i>
+                                                    67 Students
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab5" *ngIf="currentTab === 'tab5'">
+                    <div class="row">
+                        <div class="col-xl-6 col-sm-6 col-md-12">
+                            <div class="single-course-box">
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6">
+                                        <div
+                                            class="image position-relative"
+                                            style="background-image: url(../../../../assets/images/courses/course4.jpg);"
+                                        >
+                                            <img src="assets/images/courses/course4.jpg" alt="course-image">
+                                            <a routerLink="/course-details" class="link-btn"></a>
+                                            <span class="price">$99</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6">
+                                        <div class="content">
+                                            <div class="meta justify-content-between align-items-center d-flex">
+                                                <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                                    <img src="assets/images/users/user6.jpg" width="40" height="40" class="rounded-circle" alt="user-image">
+                                                    Cornell Byrd
+                                                </a>
+                                                <div class="rating">
+                                                    <i class='bx bxs-star'></i>
+                                                    (5.0)
+                                                </div>
+                                            </div>
+                                            <h3>
+                                                <a routerLink="/course-details">
+                                                    Node.js for Beginners Go From Zero Hero Nede.js
+                                                </a>
+                                            </h3>
+                                            <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                                <li>
+                                                    <i class="flaticon-open-book"></i>
+                                                    33 Lessons
+                                                </li>
+                                                <li>
+                                                    <i class="flaticon-young-man"></i>
+                                                    77 Students
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="courses-btn text-center">
+            <a routerLink="/courses-list" class="default-btn">View All Courses</a>
+        </div>
+    </div>
+</div>
+
+<!-- Courses Section for Home Demo - 2 -->
+<div
+    class="courses-area pt-100 pb-75 d-none"
+    [ngClass]="{'d-block': router.url === '/index-2'}"
+>
+    <div class="container">
+        <div class="section-title d-sm-flex justify-content-between">
+            <h2 class="mb-0">Our Popular Online Courses</h2>
+            <a routerLink="/courses-grid" class="default-btn">View All Courses</a>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                <div class="single-course-item position-relative">
+                    <div class="image position-relative">
+                        <a routerLink="/course-details" class="d-block">
+                            <img src="assets/images/courses/course12.jpg" alt="course-image">
+                        </a>
+                        <span>Advanced</span>
+                    </div>
+                    <div class="content">
+                        <ul class="info ps-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class="flaticon-open-book"></i>
+                                10 Lessons
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class="flaticon-young-man"></i>
+                                45 Students
+                            </li>
+                        </ul>
+                        <h3>
+                            <a routerLink="/course-details">
+                                HTML, JavaScript, & Bootstrap Certification Course
+                            </a>
+                        </h3>
+                        <div class="rating d-flex align-items-center">
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <span>(5.0/8 Rating)</span>
+                        </div>
+                        <div class="price">
+                            $250 <span>$300</span>
+                        </div>
+                    </div>
+                    <div class="hover-box">
+                        <h3>
+                            <a routerLink="/course-details">
+                                HTML, JavaScript, & Bootstrap Certification Course
+                            </a>
+                        </h3>
+                        <span class="sub-title d-block">What you'll learn</span>
+                        <ul class="features-list ps-0 list-unstyled mb-0">
+                            <li>
+                                <i class="flaticon-tick"></i>
+                                Get familiar with almosconcepts of business statistics
+                            </li>
+                            <li>
+                                <i class="flaticon-tick"></i>
+                                Master statistical tools which can be used for data analysis
+                            </li>
+                            <li>
+                                <i class="flaticon-tick"></i>
+                                Master the art of presenting data using different tools
+                            </li>
+                        </ul>
+                        <div class="btn-box d-flex align-items-center">
+                            <button type="button" class="default-btn">Add To Cart</button>
+                            <button type="button" class="fav-btn"><i class="flaticon-heart"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                <div class="single-course-item position-relative">
+                    <div class="image position-relative">
+                        <a routerLink="/course-details" class="d-block">
+                            <img src="assets/images/courses/course13.jpg" alt="course-image">
+                        </a>
+                        <span>Beginner</span>
+                    </div>
+                    <div class="content">
+                        <ul class="info ps-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class="flaticon-open-book"></i>
+                                05 Lessons
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class="flaticon-young-man"></i>
+                                99 Students
+                            </li>
+                        </ul>
+                        <h3>
+                            <a routerLink="/course-details">
+                                Kids Coding - Introduction to HTML, CSS & JavaScript
+                            </a>
+                        </h3>
+                        <div class="rating d-flex align-items-center">
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <span>(5.0/10 Rating)</span>
+                        </div>
+                        <div class="price">
+                            $199 <span>$250</span>
+                        </div>
+                    </div>
+                    <div class="hover-box">
+                        <h3>
+                            <a routerLink="/course-details">
+                                Kids Coding - Introduction to HTML, CSS & JavaScript
+                            </a>
+                        </h3>
+                        <span class="sub-title d-block">What you'll learn</span>
+                        <ul class="features-list ps-0 list-unstyled mb-0">
+                            <li>
+                                <i class="flaticon-tick"></i>
+                                Get familiar with almosconcepts of business statistics
+                            </li>
+                            <li>
+                                <i class="flaticon-tick"></i>
+                                Master statistical tools which can be used for data analysis
+                            </li>
+                            <li>
+                                <i class="flaticon-tick"></i>
+                                Master the art of presenting data using different tools
+                            </li>
+                        </ul>
+                        <div class="btn-box d-flex align-items-center">
+                            <button type="button" class="default-btn">Add To Cart</button>
+                            <button type="button" class="fav-btn"><i class="flaticon-heart"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                <div class="single-course-item position-relative">
+                    <div class="image position-relative">
+                        <a routerLink="/course-details" class="d-block">
+                            <img src="assets/images/courses/course14.jpg" alt="course-image">
+                        </a>
+                        <span>All Levels</span>
+                    </div>
+                    <div class="content">
+                        <ul class="info ps-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class="flaticon-open-book"></i>
+                                12 Lessons
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class="flaticon-young-man"></i>
+                                76 Students
+                            </li>
+                        </ul>
+                        <h3>
+                            <a routerLink="/course-details">
+                                The Complete Camtasia Course For Content
+                            </a>
+                        </h3>
+                        <div class="rating d-flex align-items-center">
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bx-star'></i>
+                            <span>(4.0/6 Rating)</span>
+                        </div>
+                        <div class="price">
+                            $123
+                        </div>
+                    </div>
+                    <div class="hover-box">
+                        <h3>
+                            <a routerLink="/course-details">
+                                The Complete Camtasia Course For Content
+                            </a>
+                        </h3>
+                        <span class="sub-title d-block">What you'll learn</span>
+                        <ul class="features-list ps-0 list-unstyled mb-0">
+                            <li>
+                                <i class="flaticon-tick"></i>
+                                Get familiar with almosconcepts of business statistics
+                            </li>
+                            <li>
+                                <i class="flaticon-tick"></i>
+                                Master statistical tools which can be used for data analysis
+                            </li>
+                            <li>
+                                <i class="flaticon-tick"></i>
+                                Master the art of presenting data using different tools
+                            </li>
+                        </ul>
+                        <div class="btn-box d-flex align-items-center">
+                            <button type="button" class="default-btn">Add To Cart</button>
+                            <button type="button" class="fav-btn"><i class="flaticon-heart"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                <div class="single-course-item position-relative">
+                    <div class="image position-relative">
+                        <a routerLink="/course-details" class="d-block">
+                            <img src="assets/images/courses/course15.jpg" alt="course-image">
+                        </a>
+                        <span>Advanced</span>
+                    </div>
+                    <div class="content">
+                        <ul class="info ps-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class="flaticon-open-book"></i>
+                                11 Lessons
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class="flaticon-young-man"></i>
+                                100 Students
+                            </li>
+                        </ul>
+                        <h3>
+                            <a routerLink="/course-details">
+                                Bulding A Better World One Snudent AT A Time
+                            </a>
+                        </h3>
+                        <div class="rating d-flex align-items-center">
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star'></i>
+                            <i class='bx bxs-star-half'></i>
+                            <span>(4.5/5 Rating)</span>
+                        </div>
+                        <div class="price">
+                            $99 <span>$100</span>
+                        </div>
+                    </div>
+                    <div class="hover-box">
+                        <h3>
+                            <a routerLink="/course-details">
+                                Bulding A Better World One Snudent AT A Time
+                            </a>
+                        </h3>
+                        <span class="sub-title d-block">What you'll learn</span>
+                        <ul class="features-list ps-0 list-unstyled mb-0">
+                            <li>
+                                <i class="flaticon-tick"></i>
+                                Get familiar with almosconcepts of business statistics
+                            </li>
+                            <li>
+                                <i class="flaticon-tick"></i>
+                                Master statistical tools which can be used for data analysis
+                            </li>
+                            <li>
+                                <i class="flaticon-tick"></i>
+                                Master the art of presenting data using different tools
+                            </li>
+                        </ul>
+                        <div class="btn-box d-flex align-items-center">
+                            <button type="button" class="default-btn">Add To Cart</button>
+                            <button type="button" class="fav-btn"><i class="flaticon-heart"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Courses Section for Home Demo - 3 -->
+<div
+    class="courses-area ptb-100 d-none"
+    [ngClass]="{'d-block': router.url === '/index-3'}"
+>
+    <div class="container">
+        <div class="courses-tabs">
+            <div class="d-lg-flex align-items-center justify-content-between">
+                <div class="section-title">
+                    <h2 class="mb-0">Explore Top Courses</h2>
+                </div>
+                <ul class="nav style-two nav-tabs d-block border-0">
+                    <li class="nav-item d-inline-block" [ngClass]="{'active': currentTab === 'tab1'}">
+                        <button type="button" class="nav-link shadow-none mb-0 rounded-1" (click)="switchTab($event, 'tab1')">
+                            Web Development
+                        </button>
+                    </li>
+                    <li class="nav-item d-inline-block" [ngClass]="{'active': currentTab === 'tab2'}">
+                        <button type="button" class="nav-link shadow-none mb-0 rounded-1" (click)="switchTab($event, 'tab2')">
+                            Digital Marketing
+                        </button>
+                    </li>
+                    <li class="nav-item d-inline-block" [ngClass]="{'active': currentTab === 'tab3'}">
+                        <button type="button" class="nav-link shadow-none mb-0 rounded-1" (click)="switchTab($event, 'tab3')">
+                            Web Design
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane fade" id="tab1" *ngIf="currentTab === 'tab1'">
+                    <div class="row">
+                        <div class="col-lg-4 col-xl-3 col-sm-6 col-md-6">
+                            <div class="course-item position-relative">
+                                <a routerLink="/course-details" class="d-block image">
+                                    <img src="assets/images/courses/course16.jpg" alt="course-image">
+                                </a>
+                                <div class="content">
+                                    <div class="meta justify-content-between align-items-center d-flex">
+                                        <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                            <img src="assets/images/users/user3.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
+                                            Sydney Phelps
+                                        </a>
+                                        <span>Intermediate</span>
+                                    </div>
+                                    <h3>
+                                        <a routerLink="/course-details">
+                                            The Complete Web Developer Course 3.0
+                                        </a>
+                                    </h3>
+                                    <div class="rating">
+                                        <i class='bx bxs-star'></i>
+                                        5.0 (239 Reviews)
+                                    </div>
+                                    <div class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                        <div class="price">
+                                            $78 <span>$99</span>
+                                        </div>
+                                        <span class="sub-title">4 Months At 5-10 Hrs/ Week</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-3 col-sm-6 col-md-6">
+                            <div class="course-item position-relative">
+                                <a routerLink="/course-details" class="d-block image">
+                                    <img src="assets/images/courses/course17.jpg" alt="course-image">
+                                </a>
+                                <div class="content">
+                                    <div class="meta justify-content-between align-items-center d-flex">
+                                        <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                            <img src="assets/images/users/user2.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
+                                            Alina Smith
+                                        </a>
+                                        <span>Intermediate</span>
+                                    </div>
+                                    <h3>
+                                        <a routerLink="/course-details">
+                                            Learn Python Programming Masterclass
+                                        </a>
+                                    </h3>
+                                    <div class="rating">
+                                        <i class='bx bxs-star'></i>
+                                        5.0 (239 Reviews)
+                                    </div>
+                                    <div class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                        <div class="price">
+                                            $99 <span>$119</span>
+                                        </div>
+                                        <span class="sub-title">5 Months At 1-2 Hrs/ Week</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-3 col-sm-6 col-md-6">
+                            <div class="course-item position-relative">
+                                <a routerLink="/course-details" class="d-block image">
+                                    <img src="assets/images/courses/course18.jpg" alt="course-image">
+                                </a>
+                                <div class="content">
+                                    <div class="meta justify-content-between align-items-center d-flex">
+                                        <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                            <img src="assets/images/users/user1.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
+                                            David Warner
+                                        </a>
+                                        <span>Advanced</span>
+                                    </div>
+                                    <h3>
+                                        <a routerLink="/course-details">
+                                            Complete C# Unity Game Developer 2D
+                                        </a>
+                                    </h3>
+                                    <div class="rating">
+                                        <i class='bx bxs-star'></i>
+                                        4.5 (100 Reviews)
+                                    </div>
+                                    <div class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                        <div class="price">
+                                            $54 <span>$76</span>
+                                        </div>
+                                        <span class="sub-title">5 Months At 2-4 Hrs/ Week</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-3 col-sm-6 col-md-6">
+                            <div class="course-item position-relative">
+                                <a routerLink="/course-details" class="d-block image">
+                                    <img src="assets/images/courses/course19.jpg" alt="course-image">
+                                </a>
+                                <div class="content">
+                                    <div class="meta justify-content-between align-items-center d-flex">
+                                        <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                            <img src="assets/images/users/user4.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
+                                            James Andy
+                                        </a>
+                                        <span>Beginner</span>
+                                    </div>
+                                    <h3>
+                                        <a routerLink="/course-details">
+                                            JavaScript: Understanding the Weird Parts
+                                        </a>
+                                    </h3>
+                                    <div class="rating">
+                                        <i class='bx bxs-star'></i>
+                                        4.0 (201 Reviews)
+                                    </div>
+                                    <div class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                        <div class="price">
+                                            $99
+                                        </div>
+                                        <span class="sub-title">3 Months At 1-1 Hrs/ Week</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab2" *ngIf="currentTab === 'tab2'">
+                    <div class="row">
+                        <div class="col-lg-4 col-xl-3 col-sm-6 col-md-6">
+                            <div class="course-item position-relative">
+                                <a routerLink="/course-details" class="d-block image">
+                                    <img src="assets/images/courses/course18.jpg" alt="course-image">
+                                </a>
+                                <div class="content">
+                                    <div class="meta justify-content-between align-items-center d-flex">
+                                        <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                            <img src="assets/images/users/user1.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
+                                            David Warner
+                                        </a>
+                                        <span>Advanced</span>
+                                    </div>
+                                    <h3>
+                                        <a routerLink="/course-details">
+                                            Complete C# Unity Game Developer 2D
+                                        </a>
+                                    </h3>
+                                    <div class="rating">
+                                        <i class='bx bxs-star'></i>
+                                        4.5 (100 Reviews)
+                                    </div>
+                                    <div class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                        <div class="price">
+                                            $54 <span>$76</span>
+                                        </div>
+                                        <span class="sub-title">5 Months At 2-4 Hrs/ Week</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-3 col-sm-6 col-md-6">
+                            <div class="course-item position-relative">
+                                <a routerLink="/course-details" class="d-block image">
+                                    <img src="assets/images/courses/course19.jpg" alt="course-image">
+                                </a>
+                                <div class="content">
+                                    <div class="meta justify-content-between align-items-center d-flex">
+                                        <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                            <img src="assets/images/users/user4.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
+                                            James Andy
+                                        </a>
+                                        <span>Beginner</span>
+                                    </div>
+                                    <h3>
+                                        <a routerLink="/course-details">
+                                            JavaScript: Understanding the Weird Parts
+                                        </a>
+                                    </h3>
+                                    <div class="rating">
+                                        <i class='bx bxs-star'></i>
+                                        4.0 (201 Reviews)
+                                    </div>
+                                    <div class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                        <div class="price">
+                                            $99
+                                        </div>
+                                        <span class="sub-title">3 Months At 1-1 Hrs/ Week</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="tab3" *ngIf="currentTab === 'tab3'">
+                    <div class="row">
+                        <div class="col-lg-4 col-xl-3 col-sm-6 col-md-6">
+                            <div class="course-item position-relative">
+                                <a routerLink="/course-details" class="d-block image">
+                                    <img src="assets/images/courses/course18.jpg" alt="course-image">
+                                </a>
+                                <div class="content">
+                                    <div class="meta justify-content-between align-items-center d-flex">
+                                        <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                            <img src="assets/images/users/user1.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
+                                            David Warner
+                                        </a>
+                                        <span>Advanced</span>
+                                    </div>
+                                    <h3>
+                                        <a routerLink="/course-details">
+                                            Complete C# Unity Game Developer 2D
+                                        </a>
+                                    </h3>
+                                    <div class="rating">
+                                        <i class='bx bxs-star'></i>
+                                        4.5 (100 Reviews)
+                                    </div>
+                                    <div class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                        <div class="price">
+                                            $54 <span>$76</span>
+                                        </div>
+                                        <span class="sub-title">5 Months At 2-4 Hrs/ Week</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-3 col-sm-6 col-md-6">
+                            <div class="course-item position-relative">
+                                <a routerLink="/course-details" class="d-block image">
+                                    <img src="assets/images/courses/course17.jpg" alt="course-image">
+                                </a>
+                                <div class="content">
+                                    <div class="meta justify-content-between align-items-center d-flex">
+                                        <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                            <img src="assets/images/users/user2.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
+                                            Alina Smith
+                                        </a>
+                                        <span>Intermediate</span>
+                                    </div>
+                                    <h3>
+                                        <a routerLink="/course-details">
+                                            Learn Python Programming Masterclass
+                                        </a>
+                                    </h3>
+                                    <div class="rating">
+                                        <i class='bx bxs-star'></i>
+                                        5.0 (239 Reviews)
+                                    </div>
+                                    <div class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                        <div class="price">
+                                            $99 <span>$119</span>
+                                        </div>
+                                        <span class="sub-title">5 Months At 1-2 Hrs/ Week</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-xl-3 col-sm-6 col-md-6">
+                            <div class="course-item position-relative">
+                                <a routerLink="/course-details" class="d-block image">
+                                    <img src="assets/images/courses/course19.jpg" alt="course-image">
+                                </a>
+                                <div class="content">
+                                    <div class="meta justify-content-between align-items-center d-flex">
+                                        <a routerLink="/instructor-profile" class="user d-flex align-items-center">
+                                            <img src="assets/images/users/user4.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
+                                            James Andy
+                                        </a>
+                                        <span>Beginner</span>
+                                    </div>
+                                    <h3>
+                                        <a routerLink="/course-details">
+                                            JavaScript: Understanding the Weird Parts
+                                        </a>
+                                    </h3>
+                                    <div class="rating">
+                                        <i class='bx bxs-star'></i>
+                                        4.0 (201 Reviews)
+                                    </div>
+                                    <div class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
+                                        <div class="price">
+                                            $99
+                                        </div>
+                                        <span class="sub-title">3 Months At 1-1 Hrs/ Week</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="courses-btn text-center">
+            <a routerLink="/courses-grid" class="default-btn two">View All Courses</a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,32 @@
+<!-- Page Banner -->
+<div
+    class="page-banner-area ptb-100"
+    style="background-image: url(assets/images/shapes/page-banner-bg.jpg);"
+>
+    <div class="container">
+        <div class="page-banner-content text-center">
+            <h1>Frequently Asked Questions</h1>
+            <ul class="ps-0 mb-0 list-unstyled">
+                <li class="d-inline-block position-relative"><a routerLink="/">Home</a></li>
+                <li class="d-inline-block position-relative">FAQ</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-area ptb-100">
+    <div class="container">
+        <div class="faq-content">
+            <div class="faq-item" *ngFor="let item of accordionItems; let i = index;">
+                <div class="faq-header" (click)="toggleAccordionItem(item)">
+                    {{item.title}}
+                    <i class='bx' [ngClass]="{'bx-chevron-down': !item.open, 'bx-chevron-up': item.open}"></i>
+                </div>
+                <div class="faq-content" [hidden]="!item.open">
+                    <p>{{item.content}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

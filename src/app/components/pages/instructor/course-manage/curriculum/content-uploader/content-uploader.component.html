@@ -1,0 +1,39 @@
+<div class="align-items-center d-flex flex-column gap-3 w-100 position-relative"
+    style="border-top:1px solid; padding: 11px 8px;">
+    
+    <div class="align-items-center d-flex p-1 position-absolute uploader-header">
+        {{ title }}
+        <i (click)="closeUploader()" class="bx bx-x fs-5"></i>
+    </div>
+
+    <ng-container *ngIf="state === 'select'">
+        <div>Ana içerik türünü seçin</div>
+        <div class="content-type-container d-flex gap-3">
+            <div (click)="showUploadForm('video')" class="content-type">
+                <i class="bx bx-sm bx-video-plus"></i>
+                Video
+            </div>
+            <div (click)="showUploadForm('pdf')" class="content-type">
+                <i class="bx bx-sm bx-file"></i>
+                PDF
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="state === 'upload'">
+        <div class="d-flex flex-column w-100 gap-2">
+            <input
+                #fileInput
+                class="form-control"
+                type="file"
+                id="formFile"
+                (change)="onFileChanged($event)"
+            />
+
+            <div class="d-flex gap-2 justify-content-end">
+                <button class="btn btn-outline-dark btn-sm me-1" (click)="upload()">Kaydet</button>
+            </div>
+        </div>
+    </ng-container>
+
+</div>

@@ -1,0 +1,30 @@
+.what-you-will-learn-wrapper {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.16);
+
+}
+
+.actions,
+.form-actions {
+  i:hover {
+    cursor: pointer;
+  }
+}
+
+.actions {
+  visibility: hidden;
+}
+
+.what-you-will-learn-item {
+  background: transparent;
+  transition: background-color 0.3s;
+  border-radius: 4px;
+}
+
+.what-you-will-learn-item:hover {
+  background: #f5f5f5;
+
+  .actions {
+    visibility: visible;
+
+  }
+}

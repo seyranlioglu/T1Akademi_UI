@@ -1,0 +1,51 @@
+<div class="profile-authentication-area ptb-100 d-flex flex-row-reverse pt-0">
+    <div class="container">
+        <div class="d-flex justify-content-center align-items-center">
+            <img src="../../../../assets/images/logos/t1-logo-text.png" alt=""
+                style="width: 300px;height: max-content;">
+        </div>
+        <div class="align-items-center d-flex justify-content-center row">
+            <div class="col-lg-8 col-md-12 d-flex justify-content-center login-card p-5" data-aos="fade-in"
+                data-aos-duration="1000" data-aos-delay="100">
+                <div class="login-form col-8">
+                    <h2>Giriş Yap</h2>
+                    <form [formGroup]="loginForm" (ngSubmit)="submit()">
+                        <div class="form-group">
+                            <label>Mail Adresi</label>
+                            <input type="text" formControlName="userName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Şifre</label>
+                            <input type="password" formControlName="password" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Doğrulama Yöntemi</label>
+                            <div class="select-box">
+                                <select formControlName="type">
+                                    <option [ngValue]="0">Mail</option>
+                                    <option [ngValue]="1">SMS</option>
+                                </select>
+                            </div>
+
+                        </div>
+
+                        <button type="submit" class="default-btn">
+                            <ng-container *ngIf="isLoading$ | async">
+                                <span class="indicator-progress" [style.display]="'block'">
+                                    Lütfen Bekleyin
+                                    <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                </span>
+                            </ng-container>
+                            <ng-container *ngIf="(isLoading$ | async) === false">
+                                <span class="indicator-label">Giriş Yap</span>
+                            </ng-container>
+                        </button>
+                        <a routerLink="/auth/forgot-password" class="forgot-password">Şifrenizi mi unuttunuz?</a>
+                        <div class="mt-5">Hesabınız yok mu? <a routerLink="/auth/register" class="forgot-password">Kayıt
+                                olun</a></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

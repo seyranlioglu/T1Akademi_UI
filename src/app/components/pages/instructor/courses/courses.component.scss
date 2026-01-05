@@ -1,0 +1,101 @@
+.courses-wrapper {
+    margin-left: 30px;
+}
+.course-card {
+    display: flex;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    background-color: var(--whiteColor);
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    cursor: pointer;
+
+    .card-image {
+        overflow: hidden;
+        position: relative;
+        width: 8.8rem;
+        height: 100%;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+
+    .card-body {
+        padding: 10px;
+    }
+}
+
+.page-title {
+    margin: 0.8rem 0 3.2rem 0;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+
+    .default-btn {
+        border: 0;
+        cursor: pointer;
+        border-radius: 5px;
+        padding: 13px 30px;
+        display: inline-block;
+        color: var(--whiteColor);
+        transition: var(--transition);
+        background-color: var(--primaryColor);
+        font-size: var(--fontSize);
+        font-weight: 600;
+    }
+
+    .search-box {
+        width: 320px;
+        position: relative;
+
+        .form-control {
+            height: 50px;
+            padding-left: 20px;
+            border-radius: 5px;
+            color: var(--blackColor);
+            font-size: var(--fontSize);
+            border: 1px solid var(--borderColor);
+
+            &::placeholder {
+                color: var(--bodyColor);
+                transition: var(--transition);
+            }
+
+            &:focus {
+                &::placeholder {
+                    color: transparent;
+                }
+            }
+        }
+
+        button {
+            top: 5px;
+            border: 0;
+            right: 5px;
+            padding: 0;
+            bottom: 5px;
+            width: 40px;
+            font-size: 22px;
+            position: absolute;
+            border-radius: 5px;
+            color: var(--whiteColor);
+            transition: var(--transition);
+            background-color: var(--primaryColor);
+
+            i {
+                left: 0;
+                right: 0;
+                top: 50%;
+                line-height: 1;
+                margin-top: 1px;
+                position: absolute;
+                transform: translateY(-50%);
+            }
+
+            &:hover {
+                background-color: var(--secondaryColor);
+                color: var(--whiteColor);
+            }
+        }
+    }
+}

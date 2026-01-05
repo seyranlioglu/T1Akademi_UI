@@ -1,0 +1,43 @@
+<!-- Default Featured Section -->
+<div
+    class="featured-area pt-100 pb-75"
+    [ngClass]="{'d-none': router.url === '/index-2' || router.url === '/index-3'}"
+>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-6" *ngFor="let content of featuredBox;">
+                <div class="featured-box position-relative">
+                    <div class="icon text-center rounded-circle">
+                        <img [src]="content.icon" alt="icon-gif">
+                    </div>
+                    <h4 class="mb-0">{{content.title}}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Section for Home Demo - 2 -->
+<div
+    class="featured-area style-two pt-100 pb-75 d-none"
+    [ngClass]="{'d-block': router.url === '/index-2' || router.url === '/index-3'}"
+>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-3 col-md-6 col-sm-6 col-6" *ngFor="let content of featuredBox;">
+                <div class="featured-box position-relative">
+                    <div class="icon text-center rounded-circle">
+                        <img [src]="content.icon" alt="icon-gif">
+                    </div>
+                    <h4 class="mb-0">{{content.title}}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="featured-shape1 d-none d-lg-block">
+        <img src="assets/images/shapes/shape6.png" alt="featured-shape">
+    </div>
+    <div class="featured-shape2 d-none d-lg-block">
+        <img src="assets/images/shapes/shape7.png" alt="featured-shape">
+    </div>
+</div>

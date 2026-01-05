@@ -1,0 +1,13 @@
+<div class="overview-area pb-75">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-12" *ngFor="let content of overviewBox;">
+                <div class="overview-item" style="background-image: url({{content.bgImage}});">
+                    <span class="sub-title">{{content.subTitle}}</span>
+                    <h3>{{content.title}}</h3>
+                    <a routerLink="{{content.buttonLink}}" class="default-btn">{{content.buttonText}}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

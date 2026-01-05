@@ -1,0 +1,150 @@
+.subscribe-area {
+    border-radius: 100px 100px 0 0;
+    position: relative;
+    z-index: 1;
+    background: {
+        color: var(--blackColor);
+        image: url(../../../../assets/images/bg/bg1.jpg);
+        position: center center;
+        repeat: no-repeat;
+        size: cover;
+    };
+}
+.subscribe-content {
+    h2 {
+        color: var(--whiteColor);
+        line-height: 1.3;
+        font: {
+            size: 35px;
+            weight: 700;
+        };
+    }
+}
+.subscribe-box {
+    position: relative;
+    padding-left: 50px;
+
+    .form-control {
+        height: 70px;
+        font-size: 16px;
+        border-radius: 5px;
+        padding-left: 20px;
+        color: var(--whiteColor);
+        background-color: #3b3c6b;
+        transition: var(--transition);
+        border: 1px solid rgba(255, 255, 255, 0.24);
+
+        &::placeholder {
+            color: #d2d2d2;
+            transition: var(--transition);
+        }
+        &:focus {
+            border-color: var(--whiteColor);
+
+            &::placeholder {
+                color: transparent;
+            }
+        }
+    }
+    .default-btn {
+        top: 5px;
+        right: 5px;
+        bottom: 5px;
+        position: absolute;
+    }
+}
+
+/* Max width 767px */
+@media only screen and (max-width : 767px) {
+
+    .subscribe-area {
+        border-radius: 0;
+    }
+    .subscribe-content {
+        margin-bottom: 20px;
+
+        h2 {
+            font-size: 22px;
+        }
+    }
+    .subscribe-box {
+        padding-left: 0;
+    
+        .form-control {
+            height: 50px;
+            font-size: 14px;
+            padding-left: 15px;
+        }
+        .default-btn {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            margin-top: 15px;
+            position: relative;
+        }
+    }
+
+}
+
+/* Min width 576px to Max width 767px */
+@media only screen and (min-width : 576px) and (max-width : 767px) {}
+
+/* Min width 768px to Max width 991px */
+@media only screen and (min-width : 768px) and (max-width : 991px) {
+
+    .subscribe-area {
+        border-radius: 50px 50px 0 0;
+    }
+    .subscribe-content {
+        margin-bottom: 25px;
+
+        h2 {
+            font-size: 26px;
+        }
+    }
+    .subscribe-box {
+        padding-left: 0;
+    
+        .form-control {
+            height: 58px;
+            font-size: 15px;
+            padding-left: 18px;
+        }
+    }
+
+}
+
+/* Min width 992px to Max width 1199px */
+@media only screen and (min-width : 992px) and (max-width : 1199px) {
+
+    .subscribe-area {
+        border-radius: 70px 70px 0 0;
+    }
+    .subscribe-content {
+        h2 {
+            font-size: 28px;
+        }
+    }
+    .subscribe-box {
+        padding-left: 25px;
+    
+        .form-control {
+            height: 62px;
+            font-size: 15px;
+            padding-left: 18px;
+        }
+    }
+
+}
+
+/* Min width 1200px to Max width 1399px */
+@media only screen and (min-width: 1200px) and (max-width: 1399px) {}
+
+/* Min width 1600px */
+@media only screen and (min-width: 1600px) {
+
+    .subscribe-area {
+        border-radius: 190px 190px 0 0;
+    }
+
+}

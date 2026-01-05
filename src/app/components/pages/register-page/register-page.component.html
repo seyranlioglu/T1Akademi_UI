@@ -1,0 +1,137 @@
+<div class="profile-authentication-area ptb-100">
+    <div class="container">
+        <div class="d-flex justify-content-center align-items-center">
+            <img src="../../../../assets/images/logos/t1-logo-text.png" alt=""
+                style="width: 300px;height: max-content;">
+        </div>
+        <div class="align-items-center d-flex justify-content-center row">
+            <div class="col-lg-8 col-md-12 d-flex justify-content-center register-card p-5 flex-column"
+                data-aos="fade-in" data-aos-duration="1000" data-aos-delay="100">
+                <div class="register-form ">
+                    <h2>Hesap Oluştur</h2>
+                    <form [formGroup]="registerForm" (ngSubmit)="submit()">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Mail Adresi</label>
+                                    <input type="text" class="form-control" formControlName="email" required>
+
+                                    <div *ngIf="registerForm.get('email')?.errors?.['required'] && (registerForm.get('email')?.dirty || registerForm.get('email')?.touched)"
+                                        class="error-message p-1">
+                                        Doldurulması zorunlu alan
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ad</label>
+                                    <input type="text" class="form-control" formControlName="name" required>
+
+                                    <div *ngIf="registerForm.get('name')?.errors?.['required'] && (registerForm.get('name')?.dirty || registerForm.get('name')?.touched)"
+                                        class="error-message p-1">
+                                        Doldurulması zorunlu alan
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Soyadı</label>
+                                    <input type="text" class="form-control" formControlName="surname">
+
+                                    <div *ngIf="registerForm.get('surname')?.errors?.['required'] && (registerForm.get('surname')?.dirty || registerForm.get('surname')?.touched)"
+                                        class="error-message p-1">
+                                        Doldurulması zorunlu alan
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ünvan</label>
+                                    <input type="text" class="form-control" formControlName="title">
+
+                                    <div *ngIf="registerForm.get('title')?.errors?.['required'] && (registerForm.get('title')?.dirty || registerForm.get('title')?.touched)"
+                                        class="error-message p-1">
+                                        Doldurulması zorunlu alan
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Adres</label>
+                                    <input type="text" class="form-control" formControlName="address">
+
+                                    <div *ngIf="registerForm.get('address')?.errors?.['required'] && (registerForm.get('address')?.dirty || registerForm.get('address')?.touched)"
+                                        class="error-message p-1">
+                                        Doldurulması zorunlu alan
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label>Telefon No</label>
+                                    <input type="text" class="form-control" formControlName="phoneNumber">
+
+                                    <div *ngIf="registerForm.get('phoneNumber')?.errors?.['required'] && (registerForm.get('phoneNumber')?.dirty || registerForm.get('phoneNumber')?.touched)"
+                                        class="error-message p-1">
+                                        Doldurulması zorunlu alan
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Vergi Numarası</label>
+                                    <input type="text" class="form-control" formControlName="taxNumber">
+
+                                    <div *ngIf="registerForm.get('taxNumber')?.errors?.['required'] && (registerForm.get('taxNumber')?.dirty || registerForm.get('taxNumber')?.touched)"
+                                        class="error-message p-1">
+                                        Doldurulması zorunlu alan
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>TC Kimlik No</label>
+                                    <input type="text" class="form-control" formControlName="identityNumber">
+
+                                    <div *ngIf="registerForm.get('identityNumber')?.errors?.['required'] && (registerForm.get('identityNumber')?.dirty || registerForm.get('identityNumber')?.touched)"
+                                        class="error-message p-1">
+                                        Doldurulması zorunlu alan
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Posta Kodu</label>
+                                    <input type="text" class="form-control" formControlName="postalCode">
+
+                                    <div *ngIf="registerForm.get('postalCode')?.errors?.['required'] && (registerForm.get('postalCode')?.dirty || registerForm.get('postalCode')?.touched)"
+                                        class="error-message p-1">
+                                        Doldurulması zorunlu alan
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Hesap Tipi</label>
+                                    <select formControlName="currAccTypeId">
+                                        <option *ngFor="let type of currAccTypeList" [ngValue]="type.id"> {{type.title}}
+                                        </option>
+                                    </select>
+                                    <div *ngIf="registerForm.get('currAccTypeId')?.errors?.['required'] && (registerForm.get('currAccTypeId')?.dirty || registerForm.get('currAccTypeId')?.touched)"
+                                        class="error-message p-1">
+                                        Doldurulması zorunlu alan
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="d-grid mb-10">
+                                <button type="submit" class="btn btn-primary default-btn"
+                                    [disabled]="registerForm.invalid">
+                                    <ng-container *ngIf="isLoading$ | async">
+                                        <span class="indicator-progress" [style.display]="'block'">
+                                            Lütfen Bekleyin
+                                            <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+                                        </span>
+                                    </ng-container>
+                                    <ng-container *ngIf="(isLoading$ | async) === false">
+                                        <span class="indicator-label">Kayıt Ol</span>
+                                    </ng-container>
+                                </button>
+                            </div>
+
+                            <!-- <button type="submit" [disabled]="registerForm.invalid"
+                            class="btn btn-primary default-btn">Kayıt Ol</button> -->
+
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

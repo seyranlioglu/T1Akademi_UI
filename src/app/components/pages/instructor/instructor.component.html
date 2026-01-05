@@ -1,0 +1,73 @@
+<div class="instructor-page">
+    <div class="sidenav" *ngIf="(router.url.indexOf('/instructor/course-manage')<0)"
+        [ngClass]="{'expanded': isHovered || (isSmallScreen && isSidebarOpen), 'hidden': isSmallScreen && !isSidebarOpen}"
+        (mouseenter)="isHovered = true" (mouseleave)="isHovered = false">
+        <ul class="sidenav-menu">
+            <li>
+                <a routerLink="/">
+                    <span class="icon"><img src="../../../../assets/images/logos/t1-logo-red.png" alt=""></span>
+                    <span class="title fs-3 mt-2">Akademi</span>
+                </a>
+            </li>
+            <li class="position-relative">
+                <div [ngClass]="{'indicator': (router.url.indexOf('/instructor/courses')>-1)}"></div>
+                <a routerLink="/instructor/courses">
+                    <i class="bx bx-desktop icon"></i>
+                    <span class="title">Eğitimler</span>
+                </a>
+            </li>
+            <!-- <li class="position-relative">
+                <div [ngClass]="{'indicator': (router.url.indexOf('/instructor/performance')>-1)}"></div>
+                <a routerLink="/instructor/performance">
+                    <i class="bx bx-bar-chart-alt-2 icon"></i>
+                    <span class="title">Performans</span>
+                </a>
+            </li>
+            <li class="position-relative">
+                <div [ngClass]="{'indicator': (router.url.indexOf('/instructor/settings')>-1)}"></div>
+                <a routerLink="/instructor/settings">
+                    <i class="bx bx-cog icon"></i>
+                    <span class="title">Ayarlar</span>
+                </a>
+            </li> -->
+        </ul>
+    </div>
+
+    <div *ngIf="isSmallScreen && isSidebarOpen" class="overlay" (click)="isSidebarOpen = false"></div>
+
+    <!-- <div class="topbar px-3 py-2" *ngIf="!isSmallScreen">
+        <div class="topbar-right">
+            <button class="notification-btn">
+                <i class="bx bx-bell"></i>
+            </button>
+            <button class="user-menu-btn">
+                <i class="bx bx-user"></i>
+            </button>
+        </div>
+    </div> -->
+
+    <div class="mobile-topbar" *ngIf="isSmallScreen || (router.url.indexOf('/instructor/course-manage')>-1)">
+        <ng-container *ngIf="(router.url.indexOf('/instructor/course-manage')>-1)">
+            <div class="d-flex align-items-end" style="cursor: pointer; color: white;">
+                <div class="d-flex" routerLink="/instructor/courses">
+                    <i class="bx bx-left-arrow-alt icon"></i>
+                    Geri Dön
+                </div>
+                <div class="fw-bold ms-3">{{ currentCourse?.title}}</div>
+            </div>
+            <button class="btn btn-secondary ms-auto px-2 py-1"
+                (click)="router.navigate(['/course/'+currentCourse.id+'/watch']);">
+                Ön İzleme
+            </button>
+        </ng-container>
+
+        <button *ngIf="(router.url.indexOf('/instructor/course-manage')<0)" class="hamburger-btn"
+            (click)="isSidebarOpen = true">
+            <i class="bx bx-menu"></i>
+        </button>
+    </div>
+
+    <div class="content">
+        <router-outlet></router-outlet>
+    </div>
+</div>

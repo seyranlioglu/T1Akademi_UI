@@ -1,0 +1,60 @@
+<form [formGroup]="newCourseForm" class="searchUserForm" (ngSubmit)="submit()"
+    (keydown.enter)="$event.preventDefault()">
+    <div class="modal-header justify-content-between">
+        <h4 class="modal-title">Yeni Eğitim</h4>
+        <button type="button" class="close btn-close" aria-label="Close" (click)="activeModal.dismiss()">
+        </button>
+    </div>
+
+    <div class="modal-body scrollable-body">
+        <div class="row mb-4">
+            <label class="col-lg-4 col-form-label required fw-medium fs-6">Başlık</label>
+            <div class="col-lg-5 fv-row">
+                <div class="search-box">
+                    <input formControlName="title" class="form-control shadow-none" type="text">
+                </div>
+
+                <ng-container *ngIf="(controls['title'].dirty || controls['title'].touched)">
+                    <div *ngIf="controls['title'].errors?.['required']" class="error-message p-1">
+                        Doldurulması zorunlu alan
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <label class="col-lg-4 col-form-label required fw-medium fs-6">Kategori</label>
+            <div class="col-lg-5 fv-row">
+                <select formControlName="categoryId">
+                    <option *ngFor="let category of courseCategoryList" [ngValue]="category?.id">
+                        {{category?.title}}
+                    </option>
+                </select>
+                <div *ngIf="controls['categoryId'].errors && (controls['categoryId'].dirty || controls['categoryId'].touched)"
+                    class="error-message p-1">
+                    Doldurulması zorunlu alan
+                </div>
+            </div>
+        </div>
+        <div *ngIf="newCourseForm.get('categoryId')?.value" class="row mb-4">
+            <label class="col-lg-4 col-form-label required fw-medium fs-6">Alt Kategori</label>
+            <div class="col-lg-5 fv-row">
+                <select  formControlName="subCategoryId">
+                    <option [ngValue]="null">- - Alt Kategori Seçin - -</option>
+                    <option *ngFor="let subCategory of courseSubCategoryList" [ngValue]="subCategory?.id">
+                      {{subCategory?.title}}
+                    </option>
+                  </select>
+                <div *ngIf="controls['subCategoryId'].errors && (controls['subCategoryId'].dirty || controls['subCategoryId'].touched)"
+                    class="error-message p-1">
+                    Doldurulması zorunlu alan
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">
+            Kaydet
+        </button>
+    </div>
+</form>

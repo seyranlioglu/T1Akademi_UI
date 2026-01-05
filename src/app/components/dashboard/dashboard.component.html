@@ -1,0 +1,88 @@
+<!-- Dashboard -->
+<div class="dashboard-area ptb-100">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-12">
+                <div class="dashboard-sidebar">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+                                routerLink="/dashboard">
+                                <i class="bx bx-home"></i>
+                                Ana Sayfa
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+                                routerLink="/dashboard/my-profile">
+                                <i class="bx bx-user"></i>
+                                Profil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+                                routerLink="/dashboard/edit-profile">
+                                <i class='bx bx-user-plus'></i>
+                                Profili Düzenle
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+                                routerLink="/dashboard/active-courses">
+                                <i class="bx bx-book"></i>
+                                Eğitimlerim
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+                                routerLink="/dashboard/completed-courses">
+                                <i class="bx bxs-book-bookmark"></i>
+                                Tamamlanan Eğitimlerim
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-12">
+                <ng-container *ngIf="(router.url === '/dashboard'); else elseBlock">
+
+                    <div class="row">
+                        <div *ngFor="let course of courseList" class="col-lg-6 col-xl-4 col-sm-6 col-md-6">
+                            <div class="single-course-item position-relative">
+                                <div class="image position-relative">
+                                    <a [routerLink]="'/course/'+course.id" class="d-block">
+                                        <img [src]="course.courseImage ?? 'https://angular.hibootstrap.com/toledo/assets/images/courses/course8.jpg'"
+                                            alt="course-image">
+                                    </a>
+                                    <!-- <span class="price">$19</span> -->
+                                </div>
+                                <div class="content">
+                                    <div class="meta justify-content-between align-items-center d-flex">
+                                        <a class="user d-flex align-items-center">
+                                            <img [src]="course.instructorPicturePath ?? 'assets/images/users/user3.jpg'"
+                                                width="30" height="30" class="rounded-circle" alt="user-image"
+                                                style="width: 30px;height: 30px;">
+                                            {{course.instructorTitle|| 'Eğitmen Bilgisi Yok'}}
+                                        </a>
+                                    </div>
+                                    <h3>
+                                        <a [routerLink]="'/course/'+course.id">
+                                            {{course.title}}
+                                        </a>
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </ng-container>
+                <ng-template #elseBlock>
+                    <router-outlet></router-outlet>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>

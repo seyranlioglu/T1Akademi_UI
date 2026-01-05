@@ -1,0 +1,45 @@
+.not-found-area {
+    .not-found-content {
+        img {
+            margin-bottom: 45px;
+        }
+        h4 {
+            margin-bottom: 30px;
+            font-size: 22px;
+        }
+    }
+}
+
+/* Max width 767px */
+@media only screen and (max-width : 767px) {
+
+    .not-found-area {
+        .not-found-content {
+            img {
+                margin-bottom: 30px;
+            }
+            h4 {
+                margin-bottom: 20px;
+                font-size: 18px;
+            }
+        }
+    }
+
+}
+
+/* Min width 768px to Max width 991px */
+@media only screen and (min-width : 768px) and (max-width : 991px) {
+
+    .not-found-area {
+        .not-found-content {
+            img {
+                margin-bottom: 35px;
+            }
+            h4 {
+                margin-bottom: 25px;
+                font-size: 20px;
+            }
+        }
+    }
+
+}

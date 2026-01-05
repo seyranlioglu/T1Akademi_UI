@@ -1,0 +1,39 @@
+<!-- Page Banner -->
+<div
+    class="page-banner-area ptb-100"
+    style="background-image: url(assets/images/shapes/page-banner-bg.jpg);"
+>
+    <div class="container">
+        <div class="page-banner-content text-center">
+            <h1>Testimonials</h1>
+            <ul class="ps-0 mb-0 list-unstyled">
+                <li class="d-inline-block position-relative"><a routerLink="/">Home</a></li>
+                <li class="d-inline-block position-relative">Testimonials</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Testimonials -->
+<div class="feedback-area pt-100 pb-75">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-6" *ngFor="let content of feedbackBox;">
+                <div class="single-feedback-box">
+                    <img src="assets/images/quote.svg" class="quote" alt="quote-image">
+                    <div class="user-info d-flex align-items-start">
+                        <img [src]="content.userImg" width="70" class="rounded-circle" alt="user-image">
+                        <div class="title">
+                            <h4>{{content.userName}}</h4>
+                            <span>{{content.userDesignation}}</span>
+                            <div class="rating">
+                                <i class='{{item.icon}}' *ngFor="let item of content.rating"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p>{{content.description}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

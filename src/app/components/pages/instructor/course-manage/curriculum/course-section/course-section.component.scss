@@ -1,0 +1,35 @@
+.section {
+    border: 1px solid;
+    background: #ededed;
+
+    i:not(.sort) {
+        cursor: pointer;
+    }
+
+    .actions {
+        visibility: hidden;
+    }
+
+    .section-header {
+        cursor: move;
+
+        &:hover {
+            .actions {
+                visibility: visible;
+
+            }
+        }
+    }
+
+    .new-content-selector {
+        display: flex;
+        padding: 7px 7px;
+        background: white;
+        border: 1px dashed;
+    }
+
+    .new-content-form {
+        background-color: white;
+        border: 1px solid;
+    }
+}

@@ -1,0 +1,19 @@
+<div class="subscribe-area ptb-100">
+    <div class="container">
+        <div class="row align-items-center" *ngFor="let content of subscribe;">
+            <div class="col-lg-5 col-md-12">
+                <div class="subscribe-content">
+                    <h2 class="mb-0">{{content.title}}</h2>
+                </div>
+            </div>
+            <div class="col-lg-7 col-md-12">
+                <div class="subscribe-box">
+                    <form>
+                        <input type="text" class="form-control shadow-none" placeholder="{{content.placeholderText}}">
+                        <button type="submit" class="default-btn">{{content.buttonText}}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

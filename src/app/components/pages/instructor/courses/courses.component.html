@@ -1,0 +1,26 @@
+<div class="courses-wrapper">
+    <h3 class="page-title">Eğitimler</h3>
+
+    <div class="toolbar mb-4">
+        <form class="search-box">
+            <input class="form-control shadow-none" type="text" placeholder="Eğitimlerinizi arayın" [(ngModel)]="searchTerm"
+                (ngModelChange)="searchCourses()"  [ngModelOptions]="{standalone: true}">
+            <!-- <button type="submit">
+                <i class="flaticon-search"></i>
+            </button> -->
+        </form>
+
+        <button type="text" class="default-btn" (click)="openNewCoursePopup()">Yeni Eğitim</button>
+    </div>
+
+
+    <div *ngFor="let course of shownCourses;" class="course-card" (click)="redirectToCourseManage(course)"
+        (mouseenter)="isHovered = true" (mouseleave)="isHovered = false">
+        <div class="card-image"><img [src]="course.img || 'https://angular.hibootstrap.com/toledo/assets/images/courses/course8.jpg'" alt="">
+        </div>
+        <div class="card-body">
+            <div class="card-title">{{course.title}}</div>
+        </div>
+    </div>
+
+</div>

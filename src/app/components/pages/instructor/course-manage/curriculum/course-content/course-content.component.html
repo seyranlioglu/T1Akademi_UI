@@ -1,0 +1,58 @@
+<div class="content d-flex flex-column ">
+    <div class="content-header d-flex w-100 align-items-center">
+        <div *ngIf="!isTitleEditorVisible" class="me-1">{{data.contentType.code==='lec' ? 'Ders' : 'Sınav'}} {{data.globalIndex}}:</div>
+        <div *ngIf="!isTitleEditorVisible" class="content-title">{{data.title}}</div>
+        <div *ngIf="isTitleEditorVisible" class="d-flex flex-column w-100 gap-2">
+            <div class="d-flex">
+                <div class="align-content-center me-2" style="white-space: nowrap;">{{data.contentType.code==='lec' ?
+                    'Ders' : 'Sınav'}} {{data.globalIndex}}:</div>
+                <input class="form-control form-control-sm shadow-none" [(ngModel)]="contentTitle" type="text">
+            </div>
+            <div class="d-flex gap-2 justify-content-end">
+                <button class="btn btn-sm " (click)="toggleTitleEditor()">İptal</button>
+                <button class="btn btn-outline-dark btn-sm me-1" (click)="updateContent()">Kaydet</button>
+            </div>
+        </div>
+        <div *ngIf="!isTitleEditorVisible" class="d-flex justify-content-between flex-fill align-items-center">
+            <div class="actions align-items-center d-flex gap-1 ms-2">
+                <i (click)="toggleTitleEditor()" class="bx bx-pencil"></i>
+                <i (click)="deleteContent()" class="bx bx-trash"></i>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <button *ngIf="!hasContent && !(isUploaderVisible || isTitleEditorVisible || isExamLibraryVisible)"
+                    (click)="data.contentType.code==='lec' ?toggleUploader():toggleExamLibrary()"
+                    class="btn btn-outline-dark btn-sm me-1" style="width: fit-content;">+
+                    {{data.contentType.code==='lec' ? 'İçerik' : 'Sınav'}}</button>
+                <i *ngIf="hasContent" class='actions bx bx-sm' (click)="toggleContentDetails()"
+                    [ngClass]="isContentDetailsVisible ? 'bx-chevron-up' : 'bx-chevron-down'"></i>
+                <i *ngIf="!isTitleEditorVisible" class='actions bx bx-menu sort'></i>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="isContentDetailsVisible" class="content-details align-items-center d-flex gap-2">
+        <div class="d-flex justify-content-center align-items-center"
+            style="width: 100px;height: 60px;border: 1px solid;">
+            <ng-container *ngIf="data.trainingContentLibraryDto?.trainingContentLibraryVideoDuration">
+                <img [src]="data.trainingContentLibraryDto?.trainingContentLibraryThumbnail" alt="">
+            </ng-container>
+            <ng-container *ngIf="!data.trainingContentLibraryDto?.trainingContentLibraryVideoDuration">
+                <i class='bx bxs-file-pdf bx-lg'></i>
+            </ng-container>
+        </div>
+
+        <div class="d-flex flex-column">
+            <div>{{data.trainingContentLibraryDto?.trainingContentLibraryFileName}}</div>
+            <div>{{data.trainingContentLibraryDto?.trainingContentLibraryVideoDuration}}</div>
+            <div class="edit-link d-flex align-items-center gap-1" (click)="toggleUploader()">
+                <i class="bx bx-pencil"></i>İçeriği Düzenle
+            </div>
+        </div>
+    </div>
+
+
+    <app-exam-library *ngIf="isExamLibraryVisible" (close)="toggleExamLibrary()"></app-exam-library>
+
+    <app-content-uploader *ngIf="isUploaderVisible" [id]="this.data.id"
+        (close)="this.toggleUploader()"></app-content-uploader>
+</div>

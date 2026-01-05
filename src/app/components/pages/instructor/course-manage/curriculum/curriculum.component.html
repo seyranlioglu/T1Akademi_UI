@@ -1,0 +1,33 @@
+<div class="curriculum-wrapper card border-0 card h-100">
+    <h3 class="py-4 px-5 mb-0">Müfredat</h3>
+    <hr>
+
+    <div class="card-body d-flex flex-column gap-5 p-5">
+        <div cdkDropListGroup class="d-flex flex-column section-container gap-4" cdkDropList
+            [cdkDropListData]="sections" (cdkDropListDropped)="onSectionDropped($event)">
+            <app-course-section *ngFor="let section of sections; let i = index" [data]="section" [index]="i+1"
+                (contentDropped)="onContentDropped($event)" cdkDrag></app-course-section>
+
+            <div *ngIf="isSectionFormVisible" class="section">
+                <div class="section-header d-flex  px-5 py-3">
+                    <div class="d-flex flex-column w-100 gap-2">
+                        <div class="d-flex">
+                            <div class="align-content-center me-1 fw-bold" style="white-space: nowrap;">Yeni Bölüm:
+                            </div>
+                            <input [(ngModel)]="newSectionTitle" class="form-control form-control-sm shadow-none"
+                                type="text">
+                        </div>
+                        <div class="d-flex gap-2 justify-content-end">
+                            <button class="btn btn-sm " (click)="toggleSectionForm()">İptal</button>
+                            <button [disabled]="newSectionTitle.length===0" class="btn btn-outline-dark btn-sm me-1"
+                                (click)="addSection()">Bölümü Kaydet</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button *ngIf="!isSectionFormVisible" (click)="toggleSectionForm()" class="btn btn-outline-dark"
+            style="width: fit-content;">+ Bölüm</button>
+    </div>
+</div>

@@ -1,0 +1,142 @@
+ .instructor-page {
+   display: flex;
+   flex-direction: row;
+   min-height: 900px;
+
+   .icon {
+     font-size: 1.5rem;
+     width: 40px;
+     text-align: center;
+     flex-shrink: 0;
+   }
+
+   .sidenav {
+     width: 55px;
+     background-color: #1c1d1f;
+     color: #ffffff;
+     transition: width 0.3s ease;
+     overflow: hidden;
+     display: flex;
+     flex-direction: column;
+     z-index: 3;
+
+     &.expanded {
+       width: 250px;
+     }
+
+     &.hidden {
+       display: none;
+     }
+
+     .sidenav-menu {
+       list-style-type: none;
+       padding: 0;
+       margin: 0;
+
+       & li:not(:first-child) {
+         margin: 10px 0;
+       }
+
+       li {
+         .indicator {
+           position: absolute;
+           width: 4px;
+           height: 100%;
+           background-color: var(--primaryColor);
+         }
+
+         a {
+           text-decoration: none;
+           color: #ffffff;
+           font-size: 1rem;
+           padding: 10px 5px;
+           display: flex;
+           align-items: center;
+           border-radius: 5px;
+           transition: background-color 0.3s, color 0.3s;
+           white-space: nowrap;
+           overflow: hidden;
+
+
+
+           .title {
+             opacity: 0;
+             transition: opacity 0.3s;
+             margin-left: 10px;
+             flex-grow: 1;
+           }
+         }
+       }
+     }
+
+     &.expanded .sidenav-menu li a .title {
+       opacity: 1;
+     }
+   }
+
+   .overlay {
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     background-color: rgba(0, 0, 0, 0.5);
+     backdrop-filter: blur(5px);
+     z-index: 2;
+   }
+
+   .topbar {
+     width: 100%;
+     background-color: transparent;
+     display: flex;
+     justify-content: flex-end;
+     align-items: center;
+     padding: 0 20px;
+     position: fixed;
+     top: 0;
+     z-index: 2;
+
+     .notification-btn,
+     .user-menu-btn {
+       background: none;
+       border: none;
+       color: #1c1d1f;
+       font-size: 1.5rem;
+       margin-left: 8px;
+       cursor: pointer;
+
+       &:hover {
+         color: var(--primaryColor);
+       }
+     }
+   }
+
+   .mobile-topbar {
+     width: 100%;
+     height: 50px;
+     background-color: #1c1d1f;
+     display: flex;
+     align-items: center;
+     padding: 0 10px;
+     position: fixed;
+     top: 0;
+     z-index: 2;
+
+     .hamburger-btn {
+       background: none;
+       border: none;
+       color: #ffffff;
+       font-size: 1.5rem;
+       cursor: pointer;
+     }
+   }
+
+   .content {
+     flex-grow: 1;
+     padding: 60px 20px;
+
+     @media (max-width: 768px) {
+       margin-left: 0;
+     }
+   }
+ }

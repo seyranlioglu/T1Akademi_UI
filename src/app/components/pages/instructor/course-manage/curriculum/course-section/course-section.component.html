@@ -1,0 +1,60 @@
+<div class="section">
+    <div class="section-header d-flex  px-5 py-3">
+        <div *ngIf="!isTitleEditorVisible" class="me-1 fw-bold">Bölüm {{index}}:</div>
+        <div *ngIf="!isTitleEditorVisible" class="section-name">{{data.trainingSectionTitle}}</div>
+        <div *ngIf="isTitleEditorVisible" class="d-flex flex-column w-100 gap-2">
+            <div class="d-flex">
+                <div class="align-content-center me-1 fw-bold" style="white-space: nowrap;">Bölüm {{index}}:</div>
+                <input [(ngModel)]="sectionTitle" class="form-control form-control-sm shadow-none" type="text">
+            </div>
+            <div class="d-flex gap-2 justify-content-end">
+                <button class="btn btn-sm " (click)="toggleTitleEditor()">İptal</button>
+                <button [disabled]="sectionTitle.length===0" class="btn btn-outline-dark btn-sm me-1"
+                    (click)="updateSection()">Bölümü Kaydet</button>
+            </div>
+        </div>
+        <div *ngIf="!isTitleEditorVisible" class="actions d-flex justify-content-between flex-fill align-items-center">
+            <div class="align-items-center d-flex gap-1 ms-2">
+                <i (click)="toggleTitleEditor()" class="bx bx-pencil"></i>
+                <i (click)="deleteSection()" class="bx bx-trash"></i>
+            </div>
+            <i class='bx bx-menu sort'></i>
+        </div>
+    </div>
+
+    <div cdkDropList [cdkDropListData]="data.trainingContents"
+        class="content-container d-flex flex-column gap-3 px-5 py-4" [id]="data.trainingSectionId"
+        [cdkDropListConnectedTo]="cdkDropListConnectedTo" (cdkDropListDropped)="onContentDropped($event)">
+        <app-course-content cdkDrag *ngFor="let content of data.trainingContents;"
+            [data]="content"></app-course-content>
+
+
+        <div *ngIf="isNewContentSelectorVisible" class="new-content-selector gap-1">
+            <button (click)="toggleNewContentEditor('lecture')" class="align-items-center btn d-flex"><i
+                    class="bx bx-plus"></i>Ders</button>
+            <button (click)="toggleNewContentEditor('exam')" class="align-items-center btn d-flex"><i
+                    class="bx bx-plus"></i>Sınav</button>
+            <button class="align-items-center btn d-flex ms-auto" (click)="toggleNewContentSelector()"><i
+                    class="bx bx-x fs-5"></i></button>
+        </div>
+
+        <div *ngIf="isNewContentFormVisible" class="new-content-form d-flex flex-column w-100 gap-2 p-2">
+            <div class="d-flex">
+                <div class="align-content-center me-2" style="white-space: nowrap;">{{newContentEditorTitle}}</div>
+                <input [(ngModel)]="newContentTitle" class="form-control form-control-sm shadow-none" type="text">
+            </div>
+            <div class="d-flex gap-2 justify-content-end">
+                <button class="btn btn-sm " (click)="toggleNewContentEditor()">İptal</button>
+                <button (click)="addNewContent()" [disabled]="newContentTitle.length===0"
+                    class="btn btn-outline-dark btn-sm me-1">Kaydet</button>
+            </div>
+        </div>
+        <!-- <button *ngIf="!isNewContentSelectorVisible && !isNewContentFormVisible" (click)="toggleNewContentSelector()"
+        class="btn btn-outline-dark" style="width: fit-content;">+ Müfrefat öğesi</button> -->
+    </div>
+    <div class="  d-flex flex-column gap-3 px-5 pb-4">
+        <button *ngIf="!isNewContentSelectorVisible && !isNewContentFormVisible" (click)="toggleNewContentSelector()"
+            class="btn btn-outline-dark" style="width: fit-content;">+ Müfrefat öğesi</button>
+    </div>
+
+</div>

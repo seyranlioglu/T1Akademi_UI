@@ -1,0 +1,288 @@
+<!-- Default Blog Section -->
+<div
+    class="blog-area pt-100 pb-75"
+    [ngClass]="{'d-none': router.url === '/index-2' || router.url === '/index-3'}"
+>
+    <div class="container">
+        <div class="section-title text-center">
+            <span class="sub-title d-block fw-medium text-uppercase">BLOG</span>
+            <h2 class="mb-0">Read Our Latest News</h2>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-md-6">
+                <div class="blog-card">
+                    <div class="image">
+                        <a routerLink="/blog-details" class="d-block">
+                            <img src="assets/images/blogs/blog1.jpg" alt="blog-image">  
+                        </a>
+                    </div>
+                    <div class="content">
+                        <h3>
+                            <a routerLink="/blog-details">
+                                Eco-Education in Our Lives: We Can Change the Future
+                            </a>
+                        </h3>
+                        <ul class="meta ps-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-user'></i>
+                                By <a href="/blog-grid">Les Schroeder</a>
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-calendar'></i>
+                                19 May 2024
+                            </li>
+                        </ul>
+                        <p>There are many variations of passages of lorem ipsavbut the majority have suffered alteration in somform.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="blog-card">
+                    <div class="image">
+                        <a routerLink="/blog-details" class="d-block">
+                            <img src="assets/images/blogs/blog2.jpg" alt="blog-image">  
+                        </a>
+                    </div>
+                    <div class="content">
+                        <h3>
+                            <a routerLink="/blog-details">
+                                The Link Between Vendor Certification and Growth in IT
+                            </a>
+                        </h3>
+                        <ul class="meta ps-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-user'></i>
+                                By <a href="/blog-grid">Evan Proctor</a>
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-calendar'></i>
+                                18 May 2024
+                            </li>
+                        </ul>
+                        <p>There are many variations of passages of lorem ipsavbut the majority have suffered alteration in somform.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="blog-card">
+                    <div class="image">
+                        <a routerLink="/blog-details" class="d-block">
+                            <img src="assets/images/blogs/blog3.jpg" alt="blog-image">  
+                        </a>
+                    </div>
+                    <div class="content">
+                        <h3>
+                            <a routerLink="/blog-details">
+                                Corporate Online Learning Trends 2024 You Still Need
+                            </a>
+                        </h3>
+                        <ul class="meta ps-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-user'></i>
+                                By <a href="/blog-grid">Stewart Burge</a>
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-calendar'></i>
+                                17 May 2024
+                            </li>
+                        </ul>
+                        <p>There are many variations of passages of lorem ipsavbut the majority have suffered alteration in somform.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Blog Section For Home Demo - 2 -->
+<div
+    class="blog-area pt-100 pb-75 d-none position-relative z-1"
+    [ngClass]="{'d-block': router.url === '/index-2'}"
+>
+    <div class="container">
+        <div class="section-title text-center">
+            <span class="sub-title d-block fw-medium text-uppercase">BLOG</span>
+            <h2 class="mb-0">Read Our Latest News</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-md-6">
+                <div class="blog-card style-two">
+                    <div class="image">
+                        <a routerLink="/blog-details" class="d-block">
+                            <img src="assets/images/blogs/blog1.jpg" alt="blog-image">  
+                        </a>
+                    </div>
+                    <div class="content">
+                        <ul class="meta ps-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-user'></i>
+                                By <a href="/blog-grid">Les Schroeder</a>
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-calendar'></i>
+                                19 May 2024
+                            </li>
+                        </ul>
+                        <h3>
+                            <a routerLink="/blog-details">
+                                Eco-Education in Our Lives: We Can Change the Future
+                            </a>
+                        </h3>
+                        <a routerLink="/blog-details" class="read-more-btn">Read More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="blog-card style-two">
+                    <div class="image">
+                        <a routerLink="/blog-details" class="d-block">
+                            <img src="assets/images/blogs/blog4.jpg" alt="blog-image">  
+                        </a>
+                    </div>
+                    <div class="content">
+                        <ul class="meta ps-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-user'></i>
+                                By <a href="/blog-grid">Evan Proctor</a>
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-calendar'></i>
+                                18 May 2024
+                            </li>
+                        </ul>
+                        <h3>
+                            <a routerLink="/blog-details">
+                                How to Design a Simple, Yet Unique and Memorable Brand Identity
+                            </a>
+                        </h3>
+                        <a routerLink="/blog-details" class="read-more-btn">Read More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="blog-card style-two">
+                    <div class="image">
+                        <a routerLink="/blog-details" class="d-block">
+                            <img src="assets/images/blogs/blog5.jpg" alt="blog-image">  
+                        </a>
+                    </div>
+                    <div class="content">
+                        <ul class="meta ps-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-user'></i>
+                                By <a href="/blog-grid">Stewart Burge</a>
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-calendar'></i>
+                                17 May 2024
+                            </li>
+                        </ul>
+                        <h3>
+                            <a routerLink="/blog-details">
+                                Qualification For Students Satisfaction Rate Complications
+                            </a>
+                        </h3>
+                        <a routerLink="/blog-details" class="read-more-btn">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="blog-shape1 d-none d-lg-block">
+        <img src="assets/images/shapes/shape5.gif" alt="blog-shape">
+    </div>
+</div>
+
+<!-- Blog Section For Home Demo - 3 -->
+<div
+    class="blog-area pt-100 pb-75 d-none"
+    [ngClass]="{'d-block': router.url === '/index-3'}"
+>
+    <div class="container">
+        <div class="section-title text-center">
+            <span class="sub-title d-block fw-medium text-uppercase">BLOG</span>
+            <h2 class="mb-0">Read Our Latest News</h2>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-4 col-md-6">
+                <div class="blog-card">
+                    <div class="image">
+                        <a routerLink="/blog-details" class="d-block">
+                            <img src="assets/images/blogs/blog1.jpg" alt="blog-image">  
+                        </a>
+                    </div>
+                    <div class="content">
+                        <h3>
+                            <a routerLink="/blog-details">
+                                Eco-Education in Our Lives: We Can Change the Future
+                            </a>
+                        </h3>
+                        <ul class="meta ps-0 mb-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-user'></i>
+                                By <a href="/blog-grid">Les Schroeder</a>
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-calendar'></i>
+                                19 May 2024
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="blog-card">
+                    <div class="image">
+                        <a routerLink="/blog-details" class="d-block">
+                            <img src="assets/images/blogs/blog3.jpg" alt="blog-image">  
+                        </a>
+                    </div>
+                    <div class="content">
+                        <h3>
+                            <a routerLink="/blog-details">
+                                Corporate Online Learning Trends 2024 You Still Need
+                            </a>
+                        </h3>
+                        <ul class="meta ps-0 mb-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-user'></i>
+                                By <a href="/blog-grid">Stewart Burge</a>
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-calendar'></i>
+                                17 May 2024
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="blog-card">
+                    <div class="image">
+                        <a routerLink="/blog-details" class="d-block">
+                            <img src="assets/images/blogs/blog2.jpg" alt="blog-image">  
+                        </a>
+                    </div>
+                    <div class="content">
+                        <h3>
+                            <a routerLink="/blog-details">
+                                The Link Between Vendor Certification and Growth in IT
+                            </a>
+                        </h3>
+                        <ul class="meta ps-0 mb-0 list-unstyled">
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-user'></i>
+                                By <a href="/blog-grid">Evan Proctor</a>
+                            </li>
+                            <li class="d-inline-block position-relative">
+                                <i class='bx bx-calendar'></i>
+                                18 May 2024
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

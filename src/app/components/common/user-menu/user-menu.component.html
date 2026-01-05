@@ -1,0 +1,7 @@
+<div *ngIf="userMenuVisible" class="user-menu-container">
+  <div>{{user?.name}} {{user?.surname}} </div>
+  <div class="email">{{user?.email}}</div>
+  <hr class="my-3">
+
+  <button class="btn btn-outline-danger" (click)="logout()">Çıkış Yap</button>
+</div>

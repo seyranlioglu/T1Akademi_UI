@@ -1,0 +1,49 @@
+<!-- Default Funfacts Section -->
+<div
+    class="funfacts-area pb-75"
+    [ngClass]="{'d-none': router.url === '/index-3'}"
+>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-3 col-md-6 col-sm-6" *ngFor="let content of funfactBox;">
+                <div class="funfact-box">
+                    <div class="icon">
+                        <i class="{{content.icon}}"></i>
+                    </div>
+                    <div class="count">
+                        <h2>{{content.number}}</h2>
+                        <span class="d-block">{{content.title}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Funfacts Section for Home Demo - 3 -->
+<div
+    class="funfacts-area position-relative z-1 pt-100 pb-75 bg-f6fafb d-none"
+    [ngClass]="{'d-block': router.url === '/index-3'}"
+>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-3 col-md-6 col-sm-4 col-6" *ngFor="let content of funfactBox;">
+                <div class="funfact-item">
+                    <div class="icon">
+                        <i class="{{content.icon}}"></i>
+                    </div>
+                    <div class="count">
+                        <h2>{{content.number}}</h2>
+                        <span class="d-block">{{content.title}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="funfact-shape1 d-none d-lg-block">
+        <img src="assets/images/shapes/shape12.png" alt="shape-image">
+    </div>
+    <div class="funfact-shape2 d-none d-lg-block">
+        <img src="assets/images/shapes/shape13.png" alt="shape-image">
+    </div>
+</div>

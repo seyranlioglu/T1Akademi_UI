@@ -1,0 +1,48 @@
+<div
+    class="partner-area bg-f7f7f7 pt-100 pb-75"
+    [ngClass]="{'d-none': router.url === '/index-3'}"
+>
+    <div class="container">
+         <div class="row align-items-center" *ngFor="let content of partnerContent;">
+            <div class="col-lg-3 col-md-12">
+                <div class="partner-content">
+                    <h4 class="mb-0">{{content.title}}</h4>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-12">
+                <div class="row align-items-center">
+                    <div class="col" *ngFor="let item of content.list">
+                        <div class="partner-item text-center">
+                            <img [src]="item.img" alt="partner-image">
+                        </div>
+                    </div>
+                </div>
+            </div>
+         </div>
+    </div>
+</div>
+
+<!-- Partner Section for Home Demo - 3 -->
+<div
+    class="partner-area pb-75 d-none"
+    [ngClass]="{'d-block': router.url === '/index-3'}"
+>
+    <div class="container">
+         <div class="row align-items-center" *ngFor="let content of partnerContent;">
+            <div class="col-lg-3 col-md-12">
+                <div class="partner-content">
+                    <h4 class="mb-0">{{content.title}}</h4>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-12">
+                <div class="row align-items-center">
+                    <div class="col" *ngFor="let item of content.list">
+                        <div class="partner-item text-center">
+                            <img [src]="item.img" alt="partner-image">
+                        </div>
+                    </div>
+                </div>
+            </div>
+         </div>
+    </div>
+</div>

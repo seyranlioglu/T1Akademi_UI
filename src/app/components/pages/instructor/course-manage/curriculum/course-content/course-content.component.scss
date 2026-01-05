@@ -1,0 +1,39 @@
+.content {
+    border: 1px solid;
+    background: white;
+    align-items: center;
+    cursor: move;
+
+    .actions {
+        visibility: hidden;
+    }
+
+    .content-header {
+        padding: 11px 8px;
+        min-height: 53px;
+
+        i:not(.sort) {
+            cursor: pointer;
+        }
+
+        &:hover {
+            .actions {
+                visibility: visible;
+
+            }
+        }
+    }
+
+    .content-details {
+        cursor: default;
+        border-top: 1px solid;
+        width: 100%;
+        padding: 11px 8px;
+
+        .edit-link {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--primaryColor);
+        }
+    }
+}

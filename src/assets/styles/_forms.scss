@@ -1,0 +1,89 @@
+select {
+    height: 48px;
+    width: 100%;
+    cursor: pointer;
+    line-height: 45px;
+    padding: 0 0 0 10px;
+    background: #f8f8f8;
+    display: inline-block;
+    color: var(--blackColor);
+    transition: var(--transition);
+    border-color: var(--borderColor);
+
+    border-radius: var(--bs-border-radius);
+
+    font: {
+        size: var(--fontSize);
+        weight: 500;
+    }
+
+
+    &:hover {
+        border-color: var(--primaryColor);
+        background-color: transparent;
+    }
+}
+
+.required {
+    &:after {
+        content: "*";
+        position: relative;
+        font-size: inherit;
+        color: red;
+        padding-left: 0.25rem;
+        font-weight: bold;
+    }
+}
+
+.error-message {
+    color: red
+}
+
+.search-box {
+    width: 100%;
+    position: relative;
+
+    .form-control {
+        height: 50px;
+        padding-left: 20px;
+        border-radius: 5px;
+        color: var(--blackColor);
+        font-size: var(--fontSize);
+        border: 1px solid var(--borderColor);
+
+        &::placeholder {
+            color: var(--bodyColor);
+            transition: var(--transition);
+        }
+
+        &:focus {
+            &::placeholder {
+                color: transparent;
+            }
+        }
+    }
+}
+
+.form-control:focus {
+    border-color: var(--primaryColor) !important;
+    box-shadow: none !important;
+}
+
+.btn-primary {
+    border: 0 !important;
+    background-color: var(--primaryColor) !important;
+    border-radius: 5px !important;
+    color: var(--whiteColor) !important;
+    transition: var(--transition) !important;
+    padding: 10px 20px !important;
+
+    font: {
+        size: var(--fontSize) !important;
+        weight: 600 !important;
+    }
+
+    &:hover {
+        background-color: var(--secondaryColor) !important;
+        color: var(--whiteColor) !important;
+    }
+}

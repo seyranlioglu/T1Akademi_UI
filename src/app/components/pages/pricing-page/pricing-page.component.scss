@@ -1,0 +1,200 @@
+.pricing-box {
+    padding: 40px 30px;
+    border-radius: 5px;
+    margin-bottom: 25px;
+    background-color: #f7f7f7;
+
+    .price {
+        .sub-title {
+            margin-bottom: 5px;
+            font: {
+                size: 18px;
+                weight: 600;
+            };
+        }
+        h2 {
+            line-height: 1;
+            margin-bottom: 0;
+            color: var(--secondaryColor);
+            font: {
+                size: 40px;
+                weight: 700;
+            };
+            span {
+                color: var(--bodyColor);
+                font: {
+                    size: var(--fontSize);
+                    weight: normal;
+                };
+            }
+        }
+    }
+    .icon {
+        width: 80px;
+        height: 80px;
+        text-align: center;
+        border-radius: 50%;
+        position: relative;
+        background-color: var(--whiteColor);
+
+        img {
+            left: 0;
+            top: 50%;
+            right: 0;
+            width: 50px;
+            position: absolute;
+            transform: translateY(-50%);
+            margin: {
+                left: auto;
+                right: auto;
+            };
+        }
+    }
+    p {
+        margin: {
+            top: 15px;
+            bottom: 20px;
+        };
+    }
+    .features-list {
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        padding-top: 20px;
+
+        li {
+            font-weight: 500;
+            position: relative;
+            padding-left: 22px;
+            margin-bottom: 15px;
+
+            i {
+                top: 50%;
+                left: -2px;
+                font-size: 20px;
+                color: #3bbca7;
+                margin-top: -1px;
+                position: absolute;
+                transform: translateY(-50%);
+
+                &.bx-x {
+                    color: red;
+                }
+            }
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+    .default-btn {
+        margin-top: 25px;
+    }
+}
+
+/* Max width 767px */
+@media only screen and (max-width : 767px) {
+
+    .pricing-box {
+        padding: 20px 15px;
+    
+        .price {
+            .sub-title {
+                font-size: 14px;
+            }
+            h2 {
+                font-size: 22px;
+
+                span {
+                    font-size: 14px;
+                }
+            }
+        }
+        .icon {
+            width: 60px;
+            height: 60px;
+    
+            img {
+                width: 40px;
+            }
+        }
+        p {
+            margin: {
+                top: 12px;
+                bottom: 15px;
+            };
+        }
+        .features-list {
+            padding-top: 17px;
+    
+            li {
+                padding-left: 21px;
+                margin-bottom: 12px;
+            }
+        }
+        .default-btn {
+            margin-top: 20px;
+        }
+    }
+    
+}
+
+/* Min width 576px to Max width 767px */
+@media only screen and (min-width : 576px) and (max-width : 767px) {}
+
+/* Min width 768px to Max width 991px */
+@media only screen and (min-width : 768px) and (max-width : 991px) {
+
+    .pricing-box {
+        padding: 30px 25px;
+    
+        .price {
+            .sub-title {
+                font-size: 16px;
+            }
+            h2 {
+                font-size: 25px;
+
+                span {
+                    font-size: 15px;
+                }
+            }
+        }
+        .features-list {
+            li {
+                margin-bottom: 13px;
+            }
+        }
+    }
+
+}
+
+/* Min width 992px to Max width 1199px */
+@media only screen and (min-width : 992px) and (max-width : 1199px) {
+    
+    .pricing-box {
+        padding: 35px 25px;
+    
+        .price {
+            h2 {
+                font-size: 35px;
+
+                span {
+                    font-size: 15px;
+                }
+            }
+        }
+        .icon {
+            width: 70px;
+            height: 70px;
+    
+            img {
+                width: 45px;
+            }
+        }
+    }
+
+}
+
+/* Min width 1200px to Max width 1399px */
+@media only screen and (min-width: 1200px) and (max-width: 1399px) {}
+
+/* Min width 1600px */
+@media only screen and (min-width: 1600px) {}

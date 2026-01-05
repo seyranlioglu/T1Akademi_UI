@@ -1,0 +1,199 @@
+.course-item {
+    margin-bottom: 25px;
+    background-color: var(--whiteColor);
+
+    .image {
+        overflow: hidden;
+
+        img {
+            transition: var(--transition);
+        }
+    }
+    .content {
+        padding: 25px;
+
+        .info {
+            margin-bottom: 8px;
+
+            li {
+                padding-left: 23px;
+                margin: {
+                    right: 22px;
+                    bottom: 5px;
+                };
+                i {
+                    left: 0;
+                    top: 50%;
+                    line-height: 1;
+                    position: absolute;
+                    color: var(--primaryColor);
+                    transform: translateY(-50%);
+                }
+            }
+        }
+        h3 {
+            font-size: 22px;
+            line-height: 1.3;
+            margin-bottom: 18px;
+        }
+        .meta {
+            border-top: 1px solid rgba(160, 160, 160, 0.1);
+            margin: {
+                left: -25px;
+                right: -25px;
+            };
+            padding: {
+                top: 18px;
+                left: 25px;
+                right: 25px;
+            };
+            .user {
+                color: var(--bodyColor);
+
+                img {
+                    margin-right: 10px;
+                }
+                &:hover {
+                    color: var(--primaryColor);
+                }
+            }
+            .price {
+                color: var(--primaryColor);
+                font: {
+                    size: 20px;
+                    weight: 600;
+                };
+                span {
+                    text-decoration: line-through;
+                    color: var(--bodyColor);
+                    font: {
+                        weight: normal;
+                        size: var(--fontSize);
+                    };
+                }
+            }
+        }
+    }
+    &:hover {
+        .image {
+            img {
+                transform: scale(1.08);
+            }
+        }
+    }
+}
+
+/* Max width 767px */
+@media only screen and (max-width : 767px) {
+
+    .course-item {
+        .content {
+            padding: 15px;
+    
+            .info {
+                margin-bottom: 3px;
+    
+                li {
+                    padding-left: 22px;
+                    margin: {
+                        right: 15px;
+                        bottom: 8px;
+                    };
+                }
+            }
+            h3 {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+            .meta {
+                margin: {
+                    left: -15px;
+                    right: -15px;
+                };
+                padding: {
+                    top: 15px;
+                    left: 15px;
+                    right: 15px;
+                };
+                .price {
+                    font-size: 17px;
+
+                    span {
+                        font-size: 14px;
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+/* Min width 576px to Max width 767px */
+@media only screen and (min-width : 576px) and (max-width : 767px) {}
+
+/* Min width 768px to Max width 991px */
+@media only screen and (min-width : 768px) and (max-width : 991px) {
+
+    .course-item {
+        .content {
+            padding: 20px;
+    
+            .info {
+                margin-bottom: 2px;
+    
+                li {
+                    padding-left: 22px;
+                    margin: {
+                        right: 15px;
+                        bottom: 8px;
+                    };
+                }
+            }
+            h3 {
+                font-size: 20px;
+                margin-bottom: 15px;
+            }
+            .meta {
+                margin: {
+                    left: -20px;
+                    right: -20px;
+                };
+                padding: {
+                    top: 15px;
+                    left: 20px;
+                    right: 20px;
+                };
+            }
+        }
+    }
+
+}
+
+/* Min width 992px to Max width 1199px */
+@media only screen and (min-width : 992px) and (max-width : 1199px) {
+
+    .course-item {
+        .content {
+            padding: 22px;
+    
+            .info {
+                margin-bottom: 3px;
+    
+                li {
+                    padding-left: 22px;
+                    margin: {
+                        right: 15px;
+                        bottom: 8px;
+                    };
+                }
+            }
+        }
+    }
+
+}
+
+/* Min width 1200px to Max width 1399px */
+@media only screen and (min-width: 1200px) and (max-width: 1399px) {}
+
+/* Min width 1600px */
+@media only screen and (min-width: 1600px) {}

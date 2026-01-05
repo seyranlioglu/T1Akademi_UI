@@ -1,0 +1,29 @@
+:host {
+    display: block;
+    cursor: default;
+    width: 100%;
+
+    .uploader-header {
+        top: -34px;
+        right: 50px;
+        border-top: 1px solid;
+        border-left: 1px solid;
+        border-right: 1px solid;
+        border-bottom: 1px solid white;
+        background: white;
+
+        i {
+            cursor: pointer;
+        }
+    }
+
+    .content-type {
+        cursor: pointer;
+        border: 1px solid #d1d7dc;
+        width: 70px;
+        height: 60px;
+        display: grid;
+        justify-items: center;
+        align-items: center;
+    }
+}

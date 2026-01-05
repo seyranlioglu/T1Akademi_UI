@@ -1,0 +1,43 @@
+<!-- Default Featured Boxes Section -->
+<div
+    class="featured-boxes-area pt-100 pb-75"
+    [ngClass]="{'d-none': router.url === '/index-3'}"
+>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-3 col-md-6 col-lg-4 col-sm-6" *ngFor="let content of featuredBox;">
+                <div class="featured-box">
+                    <div class="icon">
+                        <img [src]="content.icon" alt="icon">
+                    </div>
+                    <div class="content">
+                        <h3>{{content.title}}</h3>
+                        <p>{{content.paragraph}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Boxes Section Home Demo - 3 -->
+<div
+    class="featured-boxes-area pt-100 pb-75 d-none"
+    [ngClass]="{'d-block': router.url === '/index-3'}"
+>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-3 col-md-6 col-lg-4 col-sm-6" *ngFor="let content of featuredBox;">
+                <div class="featured-item">
+                    <div class="icon">
+                        <img [src]="content.icon" alt="icon">
+                    </div>
+                    <div class="content">
+                        <h3>{{content.title}}</h3>
+                        <p>{{content.paragraph}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

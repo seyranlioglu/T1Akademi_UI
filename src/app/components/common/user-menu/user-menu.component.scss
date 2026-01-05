@@ -1,0 +1,18 @@
+.user-menu-container {
+  width: 250px;
+  right: 23px;
+  top: 60px;
+  position: absolute;
+  border: 1px solid var(--borderColor);
+  transition: var(--transition);
+  padding: 15px 20px 15px 20px;
+  color: var(--blackColor);
+  font-size: 17px;
+  font-weight: 500;
+  background: white;
+  border-radius: 5px;
+  .email{
+    color: var(--bodyColor);
+    font-size: 14px;
+  }
+}

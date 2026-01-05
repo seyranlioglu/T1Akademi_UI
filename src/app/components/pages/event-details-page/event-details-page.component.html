@@ -1,0 +1,148 @@
+<!-- Page Banner -->
+<div
+    class="page-banner-area ptb-100"
+    style="background-image: url(assets/images/shapes/page-banner-bg.jpg);"
+>
+    <div class="container">
+        <div class="page-banner-content text-center">
+            <div class="list">
+                <div class="list-item d-inline-block position-relative">
+                    <i class="flaticon-calendar"></i>
+                    22 May 2024
+                </div>
+                <div class="list-item d-inline-block position-relative">
+                    <i class="flaticon-pin"></i>
+                    London, UK
+                </div>
+            </div>
+            <h1>Global Education Fall Meeting for Everyone</h1>
+            <ul class="ps-0 mb-0 list-unstyled">
+                <li class="d-inline-block position-relative"><a routerLink="/">Home</a></li>
+                <li class="d-inline-block position-relative">Event Details</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Event Details -->
+<div class="event-details ptb-100">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-md-12">
+                <div class="event-details-desc">
+                    <img src="assets/images/blogs/blog1.jpg" alt="event-image">
+                    <h4>About The Event</h4>
+                    <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration demi text in some form, injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden.</p>
+                    <p>In the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary</p>
+                    <ul>
+                        <li>Aute irure dolor in reprehenderit</li>
+                        <li>Occaecat cupidatat non proident sunt in culpa</li>
+                        <li>Pariatur enim ipsam</li>
+                    </ul>
+                    <h4>Event Location</h4>
+                    <p>Long established fact that a reader will be distracted by the readable content of a page when looking at its layout The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English many desktop.</p>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3152.2050823714085!2d144.87745987655893!3d-37.80866507197691!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad667516adaac11%3A0xd54cbf3146bb604!2sWales%20St%2C%20Kingsville%20VIC%203012%2C%20Australia!5e0!3m2!1sen!2sbd!4v1684132507508!5m2!1sen!2sbd" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-12">
+                <div class="event-details-info">
+                    <h3>Event Details</h3>
+                    <ul class="info ps-0 mb-0 list-unstyled">
+                        <li class="d-flex align-items-center justify-content-between">
+                            <span>Start Date:</span>
+                            22 May 2024
+                        </li>
+                        <li class="d-flex align-items-center justify-content-between">
+                            <span>End Date:</span>
+                            Same Day
+                        </li>
+                        <li class="d-flex align-items-center justify-content-between">
+                            <span>Start Time:</span>
+                            08:00 AM
+                        </li>
+                        <li class="d-flex align-items-center justify-content-between">
+                            <span>End Time:</span>
+                            11:00 AM
+                        </li>
+                        <li class="d-flex align-items-center justify-content-between">
+                            <span>Location:</span>
+                            London, UK
+                        </li>
+                        <li class="d-flex align-items-center justify-content-between">
+                            <span>Certificate:</span>
+                            Alpaca Way
+                        </li>
+                        <li class="d-flex align-items-center justify-content-between">
+                            <span>Pricing:</span>
+                            $92.00
+                        </li>
+                    </ul>
+                    <div class="btn-box">
+                        <a href="javascript:void(0);" class="default-btn d-block w-100 text-center">Start Now</a>
+                        <a href="javascript:void(0);" class="default-btn d-block w-100 text-center two">Get Ticket</a>
+                    </div>
+                    <span class="d-block fw-medium">Share On:</span>
+                    <ul class="social-links ps-0 mb-0 list-unstyled">
+                        <li class="d-inline-block">
+                            <a href="https://www.facebook.com/" target="_blank" class="position-relative d-block rounded-circle text-center">
+                                <i class="bx bxl-facebook"></i>
+                            </a>
+                        </li>
+                        <li class="d-inline-block">
+                            <a href="https://linkedin.com/" target="_blank" class="position-relative d-block rounded-circle text-center">
+                                <i class="bx bxl-linkedin"></i>
+                            </a>
+                        </li>
+                        <li class="d-inline-block">
+                            <a href="https://twitter.com/" target="_blank" class="position-relative d-block rounded-circle text-center">
+                                <i class="bx bxl-twitter"></i>
+                            </a>
+                        </li>
+                        <li class="d-inline-block">
+                            <a href="https://www.instagram.com/" target="_blank" class="position-relative d-block rounded-circle text-center">
+                                <i class='bx bxl-instagram'></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="event-details-box text-center">
+                    <h3>We Help You Learn While Staying Home</h3>
+                    <a routerLink="/courses-grid" class="default-btn">Get Started Now</a>
+                    <img src="assets/images/man.png" class="d-block ms-auto me-auto" alt="man">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Event Speakers -->
+<div class="instructors-area pb-75">
+    <div class="container">
+        <div class="section-title" *ngFor="let content of sectionTitle;">
+            <h2 class="mb-0">{{content.title}}</h2>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-xl-3 col-lg-4 col-sm-6" *ngFor="let content of instructorBox;">
+                <div class="single-instructor-box">
+                    <img [src]="content.image" alt="instructor-image">
+                    <div class="content">
+                        <h3><a routerLink="{{content.link}}">
+                            {{content.name}}
+                        </a></h3>
+                        <span class="d-block">{{content.designation}}</span>
+                        <div class="icon">
+                            <i class='bx bxs-share-alt'></i>
+                        </div>
+                    </div>
+                    <ul class="social-links ps-0 mb-0 list-unstyled">
+                        <li *ngFor="let item of content.socials;">
+                            <a href="{{item.link}}" target="_blank" class="position-relative d-block rounded-circle text-center">
+                                <i class="{{item.icon}}"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

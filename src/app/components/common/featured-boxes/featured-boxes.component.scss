@@ -1,0 +1,219 @@
+// Style One
+.featured-box {
+    padding: 30px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 25px;
+    background-color: #f6fafb;
+
+    .icon {
+        z-index: 1;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        position: relative;
+        background-color: #ededed;
+        transition: var(--transition);
+        margin: {
+            left: auto;
+            right: auto;
+            bottom: 18px;
+        };
+        img {
+            left: 0;
+            right: 0;
+            top: 50%;
+            width: 70px;
+            position: absolute;
+            transform: translateY(-50%);
+            margin: {
+                left: auto;
+                right: auto;
+            };
+        }
+        &::before {
+            top: 0;
+            left: 3px;
+            bottom: 0;
+            content: "";
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            border-radius: 50%;
+            background-color: var(--whiteColor);
+        }
+    }
+    h3 {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+    &:hover {
+        .icon {
+            background-color: var(--primaryColor);
+        }
+    }
+}
+
+// Style Two
+.featured-item {
+    padding: 30px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 25px;
+    background-color: var(--whiteColor);
+    box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.09);
+
+    .icon {
+        z-index: 1;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        position: relative;
+        transition: var(--transition);
+        background: rgba(59, 188, 167, 0.12);
+        margin: {
+            left: auto;
+            right: auto;
+            bottom: 18px;
+        };
+        img {
+            left: 0;
+            right: 0;
+            top: 50%;
+            width: 70px;
+            position: absolute;
+            transform: translateY(-50%);
+            margin: {
+                left: auto;
+                right: auto;
+            };
+        }
+        &::before {
+            top: 0;
+            right: 3px;
+            bottom: 0;
+            content: "";
+            z-index: -1;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            border-radius: 50%;
+            background-color: var(--whiteColor);
+        }
+    }
+    h3 {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+    &:hover {
+        .icon {
+            background-color: var(--primaryColor);
+        }
+    }
+}
+
+// Extra
+.d-none {
+    &.d-block {
+        display: block !important;
+    }
+}
+
+/* Max width 767px */
+@media only screen and (max-width : 767px) {
+
+    // Style One
+    .featured-box {
+        padding: 20px 15px;
+    
+        .icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+
+            img {
+                width: 50px;
+            }
+        }
+        h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+    }
+
+    // Style Two
+    .featured-item {
+        padding: 20px 15px;
+    
+        .icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+
+            img {
+                width: 50px;
+            }
+        }
+        h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+    }
+
+}
+
+/* Min width 576px to Max width 767px */
+@media only screen and (min-width : 576px) and (max-width : 767px) {}
+
+/* Min width 768px to Max width 991px */
+@media only screen and (min-width : 768px) and (max-width : 991px) {
+
+    // Style One
+    .featured-box {
+        padding: 25px 20px;
+    
+        .icon {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 15px;
+
+            img {
+                width: 60px;
+            }
+        }
+        h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+    }
+
+    // Style Two
+    .featured-item {
+        padding: 25px 20px;
+    
+        .icon {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 15px;
+
+            img {
+                width: 60px;
+            }
+        }
+        h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+    }
+
+}
+
+/* Min width 992px to Max width 1199px */
+@media only screen and (min-width : 992px) and (max-width : 1199px) {}
+
+/* Min width 1200px to Max width 1399px */
+@media only screen and (min-width: 1200px) and (max-width: 1399px) {}
+
+/* Min width 1600px */
+@media only screen and (min-width: 1600px) {}

@@ -1,0 +1,78 @@
+<div class="course-landing-wrapper card border-0 card h-100">
+  <h3 class="py-4 px-5 mb-0">Eğitim Açılış Sayfası</h3>
+  <hr>
+
+  <div class="card-body d-flex flex-column gap-4 p-5">
+    <p>
+      Eğitim açılış sayfanız, T1Akademi'de başarınız için büyük önem taşır. Doğru hazırlandığında, Google gibi arama
+      motorlarında görünürlük kazanmanıza da yardımcı olabilir. Bu bölümü tamamlarken bir kişinin eğitiminize neden
+      katılmak isteyeceğini gösteren, ilgi çekici bir Eğitim Açılış Sayfası oluşturmaya dikkat edin.
+    </p>
+    <form [formGroup]="landingForm" class="d-flex flex-column gap-4" (ngSubmit)="updateTraining()"
+      (keydown.enter)="$event.preventDefault()">
+      <div>
+        <label class="fw-medium mb-2" for="title">Eğitim Başlığı</label>
+        <input type="text" class="form-control" formControlName="title"
+          placeholder="Eğitim başlığı (örnek: Proje Yönetimi Temelleri)">
+        <div *ngIf="landingForm.get('title')?.errors?.['required']" class="error-message p-1">
+          Doldurulması zorunlu alan
+        </div>
+      </div>
+      <div>
+        <label class="fw-medium mb-2" for="subTitle">Eğitim Alt Başlığı</label>
+        <input type="text" class="form-control" formControlName="subTitle"
+          placeholder="Eğitim alt başlığı (örnek: Proje yönetimi becerilerinizi geliştirin)">
+      </div>
+      <div>
+        <label class="fw-medium mb-2" for="description">Eğitim Açıklaması</label>
+        <textarea class="form-control" formControlName="description"
+          placeholder="Eğitim açıklaması (örnek: Bu eğitim, proje yönetimi temellerini kapsar ve proje yöneticilerinin rollerini ve sorumluluklarını anlamalarına yardımcı olur.)"></textarea>
+      </div>
+      <div>
+        <label class="fw-medium mb-2">Temel Bilgiler</label>
+        <div class="d-flex gap-5">
+          <select formControlName="trainingLanguageId">
+            <option [ngValue]="null">- - Dil Seçin - -</option>
+            <option *ngFor="let lang of languageList" [ngValue]="lang.id"> {{lang.description}}</option>
+          </select>
+          <select formControlName="categoryId">
+            <option [ngValue]="null">- - Kategori Seçin - -</option>
+            <option *ngFor="let category of courseCategoryList" [ngValue]="category?.id">
+              {{category?.title}}
+            </option>
+          </select>
+          <select *ngIf="landingForm.get('categoryId')?.value" formControlName="subCategoryId">
+            <option [ngValue]="null">- - Alt Kategori Seçin - -</option>
+            <option *ngFor="let subCategory of courseSubCategoryList" [ngValue]="subCategory?.id">
+              {{subCategory?.title}}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="fw-medium mb-2" for="image">Eğitim Görseli</label>
+        <input type="file" class="form-control" (change)="onFileSelected($event)" accept="image/*">
+
+      </div>
+      <div>
+        <label class="fw-medium mb-2" for="video">Tanıtım Videosu</label>
+        <input type="file" class="form-control" (change)="onVideoSelected($event)" accept="video/*">
+      </div>
+      <div>
+        <label class="fw-medium mb-2" for="welcomeMessage">Karşılama Mesajı</label>
+        <input type="text" class="form-control" formControlName="welcomeMessage">
+      </div>
+      <div>
+        <label class="fw-medium mb-2" for="congratulationMessage">Tebrik Mesajı</label>
+        <input type="text" class="form-control" formControlName="congratulationMessage">
+      </div>
+
+
+      <button type="submit" class="btn btn-primary" [disabled]="landingForm.invalid" style="width:fit-content">
+        Kaydet
+      </button>
+
+    </form>
+
+  </div>
+</div>
