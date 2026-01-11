@@ -1,50 +1,112 @@
-<div class="profile-authentication-area ptb-100 d-flex flex-row-reverse pt-0">
-    <div class="container">
-        <div class="d-flex justify-content-center align-items-center">
-            <img src="../../../../assets/images/logos/t1-logo-text.png" alt=""
-                style="width: 300px;height: max-content;">
+<div class="container-fluid vh-100 p-0 overflow-hidden">
+    <div class="row g-0 h-100">
+        
+        <div class="col-md-7 d-none d-md-flex align-items-center justify-content-center bg-branding">
+            <div class="text-center p-5 fade-in-up">
+                <img src="assets/images/logos/t1-logo-text.png" alt="T1 Akademi Logo" class="brand-logo mb-4">
+                <h2 class="text-white fw-light mb-2">Hoş Geldiniz</h2>
+                <p class="text-white-50 lead fs-6" style="max-width: 400px; margin: 0 auto;">
+                    Kurumsal eğitim ve gelişim platformuna giriş yapın.
+                </p>
+            </div>
         </div>
-        <div class="align-items-center d-flex justify-content-center row">
-            <div class="col-lg-8 col-md-12 d-flex justify-content-center login-card p-5" data-aos="fade-in"
-                data-aos-duration="1000" data-aos-delay="100">
-                <div class="login-form col-8">
-                    <h2>Giriş Yap</h2>
-                    <form [formGroup]="loginForm" (ngSubmit)="submit()">
-                        <div class="form-group">
-                            <label>Mail Adresi</label>
-                            <input type="text" formControlName="userName" class="form-control">
+
+        <div class="col-md-5 d-flex flex-column bg-light-mobile h-100">
+            
+            <div class="flex-grow-1 d-flex align-items-center justify-content-center px-3 py-4">
+                <div class="login-wrapper w-100">
+                    
+                    <div class="text-center mb-4 d-md-none">
+                        <img src="assets/images/logos/t1-logo-text.png" alt="Logo" style="height: 50px;">
+                    </div>
+
+                    <div class="mb-4 text-center text-md-start">
+                        <h3 class="fw-bold text-dark mb-1">
+                            {{ isVerificationStep ? 'Doğrulama' : 'Giriş Yap' }}
+                        </h3>
+                        <p class="text-muted small mb-0">
+                            {{ isVerificationStep ? 'Lütfen gönderilen doğrulama kodunu giriniz.' : 'Devam etmek için bilgilerinizi giriniz.' }}
+                        </p>
+                    </div>
+
+                    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" *ngIf="!isVerificationStep">
+                        
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="emailInput" placeholder="name@example.com" 
+                                   formControlName="emailOrPhone" (input)="onDynamicInput($event)"
+                                   [class.is-invalid]="f['emailOrPhone'].invalid && (f['emailOrPhone'].dirty || f['emailOrPhone'].touched)">
+                            <label for="emailInput">E-Posta veya Telefon</label>
                         </div>
-                        <div class="form-group">
-                            <label>Şifre</label>
-                            <input type="password" formControlName="password" class="form-control">
+
+                        <div class="form-floating mb-3 position-relative">
+                            <input [type]="showPassword ? 'text' : 'password'" class="form-control" id="passwordInput" placeholder="Şifre"
+                                   formControlName="password"
+                                   [class.is-invalid]="f['password'].invalid && (f['password'].dirty || f['password'].touched)">
+                            <label for="passwordInput">Şifre</label>
+                            <i class='bx' [ngClass]="showPassword ? 'bx-show' : 'bx-hide'"
+                               style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); cursor: pointer; font-size: 1.4rem; color: #888; z-index: 5;"
+                               (click)="showPassword = !showPassword"></i>
                         </div>
-                        <div class="form-group">
-                            <label>Doğrulama Yöntemi</label>
-                            <div class="select-box">
-                                <select formControlName="type">
-                                    <option [ngValue]="0">Mail</option>
-                                    <option [ngValue]="1">SMS</option>
-                                </select>
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="rememberMe" formControlName="rememberMe">
+                                <label class="form-check-label small text-muted" for="rememberMe">Beni Hatırla</label>
                             </div>
-
+                            <a routerLink="/auth/forgot-password" class="text-decoration-none small fw-bold text-warning-dark">Şifremi Unuttum?</a>
                         </div>
 
-                        <button type="submit" class="default-btn">
-                            <ng-container *ngIf="isLoading$ | async">
-                                <span class="indicator-progress" [style.display]="'block'">
-                                    Lütfen Bekleyin
-                                    <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                                </span>
-                            </ng-container>
-                            <ng-container *ngIf="(isLoading$ | async) === false">
-                                <span class="indicator-label">Giriş Yap</span>
-                            </ng-container>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold shadow-sm border-0 mb-3" 
+                                [disabled]="(isLoading$ | async)">
+                            {{ (isLoading$ | async) ? 'İşleniyor...' : 'Giriş Yap' }}
                         </button>
-                        <a routerLink="/auth/forgot-password" class="forgot-password">Şifrenizi mi unuttunuz?</a>
-                        <div class="mt-5">Hesabınız yok mu? <a routerLink="/auth/register" class="forgot-password">Kayıt
-                                olun</a></div>
+
+                        <div class="text-center">
+                            <span class="text-muted small">Hesabınız yok mu? </span>
+                            <a routerLink="/auth/register" class="text-decoration-none fw-bold text-warning-dark">Kayıt Ol</a>
+                        </div>
                     </form>
+
+                    <form [formGroup]="verifyForm" (ngSubmit)="onVerifySubmit()" *ngIf="isVerificationStep" class="fade-in text-center">
+                        
+                        <div class="mb-4 mt-3">
+                            <input type="text" formControlName="code" 
+                                   class="form-control form-control-lg text-center mx-auto shadow-sm" 
+                                   style="font-size: 2rem; letter-spacing: 0.8rem; max-width: 250px; height: 70px; border-radius: 15px;" 
+                                   placeholder="••••" maxlength="6" (keypress)="numberOnly($event)">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold shadow-sm border-0 mb-3"
+                                [disabled]="(isLoading$ | async)">
+                            {{ (isLoading$ | async) ? 'Doğrulanıyor...' : 'Kodu Onayla' }}
+                        </button>
+
+                        <div class="text-center mt-3">
+                            <span *ngIf="remainingTime > 0" class="text-muted small">
+                                <i class="bx bx-time"></i> Kalan Süre: <b>{{ remainingTime }}</b> sn
+                            </span>
+                            
+                            <span *ngIf="remainingTime === 0">
+                                <button type="button" class="btn btn-link text-warning-dark fw-bold text-decoration-none" (click)="resendCode()">
+                                    Kodu Tekrar Gönder <i class='bx bx-refresh'></i>
+                                </button>
+                            </span>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="button" class="btn btn-link text-muted small text-decoration-none" (click)="isVerificationStep = false">
+                                <i class='bx bx-arrow-back'></i> Giriş ekranına dön
+                            </button>
+                        </div>
+                    </form>
+
                 </div>
+            </div>
+
+            <div class="py-3 text-center bg-light-mobile">
+                <small class="text-muted" style="font-size: 0.75rem;">
+                    &copy; 2026 T1 Akademi. Tüm hakları saklıdır.
+                </small>
             </div>
         </div>
     </div>

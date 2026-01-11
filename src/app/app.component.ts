@@ -1,55 +1,47 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs';
-import { InactivityService } from './shared/services/inactivity.service';
-import { AuthService } from './shared/services/auth.service';
+import { Component, OnInit } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
+    styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-    title = 'Toledo - Angular 17 Online Courses & Education Template';
+export class AppComponent implements OnInit {
+    
+    // Navbar ve Footer'ın GİZLENECEĞİ durumlar
+    hideNavbar = false;
+    hideFooter = false;
 
-    showAuthFooter: boolean = false;
-    showNavbar: boolean = false;
-    isOnCoursePage: boolean = false;
-    constructor(
-        public router: Router,
-        private inactivityService: InactivityService,
-        private authService: AuthService
-    ) { }
+    constructor(public router: Router) {
+        // Sayfa her değiştiğinde kontrol et
+        this.router.events.pipe(
+            filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+        ).subscribe((event: NavigationEnd) => {
+            this.checkVisibility(event.url);
+        });
+    }
 
     ngOnInit() {
-        if (!this.authService.currentUserValue) {
-            this.router.navigate(['/auth/login']);
-        }
+        // İlk açılışta da kontrol et
+        this.checkVisibility(this.router.url);
+    }
 
-        this.router.events
-            .pipe(filter((event) => event instanceof NavigationEnd))
-            .subscribe(() => {
-                const path = window.location.pathname;
+    checkVisibility(url: string) {
+        // 1. Auth sayfaları (Login/Register) -> Hepsi gizli
+        const isAuth = url.includes('/auth');
 
-                if (path.indexOf('/auth') > -1) {
-                    this.showAuthFooter = true;
-                    this.showNavbar = false;
-                } else {
-                    this.showAuthFooter = false;
-                    this.showNavbar = true;
-                }
+        // 2. Instructor Paneli -> Navbar gizlenebilir (isteğe bağlı)
+        const isInstructor = url.includes('/instructor');
 
-                this.isOnCoursePage = path.indexOf('/watch') > -1;
-            });
+        // 3. Ders İzleme Ekranı (watch) -> Navbar gizli
+        const isPlayer = url.includes('/watch');
 
-        this.inactivityService.$onInactive.subscribe(() => {
-            const user = this.authService.currentUserValue;
-            const isLoggedIn = user && user.accessToken;
-            if (isLoggedIn) {
-                //TODO: uncomment
-                // this.authService.logout();
-                // document.location.reload();
-            }
-        });
+        // Karar Ver:
+        // Eğer Auth, Instructor veya Player sayfasındaysak Navbar'ı gizle
+        this.hideNavbar = isAuth || isInstructor || isPlayer;
+        
+        // Footer da aynı mantıkla gizlensin
+        this.hideFooter = isAuth || isInstructor || isPlayer;
     }
 }

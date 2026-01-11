@@ -105,7 +105,7 @@ export class VerifyComponent implements OnInit {
             this.verifyPhoneNumber();
         } else {
             const verifySubs = this.authService
-                .verify(this.userName, this.f['code'].value)
+                .verify(this.userName, this.f['code'].value,false)
                 .pipe(first())
                 .subscribe((response: any) => {
                     if (response?.header.result) {

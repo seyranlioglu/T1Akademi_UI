@@ -1,269 +1,47 @@
-@import "../common/featured-courses/featured-courses.component.scss";
+$sidebar-width: 260px;
+$sidebar-collapsed-width: 70px;
+// Navbar yüksekliğini + Kategori barı yüksekliğini hesaba katarak artırıyoruz
+$navbar-height: 110px; // Eskiden 75px idi, şimdi kategori barı + navbar için artırdık
 
-.dashboard-sidebar {
-    border-radius: 5px;
-    margin-right: 15px;
-    background-color: var(--whiteColor);
-    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
-
-    .nav {
-        .nav-item {
-            .nav-link {
-                border-bottom: 1px solid var(--borderColor);
-                transition: var(--transition);
-                padding: 15px 20px 15px 45px;
-                color: var(--blackColor);
-                position: relative;
-                font: {
-                    size: 17px;
-                    weight: 500;
-                };
-                i {
-                    transform: translateY(-50%);
-                    position: absolute;
-                    margin-top: -1px;
-                    line-height: 1;
-                    left: 20px;
-                    top: 50%;
-                }
-                &:hover, &.active {
-                    background-color: var(--primaryColor);
-                    border-color: var(--primaryColor);
-                    color: var(--whiteColor);
-                }
-            }
-            &:first-child {
-                .nav-link {
-                    border-radius: 5px 5px 0 0;
-                }
-            }
-            &:last-child {
-                .nav-link {
-                    border-bottom: none;
-                    border-radius: 0 0 5px 5px;
-                }
-            }
-        }
-    }
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f7f9fa;
+    position: relative;
+    padding-top: $navbar-height; // İÇERİK NAVBARIN ALTINDA KALMASIN DİYE
 }
- 
-.courses-table {
-    padding: 25px;
-    border-radius: 5px;
-    background-color: var(--whiteColor);
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 
-    table, .table {
-        margin-bottom: 0;
-
-        thead {
-            tr {
-                th {
-                    background-color: #f7f7f7;
-                    padding: 14px 20px;
-                    box-shadow: unset;
-                    border: none;
-                    font: {
-                        size: var(--fontSize);
-                        weight: 500;
-                    };
-                }
-            }
-        }
-        tbody {
-            tr {
-                border-color: var(--borderColor);
-                box-shadow: unset;
-
-                th, td {
-                    padding: 14px 20px;
-                    font-weight: normal;
-                    color: var(--bodyColor);
-                    border-color: var(--borderColor);
-
-                    .rating {
-                        i {
-                            line-height: 1;
-                            color: #ffc107;
-                            margin-right: 2px;
-
-                            &:last-child {
-                                margin-right: 0;
-                            }
-                        }
-                    }
-                    .progress {
-                        height: 4px;
-                        border-radius: 0;
-
-                        .progress-bar {
-                            background-color: var(--secondaryColor);
-                        }
-                    }
-                    .progress-title {
-                        font-size: 15px;
-                    }
-                    .default-btn {
-                        font-size: 14px;
-                        padding: {
-                            top: 12px;
-                            left: 25px;
-                            right: 25px;
-                            bottom: 12px;
-                        };
-                    }
-                    &:first-child {
-                        padding-left: 0;
-
-                        a {
-                            color: var(--bodyColor);
+.page-content-wrapper {
+    margin-left: $sidebar-width;
+    width: 100%;
+    transition: all 0.3s ease-in-out; 
     
-                            &:hover {
-                                color: var(--primaryColor);
-                            }
-                        }
-                    }
-                    &.action {
-                        .default-btn {
-                            padding: 0;
-                            width: 30px;
-                            height: 30px;
-                            line-height: 32px;
-                            text-align: center;
-                            border-radius: 50%;
-                        }
-                    }
-                }
-            }
-        }
+    // Navbar fixed olduğu için margin-top'a gerek kalmayabilir, padding-top container'dan geliyor
+    // margin-top: 20px; // İsteğe bağlı ince ayar
+
+    &.expanded {
+        margin-left: $sidebar-collapsed-width;
     }
 }
 
-/* Max width 767px */
-@media only screen and (max-width : 767px) {
+.content-body {
+    width: 100%;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    // Yükseklik hesabı
+    min-height: calc(100vh - #{$navbar-height});
+}
 
-    .dashboard-sidebar {
-        margin: {
-            right: 0;
-            bottom: 25px;
-        };
-        .nav {
-            .nav-item {
-                .nav-link {
-                    padding: 12px 15px 12px 37px;
-                    font-size: 15px;
-
-                    i {
-                        left: 15px;
-                    }
-                }
-            }
-        }
+// --- MOBİL ---
+@media (max-width: 991px) {
+    .dashboard-container {
+        padding-top: 70px; // Mobilde kategori barı yok, daha az boşluk yeter
     }
- 
-    .courses-table {
-        padding: 15px;
     
-        table, .table {
-            thead {
-                tr {
-                    th {
-                        padding: 12px 15px;
-                        font-size: 15px;
-                    }
-                }
-            }
-            tbody {
-                tr {
-                    th, td {
-                        padding: 12px 15px;
-                        white-space: nowrap;
-    
-                        .progress-title {
-                            font-size: 14px;
-                        }
-                        .default-btn {
-                            font-size: 13px;
-                            padding: {
-                                top: 11px;
-                                left: 25px;
-                                right: 25px;
-                                bottom: 11px;
-                            };
-                        }
-                    }
-                }
-            }
-        }
+    .page-content-wrapper {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 10px;
     }
-
 }
-
-/* Min width 576px to Max width 767px */
-@media only screen and (min-width : 576px) and (max-width : 767px) {}
-
-/* Min width 768px to Max width 991px */
-@media only screen and (min-width : 768px) and (max-width : 991px) {
-
-    .dashboard-sidebar {
-        margin: {
-            right: 0;
-            bottom: 25px;
-        };
-        .nav {
-            .nav-item {
-                .nav-link {
-                    font-size: 16px;
-                }
-            }
-        }
-    }
- 
-    .courses-table {
-        table, .table {
-            tbody {
-                tr {
-                    th, td {
-                        white-space: nowrap;
-                    }
-                }
-            }
-        }
-    }
-
-}
-
-/* Min width 992px to Max width 1199px */
-@media only screen and (min-width : 992px) and (max-width : 1199px) {
-
-    .dashboard-sidebar {
-        margin-right: 0;
-    
-        .nav {
-            .nav-item {
-                .nav-link {
-                    font-size: 16px;
-                }
-            }
-        }
-    }
- 
-    .courses-table {
-        table, .table {
-            tbody {
-                tr {
-                    th, td {
-                        white-space: nowrap;
-                    }
-                }
-            }
-        }
-    }
-
-}
-
-/* Min width 1200px to Max width 1399px */
-@media only screen and (min-width: 1200px) and (max-width: 1399px) {}
-
-/* Min width 1600px */
-@media only screen and (min-width: 1600px) {}

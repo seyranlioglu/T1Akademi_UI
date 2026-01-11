@@ -1,136 +1,215 @@
-<div class="profile-authentication-area ptb-100">
-    <div class="container">
-        <div class="d-flex justify-content-center align-items-center">
-            <img src="../../../../assets/images/logos/t1-logo-text.png" alt=""
-                style="width: 300px;height: max-content;">
+<div class="container-fluid vh-100 p-0 overflow-hidden">
+    <div class="row g-0 h-100">
+        
+        <div class="col-lg-5 d-none d-lg-flex align-items-center justify-content-center bg-branding position-relative">
+            <div class="text-center p-5 fade-in-up layer-z">
+                <img src="assets/images/logos/t1-logo-text.png" alt="T1 Akademi Logo" class="brand-logo mb-4">
+                <h2 class="text-white fw-light mb-3">Aramıza Katılın</h2>
+                <p class="text-white-50 lead fs-6" style="max-width: 400px; margin: 0 auto;">
+                    T1 Akademi dünyasına adım atın, kurumsal gelişiminizi hızlandırın.
+                </p>
+            </div>
+            <div class="bg-overlay"></div>
         </div>
-        <div class="align-items-center d-flex justify-content-center row">
-            <div class="col-lg-8 col-md-12 d-flex justify-content-center register-card p-5 flex-column"
-                data-aos="fade-in" data-aos-duration="1000" data-aos-delay="100">
-                <div class="register-form ">
-                    <h2>Hesap Oluştur</h2>
-                    <form [formGroup]="registerForm" (ngSubmit)="submit()">
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>Mail Adresi</label>
-                                    <input type="text" class="form-control" formControlName="email" required>
 
-                                    <div *ngIf="registerForm.get('email')?.errors?.['required'] && (registerForm.get('email')?.dirty || registerForm.get('email')?.touched)"
-                                        class="error-message p-1">
-                                        Doldurulması zorunlu alan
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Ad</label>
-                                    <input type="text" class="form-control" formControlName="name" required>
+        <div class="col-lg-7 d-flex flex-column h-100 bg-light-mobile scrollable-column">
+            
+            <div class="flex-grow-1 d-flex justify-content-center py-5 px-3">
+                <div class="register-wrapper w-100">
+                    
+                    <div class="text-center mb-4 d-lg-none">
+                        <img src="assets/images/logos/t1-logo-text.png" alt="Logo" style="height: 45px; width: auto;">
+                    </div>
 
-                                    <div *ngIf="registerForm.get('name')?.errors?.['required'] && (registerForm.get('name')?.dirty || registerForm.get('name')?.touched)"
-                                        class="error-message p-1">
-                                        Doldurulması zorunlu alan
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Soyadı</label>
-                                    <input type="text" class="form-control" formControlName="surname">
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold text-dark">
+                            <ng-container *ngIf="currentStep === 1">Hesap Oluştur</ng-container>
+                            <ng-container *ngIf="currentStep === 2">Kurumsal Bilgiler</ng-container>
+                            <ng-container *ngIf="currentStep > 2">Doğrulama</ng-container>
+                        </h3>
+                        
+                        <div class="d-flex justify-content-center mt-3" *ngIf="currentStep < 3">
+                            <span class="badge rounded-pill me-2 px-3 py-2 transition-badge" 
+                                  [ngClass]="currentStep === 1 ? 'bg-warning text-dark' : 'bg-light text-muted border'">
+                                1. Kişisel
+                            </span>
+                            <span class="text-muted align-self-center mx-1"><i class='bx bx-chevron-right'></i></span>
+                            <span class="badge rounded-pill ms-2 px-3 py-2 transition-badge" 
+                                  [ngClass]="currentStep === 2 ? 'bg-warning text-dark' : 'bg-light text-muted border'">
+                                2. Kurumsal
+                            </span>
+                        </div>
+                    </div>
 
-                                    <div *ngIf="registerForm.get('surname')?.errors?.['required'] && (registerForm.get('surname')?.dirty || registerForm.get('surname')?.touched)"
-                                        class="error-message p-1">
-                                        Doldurulması zorunlu alan
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Ünvan</label>
-                                    <input type="text" class="form-control" formControlName="title">
-
-                                    <div *ngIf="registerForm.get('title')?.errors?.['required'] && (registerForm.get('title')?.dirty || registerForm.get('title')?.touched)"
-                                        class="error-message p-1">
-                                        Doldurulması zorunlu alan
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Adres</label>
-                                    <input type="text" class="form-control" formControlName="address">
-
-                                    <div *ngIf="registerForm.get('address')?.errors?.['required'] && (registerForm.get('address')?.dirty || registerForm.get('address')?.touched)"
-                                        class="error-message p-1">
-                                        Doldurulması zorunlu alan
-                                    </div>
+                    <form [formGroup]="registerForm">
+                        
+                        <div class="row g-3 fade-in" *ngIf="currentStep === 1">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" formControlName="name" class="form-control" id="nameInput" placeholder="Ad"
+                                           [class.is-invalid]="f['name'].invalid && (f['name'].dirty || f['name'].touched)">
+                                    <label for="nameInput">Ad</label>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>Telefon No</label>
-                                    <input type="text" class="form-control" formControlName="phoneNumber">
-
-                                    <div *ngIf="registerForm.get('phoneNumber')?.errors?.['required'] && (registerForm.get('phoneNumber')?.dirty || registerForm.get('phoneNumber')?.touched)"
-                                        class="error-message p-1">
-                                        Doldurulması zorunlu alan
-                                    </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" formControlName="surname" class="form-control" id="surnameInput" placeholder="Soyad"
+                                           [class.is-invalid]="f['surname'].invalid && (f['surname'].dirty || f['surname'].touched)">
+                                    <label for="surnameInput">Soyad</label>
                                 </div>
-                                <div class="form-group">
-                                    <label>Vergi Numarası</label>
-                                    <input type="text" class="form-control" formControlName="taxNumber">
-
-                                    <div *ngIf="registerForm.get('taxNumber')?.errors?.['required'] && (registerForm.get('taxNumber')?.dirty || registerForm.get('taxNumber')?.touched)"
-                                        class="error-message p-1">
-                                        Doldurulması zorunlu alan
-                                    </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="email" formControlName="email" class="form-control" id="emailInput" placeholder="E-Posta"
+                                           [class.is-invalid]="f['email'].invalid && (f['email'].dirty || f['email'].touched)">
+                                    <label for="emailInput">E-Posta Adresi</label>
                                 </div>
-                                <div class="form-group">
-                                    <label>TC Kimlik No</label>
-                                    <input type="text" class="form-control" formControlName="identityNumber">
-
-                                    <div *ngIf="registerForm.get('identityNumber')?.errors?.['required'] && (registerForm.get('identityNumber')?.dirty || registerForm.get('identityNumber')?.touched)"
-                                        class="error-message p-1">
-                                        Doldurulması zorunlu alan
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Posta Kodu</label>
-                                    <input type="text" class="form-control" formControlName="postalCode">
-
-                                    <div *ngIf="registerForm.get('postalCode')?.errors?.['required'] && (registerForm.get('postalCode')?.dirty || registerForm.get('postalCode')?.touched)"
-                                        class="error-message p-1">
-                                        Doldurulması zorunlu alan
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Hesap Tipi</label>
-                                    <select formControlName="currAccTypeId">
-                                        <option *ngFor="let type of currAccTypeList" [ngValue]="type.id"> {{type.title}}
-                                        </option>
-                                    </select>
-                                    <div *ngIf="registerForm.get('currAccTypeId')?.errors?.['required'] && (registerForm.get('currAccTypeId')?.dirty || registerForm.get('currAccTypeId')?.touched)"
-                                        class="error-message p-1">
-                                        Doldurulması zorunlu alan
-                                    </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="tel" formControlName="phoneNumber" class="form-control" id="phoneInput" placeholder="Telefon"
+                                           (input)="onPhoneInput($event)"
+                                           [class.is-invalid]="f['phoneNumber'].invalid && (f['phoneNumber'].dirty || f['phoneNumber'].touched)">
+                                    <label for="phoneInput">Telefon (05XX...)</label>
                                 </div>
                             </div>
 
+                            <div class="col-md-6">
+                                <div class="form-floating position-relative">
+                                    <input [type]="showPassword ? 'text' : 'password'" formControlName="password" class="form-control pr-5" id="passInput" placeholder="Şifre"
+                                           (input)="checkPasswordRules()"
+                                           [class.is-invalid]="f['password'].invalid && (f['password'].dirty || f['password'].touched)">
+                                    <label for="passInput">Şifre</label>
+                                    
+                                    <i class='bx' [ngClass]="showPassword ? 'bx-show' : 'bx-hide'" 
+                                       class="password-toggle" 
+                                       (click)="showPassword = !showPassword"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating position-relative">
+                                    <input [type]="showConfirmPassword ? 'text' : 'password'" formControlName="passwordConfirm" class="form-control pr-5" id="passConfInput" placeholder="Şifre Tekrar"
+                                           (input)="checkPasswordRules()"
+                                           [class.is-invalid]="f['passwordConfirm'].invalid && (f['passwordConfirm'].dirty || f['passwordConfirm'].touched)">
+                                    <label for="passConfInput">Şifre Tekrar</label>
+                                    
+                                    <i class='bx' [ngClass]="showConfirmPassword ? 'bx-show' : 'bx-hide'" 
+                                       class="password-toggle" 
+                                       (click)="showConfirmPassword = !showConfirmPassword"></i>
+                                </div>
+                            </div>
 
-                            <div class="d-grid mb-10">
-                                <button type="submit" class="btn btn-primary default-btn"
-                                    [disabled]="registerForm.invalid">
-                                    <ng-container *ngIf="isLoading$ | async">
-                                        <span class="indicator-progress" [style.display]="'block'">
-                                            Lütfen Bekleyin
-                                            <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
-                                        </span>
-                                    </ng-container>
-                                    <ng-container *ngIf="(isLoading$ | async) === false">
-                                        <span class="indicator-label">Kayıt Ol</span>
-                                    </ng-container>
+                            <div class="col-12">
+                                <div class="p-3 bg-light rounded border border-light">
+                                    <small class="fw-bold d-block mb-2 text-muted">Şifre Gereksinimleri:</small>
+                                    <div class="row g-2 small">
+                                        <div class="col-md-6" [ngClass]="passwordCriteria.length ? 'text-success' : 'text-danger'">
+                                            <i class='bx' [ngClass]="passwordCriteria.length ? 'bx-check-circle' : 'bx-x-circle'"></i> En az 8 karakter
+                                        </div>
+                                        <div class="col-md-6" [ngClass]="passwordCriteria.upperCase ? 'text-success' : 'text-danger'">
+                                            <i class='bx' [ngClass]="passwordCriteria.upperCase ? 'bx-check-circle' : 'bx-x-circle'"></i> En az 1 büyük harf
+                                        </div>
+                                        <div class="col-md-6" [ngClass]="passwordCriteria.number ? 'text-success' : 'text-danger'">
+                                            <i class='bx' [ngClass]="passwordCriteria.number ? 'bx-check-circle' : 'bx-x-circle'"></i> En az 1 rakam
+                                        </div>
+                                        <div class="col-md-6" [ngClass]="passwordCriteria.specialChar ? 'text-success' : 'text-danger'">
+                                            <i class='bx' [ngClass]="passwordCriteria.specialChar ? 'bx-check-circle' : 'bx-x-circle'"></i> En az 1 özel karakter
+                                        </div>
+                                        <div class="col-md-6" [ngClass]="passwordCriteria.noSequential ? 'text-success' : 'text-danger'">
+                                            <i class='bx' [ngClass]="passwordCriteria.noSequential ? 'bx-check-circle' : 'bx-x-circle'"></i> Ardışık karakter yok
+                                        </div>
+                                        <div class="col-md-6" [ngClass]="passwordCriteria.match ? 'text-success' : 'text-danger'">
+                                            <i class='bx' [ngClass]="passwordCriteria.match ? 'bx-check-circle' : 'bx-x-circle'"></i> Şifreler eşleşiyor
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <button type="button" class="btn btn-primary btn-lg w-100 py-3 fw-bold" (click)="goToStep2()">
+                                    Devam Et <i class='bx bx-right-arrow-alt'></i>
                                 </button>
                             </div>
+                        </div>
 
-                            <!-- <button type="submit" [disabled]="registerForm.invalid"
-                            class="btn btn-primary default-btn">Kayıt Ol</button> -->
-
+                        <div class="row g-3 fade-in" *ngIf="currentStep === 2">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="text" formControlName="title" class="form-control" id="titleInput" placeholder="Unvan"
+                                           [class.is-invalid]="f['title'].invalid && (f['title'].dirty || f['title'].touched)">
+                                    <label for="titleInput">Şirket Unvanı</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" formControlName="taxNumber" class="form-control" id="taxInput" placeholder="Vergi No" maxlength="10" (keypress)="numberOnly($event)"
+                                           [class.is-invalid]="f['taxNumber'].invalid && (f['taxNumber'].dirty || f['taxNumber'].touched)">
+                                    <label for="taxInput">Vergi No</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" formControlName="postalCode" class="form-control" id="postalInput" placeholder="Posta Kodu" maxlength="5" (keypress)="numberOnly($event)"
+                                           [class.is-invalid]="f['postalCode'].invalid && (f['postalCode'].dirty || f['postalCode'].touched)">
+                                    <label for="postalInput">Posta Kodu</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea formControlName="address" class="form-control" id="addressInput" placeholder="Adres" style="height: 100px"
+                                              [class.is-invalid]="f['address'].invalid && (f['address'].dirty || f['address'].touched)"></textarea>
+                                    <label for="addressInput">Fatura Adresi</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12 mt-4 d-flex gap-3">
+                                <button type="button" class="btn btn-outline-secondary btn-lg w-50 py-3" (click)="goBackToStep1()">
+                                    <i class='bx bx-left-arrow-alt'></i> Geri
+                                </button>
+                                <button type="button" class="btn btn-primary btn-lg w-50 py-3 fw-bold" (click)="submitRegister()" [disabled]="(isLoading$ | async)">
+                                    {{ (isLoading$ | async) ? 'Kayıt Olunuyor...' : 'Kayıt Ol' }}
+                                </button>
+                            </div>
                         </div>
                     </form>
-                </div>
 
+                    <form [formGroup]="verifyForm" (ngSubmit)="submitVerify()" *ngIf="currentStep === 3 || currentStep === 4" class="fade-in text-center">
+                         <div class="py-4">
+                             <p class="mb-4 text-dark fw-medium">
+                                <span *ngIf="currentStep === 3">Lütfen <b>{{ registeredEmail }}</b> adresine gelen kodu giriniz.</span>
+                                <span *ngIf="currentStep === 4">Lütfen <b>{{ registeredPhoneNumber }}</b> numarasına gelen SMS kodunu giriniz.</span>
+                            </p>
+
+                            <input type="text" formControlName="code" class="form-control form-control-lg text-center mx-auto shadow-sm mb-4" 
+                                   style="font-size: 2rem; letter-spacing: 0.8rem; max-width: 250px; height: 70px; border-radius: 15px;" 
+                                   placeholder="••••" maxlength="6" (keypress)="numberOnly($event)">
+
+                            <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold">
+                                {{ currentStep === 3 ? 'E-Postayı Doğrula' : 'Telefonu Doğrula' }}
+                            </button>
+
+                            <div class="mt-4">
+                                <span *ngIf="remainingTime > 0" class="text-muted small">
+                                    <i class="bx bx-time"></i> Kalan Süre: <b>{{ remainingTime }}</b> sn
+                                </span>
+                                <span *ngIf="remainingTime === 0">
+                                    <button type="button" class="btn btn-link text-warning-dark fw-bold text-decoration-none" (click)="resendCurrentCode()">
+                                        Kodu Tekrar Gönder <i class='bx bx-refresh'></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <span class="text-muted small">Zaten hesabınız var mı? </span>
+                        <a routerLink="/auth/login" class="text-decoration-none fw-bold text-warning-dark">Giriş Yap</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="py-3 text-center bg-light-mobile">
+                <small class="text-muted" style="font-size: 0.75rem;">&copy; 2026 T1 Akademi.</small>
             </div>
         </div>
     </div>

@@ -1,391 +1,146 @@
-<div *ngIf="showNavbar" class="navbar-area" [ngClass]="{'sticky': isSticky}">
-    <div class="container-fluid">
-        <nav class="navbar navbar-expand-lg" [class.active]="classApplied">
-            <a class="navbar-brand" routerLink="/">
-                <img src="assets/images/logos/t1-logo-text.png" alt="logo" style="width: 74px;">
-            </a>
-            <button class="navbar-toggler" type="button" (click)="toggleClass()">
-                <span class="burger-menu">
-                    <span class="top-bar"></span>
-                    <span class="middle-bar"></span>
-                    <span class="bottom-bar"></span>
-                </span>
-            </button>
-            <div class="collapse navbar-collapse">
-                <!-- <form class="search-box">
-                    <input class="form-control shadow-none" type="text" placeholder="Search here...">
-                    <button type="submit">
-                        <i class="flaticon-search"></i>
-                    </button>
-                </form> -->
-                <ul class="navbar-nav">
-                    <!-- <li class="nav-item">
-                        <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                            Home
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item">
-                                <a routerLink="/" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Home Demo - 1
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/index-2" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Home Demo - 2
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/index-3" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Home Demo - 3
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                            Courses
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item">
-                                <a routerLink="/courses-grid" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Courses Grid
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/courses-list" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Courses List
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/course-details" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Course Details
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/dashboard" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Dashboard
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                            Events
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item">
-                                <a routerLink="/events" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Events
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/event-details" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Event Details
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                            Pages
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item">
-                                <a routerLink="/about" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    About Us
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/success-stories" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Success Stories
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                                    Instructors
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li class="nav-item">
-                                        <a routerLink="/instructors" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                            Instructors
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a routerLink="/instructor-profile" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                            Instructor Profile
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/testimonials" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Testimonials
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/faq" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    FAQ
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                                    My Account
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li class="nav-item">
-                                        <a routerLink="/auth/login" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                            Login/Register
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a routerLink="/auth/forgot-password" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                            Forgot Password
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/privacy-policy" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Privacy Policy
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/terms-conditions" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Terms & Conditions
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/not-found" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    404 Error Page
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                            Blog
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item">
-                                <a routerLink="/blog-grid" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Blog Grid
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/blog-right-sidebar" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Blog Right Sidebar
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/blog-details" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                                    Blog Details
-                                </a>
-                            </li>
-                        </ul>
-                    </li> -->
-                    <li *ngIf="isInstructor" class="nav-item">
-                        <a routerLink="/instructor" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                            Eğitmen
-                        </a>
-                    </li>
-                    <!-- <li class="nav-item">
-                        <a routerLink="/contact" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-                            Contact Us
-                        </a>
-                    </li> -->
-                </ul>
-                <ul class="navbar-nav for-responsive">
-                    <li class="nav-item">
-                        <a routerLink="/instructor" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                            Eğitmen
-                        </a>
-                    </li>
-                    <!-- <li class="nav-item">
-                        <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                            Home
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item">
-                                <a routerLink="/" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Home Demo - 1
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/index-2" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Home Demo - 2
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/index-3" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Home Demo - 3
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                            Courses
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item">
-                                <a routerLink="/courses-grid" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Courses Grid
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/courses-list" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Courses List
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/course-details" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Course Details
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/dashboard" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Dashboard
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                            Events
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item">
-                                <a routerLink="/events" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Events
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/event-details" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Event Details
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                            Pages
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item">
-                                <a routerLink="/about" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    About Us
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/success-stories" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Success Stories
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                                    Instructors
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li class="nav-item">
-                                        <a routerLink="/instructors" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                            Instructors
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a routerLink="/instructor-profile" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                            Instructor Profile
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/testimonials" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Testimonials
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/faq" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    FAQ
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                                    My Account
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li class="nav-item">
-                                        <a routerLink="/auth/login" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                            Login/Register
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a routerLink="/forgot-password" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                            Forgot Password
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/privacy-policy" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Privacy Policy
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/terms-conditions" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Terms & Conditions
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/not-found" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    404 Error Page
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a href="javascript:void(0)" class="dropdown-toggle nav-link">
-                            Blog
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="nav-item">
-                                <a routerLink="/blog-grid" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Blog Grid
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/blog-right-sidebar" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Blog Right Sidebar
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a routerLink="/blog-details" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                                    Blog Details
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a routerLink="/contact" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="toggleClass()">
-                            Contact Us
-                        </a>
-                    </li> -->
-                </ul>
-                <div class="others-option d-flex align-items-center position-relative">
-                    <div class="option-item">
-                        <a (click)="toggleUserMenu()" class="cart-btn">
-                            <i class="bx bx-user"></i>
-                            <!-- <span>01</span> -->
-                        </a>
-                    </div>
-                    <!-- <div class="option-item">
-                        <a routerLink="/auth/login" class="default-btn two">Login/Register</a>
-                    </div> -->
-                  <!-- <ng-container *ngIf="userMenuVisible">
-                    
-                  </ng-container>  -->
-                  <app-user-menu [userMenuVisible]="userMenuVisible" (userMenuVisibleChange)="userMenuVisible = $event"></app-user-menu> 
+<div class="navbar-area fixed-top bg-white border-bottom shadow-sm" style="z-index: 1020;">
+    
+    <div class="top-info-bar text-center py-2 border-bottom bg-light d-none d-md-block">
+        <div class="container-fluid">
+             <small class="fw-bold text-dark">Yazılım dünyasına hızlı bir giriş yapın! <a href="javascript:void(0)" class="text-primary text-decoration-none">Yeni kursları incele.</a></small>
+        </div>
+    </div>
+
+    <div class="main-navbar">
+        <div class="container-fluid px-2 px-md-4">
+            <nav class="navbar navbar-expand-lg navbar-light p-0" style="min-height: 65px;">
+                
+                <button class="navbar-toggler me-2 d-lg-none border-0 p-0" type="button" (click)="toggleMobileMenu()">
+                    <i class='bx bx-menu fs-1'></i>
+                </button>
+
+                <a class="navbar-brand me-3 me-lg-5 py-2" routerLink="/">
+                    <img src="assets/images/logos/t1-logo-text.png" alt="Logo" style="height: 30px; width: auto;" class="d-lg-none"> 
+                    <img src="assets/images/logos/t1-logo-text.png" alt="Logo" style="height: 38px; width: auto;" class="d-none d-lg-block"> 
+                </a>
+
+                <div class="dropdown d-none d-lg-block me-3" (mouseenter)="showCatMenu=true" (mouseleave)="showCatMenu=false">
+                    <a href="javascript:void(0)" class="text-dark text-decoration-none category-link fw-bold" (click)="showCatMenu=!showCatMenu">
+                        Kategoriler
+                    </a>
+                    <ul class="dropdown-menu shadow border-0 mt-0 rounded-0 category-dropdown-menu" [class.show]="showCatMenu">
+                        <li *ngFor="let cat of categories" class="dropdown-submenu position-relative">
+                            <a class="dropdown-item py-2 d-flex justify-content-between align-items-center" routerLink="/courses-grid" [queryParams]="{category: cat.id}">
+                                {{ cat.title }} 
+                                <i *ngIf="cat.subCategories && cat.subCategories.length > 0" class='bx bx-chevron-right text-muted'></i>
+                            </a>
+                            <ul *ngIf="cat.subCategories && cat.subCategories.length > 0" class="dropdown-menu submenu shadow border-0 rounded-0">
+                                <li *ngFor="let sub of cat.subCategories">
+                                    <a class="dropdown-item py-2" routerLink="/courses-grid" [queryParams]="{subcategory: sub.id}">
+                                        {{ sub.title }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
-            </div>
-        </nav>
+
+                <form class="search-box flex-grow-1 mx-2 mx-lg-4" style="max-width: 800px;">
+                    <div class="input-group rounded-pill border position-relative overflow-hidden bg-white">
+                        <button class="btn btn-link text-muted border-0 ps-3 bg-transparent" type="button">
+                            <i class='bx bx-search fs-5 pt-1'></i>
+                        </button>
+                        <input type="text" class="form-control bg-transparent border-0 shadow-none ps-0" placeholder="Ara..." style="height: 40px; font-size: 14px;">
+                    </div>
+                </form>
+
+                <div class="others-options d-flex align-items-center gap-2 gap-lg-3 ms-auto">
+                    <a routerLink="/pricing" class="nav-link text-dark d-none d-xl-block fw-bold" style="font-size: 13px;">Planlar</a>
+                    <a *ngIf="isInstructor" routerLink="/instructor" class="nav-link text-dark d-none d-lg-block fw-bold" style="font-size: 13px;">Eğitmen</a>
+
+                    <div class="dropdown position-relative" (mouseenter)="showMyCourses=true" (mouseleave)="showMyCourses=false">
+                        <a href="javascript:void(0)" class="nav-link text-dark fw-bold d-none d-lg-block" style="font-size: 13px;" (click)="showMyCourses=!showMyCourses">Eğitimlerim</a>
+                        <a href="javascript:void(0)" class="text-dark d-lg-none" (click)="showMyCourses=!showMyCourses">
+                            <i class='bx bx-play-circle fs-2' style="position: relative; top: 2px;"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0 mt-0" [class.show]="showMyCourses" style="width: 300px; max-width: 90vw; position: absolute; right: 0;">
+                            <div class="p-3 border-bottom bg-light">
+                                <h6 class="m-0 fw-bold">Öğrenim İçeriğim</h6>
+                            </div>
+                            <div class="p-4 text-center text-muted">Henüz kayıt yok.</div>
+                            <div class="p-2 text-center bg-light border-top">
+                                <a routerLink="/dashboard/enrolled-courses" class="fw-bold text-dark text-decoration-none small">Tümüne Git</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a routerLink="/dashboard/wishlist" class="text-dark d-none d-sm-block" title="İstek Listesi"><i class='bx bx-heart fs-4'></i></a>
+                    <a routerLink="/dashboard/cart" class="text-dark position-relative" title="Sepet"><i class='bx bx-cart fs-3'></i></a>
+                    
+                    <div class="dropdown position-relative profile-menu-wrapper" (mouseenter)="isProfileMenuOpen=true" (mouseleave)="isProfileMenuOpen=false">
+                        <a href="javascript:void(0)" class="d-flex align-items-center text-decoration-none" (click)="toggleProfileMenu()">
+                            <div class="user-avatar bg-dark text-white rounded-circle d-flex justify-content-center align-items-center fw-bold" style="width: 32px; height: 32px; font-size: 13px;">
+                                {{ userInitials }}
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-0" [class.show]="isProfileMenuOpen" style="width: 280px; position: absolute; right: 0;">
+                             <li class="p-3 border-bottom">
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar bg-dark text-white rounded-circle d-flex justify-content-center align-items-center fw-bold me-3" style="width: 50px; height: 50px; font-size: 18px;">
+                                        {{ userInitials }}
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <h6 class="m-0 fw-bold text-truncate">{{ userName }}</h6>
+                                        <small class="text-muted text-truncate d-block">{{ userEmail }}</small>
+                                    </div>
+                                </div>
+                            </li>
+                            <div class="py-2">
+                                <li><a routerLink="/dashboard/active-courses" class="dropdown-item py-2 px-3">Öğrenim İçeriğim</a></li>
+                                <li><a routerLink="/dashboard/cart" class="dropdown-item py-2 px-3">Sepetim</a></li>
+                                <li><a routerLink="/dashboard/wishlist" class="dropdown-item py-2 px-3">İstek Listesi</a></li>
+                                <li *ngIf="isInstructor"><a routerLink="/instructor" class="dropdown-item py-2 px-3 fw-bold text-primary">Eğitmen Paneli</a></li>
+                            </div>
+                            <li><hr class="dropdown-divider my-0"></li>
+                            <div class="py-2">
+                                <li><a href="javascript:void(0)" class="dropdown-item py-2 px-3">Bildirimler</a></li>
+                                <li><a href="javascript:void(0)" class="dropdown-item py-2 px-3">Mesajlar</a></li>
+                            </div>
+                            <li><hr class="dropdown-divider my-0"></li>
+                            <div class="py-2">
+                                <li><a routerLink="/dashboard/edit-profile" class="dropdown-item py-2 px-3">Hesap Ayarları</a></li>
+                                <li><a href="javascript:void(0)" class="dropdown-item py-2 px-3">Ödeme Yöntemleri</a></li>
+                                <li><a href="javascript:void(0)" class="dropdown-item py-2 px-3">Satın Alma Geçmişi</a></li>
+                            </div>
+                            <li><hr class="dropdown-divider my-0"></li>
+                            <div class="py-2">
+                                <li><a routerLink="/dashboard/my-profile" class="dropdown-item py-2 px-3">Herkese açık profil</a></li>
+                                <li><a routerLink="/dashboard/edit-profile" class="dropdown-item py-2 px-3">Profili düzenle</a></li>
+                            </div>
+                            <li><hr class="dropdown-divider my-0"></li>
+                            <div class="py-2">
+                                <li><a href="javascript:void(0)" (click)="logout()" class="dropdown-item py-2 px-3 text-danger fw-bold">Oturumu Kapat</a></li>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+
+    <div class="d-none d-lg-block border-top bg-white position-relative" style="z-index: 900;">
+        <ul class="nav justify-content-center category-nav m-0 p-0"> 
+            <li class="nav-item category-hover-item" *ngFor="let cat of popularCategories">
+                <a class="nav-link py-2 px-3" routerLink="/courses-grid">{{ cat.title }}</a>
+                
+                <div class="hover-menu shadow" *ngIf="cat.subCategories && cat.subCategories.length > 0">
+                    <div class="container-fluid px-3">
+                        <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 py-2">
+                            <a *ngFor="let sub of cat.subCategories" 
+                               routerLink="/courses-grid" 
+                               [queryParams]="{subcategory: sub.id}"
+                               class="sub-cat-link">
+                                {{ sub.title }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
     </div>
 </div>

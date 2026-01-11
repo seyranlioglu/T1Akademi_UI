@@ -1,87 +1,90 @@
-import { Component, ElementRef, HostListener, Input } from '@angular/core';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { filter, mergeMap } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/services/auth.service';
+import { CategoryService } from 'src/app/shared/services/category.service';
+import { SidebarService } from 'src/app/shared/services/sidebar.service'; // YENİ: Servisi ekle
+import { TrainingCategory } from 'src/app/shared/models/training-category.model';
 
 @Component({
-    selector: 'app-navbar',
-    templateUrl: './navbar.component.html',
-    styleUrls: ['./navbar.component.scss'],
+  selector: 'app-navbar',
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.scss']
 })
-export class NavbarComponent {
-    showNavbar: boolean = true;
-    // Navbar Sticky
-    isSticky: boolean = false;
-    classApplied = false;
-    searchClassApplied = false;
-    sidebarClassApplied = false;
-    userMenuVisible: boolean = false;
-    isInstructor: boolean = false;
-    @HostListener('window:scroll', ['$event'])
-    checkScroll() {
-        const scrollPosition =
-            window.pageYOffset ||
-            document.documentElement.scrollTop ||
-            document.body.scrollTop ||
-            0;
-        if (scrollPosition >= 70) {
-            this.isSticky = true;
-        } else {
-            this.isSticky = false;
+export class NavbarComponent implements OnInit {
+
+  isLoggedIn = false;
+  isInstructor = false;
+  userName = 'Kullanıcı';
+  userEmail = '';
+  userInitials = 'U';
+
+  showCatMenu = false;
+  showMyCourses = false;
+  isProfileMenuOpen = false;
+  
+  // Eski isMobileMenuOpen değişkenini kaldırdık, artık SidebarService yönetiyor.
+
+  categories: TrainingCategory[] = [];
+  popularCategories: TrainingCategory[] = [];
+
+  constructor(
+    private authService: AuthService,
+    private categoryService: CategoryService,
+    private router: Router,
+    private sidebarService: SidebarService // YENİ: Inject et
+  ) { }
+
+  ngOnInit(): void {
+    const userJson = localStorage.getItem('currentUser');
+    if (userJson) {
+        this.isLoggedIn = true;
+        const user = JSON.parse(userJson);
+        this.userName = user.firstName ? `${user.firstName} ${user.lastName}` : 'Öğrenci';
+        this.userEmail = user.email || '';
+        this.userInitials = this.userName.match(/\b(\w)/g)?.join('').substring(0, 2).toUpperCase() || 'U';
+        
+        this.checkUserRole(user);
+    }
+
+    this.getCategoriesFromApi();
+  }
+
+  checkUserRole(user: any) {
+    if (user.roles && Array.isArray(user.roles)) {
+        this.isInstructor = user.roles.includes('Instructor') || user.roles.includes('Admin');
+    } 
+    else if (user.isInstructor === true) {
+        this.isInstructor = true;
+    }
+  }
+
+  getCategoriesFromApi() {
+    this.categoryService.getCategories().subscribe({
+      next: (response) => {
+        const incomingData = response.body || response.body || response; 
+        if (incomingData) {
+            this.categories = incomingData;
+            this.popularCategories = incomingData; 
         }
-    }
+      },
+      error: (err) => {
+        console.error('Kategoriler yüklenirken hata oluştu:', err);
+      }
+    });
+  }
 
-    constructor(
-        public router: Router,
-        private activatedRoute: ActivatedRoute,
-        public authService: AuthService,
-    ) { }
+  // YENİ: Mobilde menü butonuna basılınca çalışır
+  toggleMobileMenu() {
+    this.sidebarService.toggle(); // Sidebar'a "Açıl/Kapan" emri gönder
+  }
 
-    ngOnInit() {
-        this.router.events
-            .pipe(filter((event) => event instanceof NavigationEnd))
-            .subscribe(() => {
-                let currentRoute = this.activatedRoute;
+  toggleProfileMenu() {
+    this.isProfileMenuOpen = !this.isProfileMenuOpen;
+  }
 
-                while (currentRoute.firstChild) {
-                    currentRoute = currentRoute.firstChild;
-                }
-
-                currentRoute.data.subscribe((data) => {
-                    this.showToolbar(data['toolbar']);
-                });
-            });
-
-        this.authService.currentUser$.subscribe((user) => {
-            if (user) {
-                this.isInstructor = Boolean(user.instructorCode);
-            }
-        });
-
-    }
-
-    showToolbar(event: any) {
-        if (event === false) {
-            this.showNavbar = false;
-        } else if (event === true || event === undefined) {
-            this.showNavbar = true;
-        } else {
-            this.showNavbar = this.showNavbar;
-        }
-    }
-
-    toggleClass() {
-        this.classApplied = !this.classApplied;
-    }
-
-    toggleSearchClass() {
-        this.searchClassApplied = !this.searchClassApplied;
-    }
-
-    toggleSidebarClass() {
-        this.sidebarClassApplied = !this.sidebarClassApplied;
-    }
-    toggleUserMenu() {
-        this.userMenuVisible = !this.userMenuVisible;
-    }
+  logout() {
+    this.authService.logout();
+    this.isLoggedIn = false;
+    this.router.navigate(['/auth/login']).then(() => window.location.reload());
+  }
 }

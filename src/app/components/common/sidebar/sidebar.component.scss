@@ -1,0 +1,102 @@
+$sidebar-width: 260px;
+$sidebar-collapsed-width: 70px;
+$navbar-height: 75px; 
+$primary-color: #5624d0;
+$dark-bg: #1c1d1f;
+$hover-bg: rgba(255, 255, 255, 0.1);
+
+// --- DESKTOP (VARSAYILAN) ---
+.sidebar-wrapper {
+    width: $sidebar-width;
+    background: $dark-bg;
+    color: #fff;
+    position: fixed;
+    top: $navbar-height;
+    left: 0;
+    height: calc(100vh - #{$navbar-height});
+    transition: all 0.3s ease-in-out;
+    z-index: 999;
+    overflow-y: auto;
+    border-right: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 20px;
+
+    &.collapsed {
+        width: $sidebar-collapsed-width;
+        
+        .menu-text, .menu-header, .sidebar-divider, .logo-area, .dropdown-arrow, .sub-menu {
+            display: none !important;
+        }
+        .sidebar-header { justify-content: center; padding: 10px 0; }
+        .menu-link { 
+            justify-content: center; padding: 15px 0; 
+            .menu-icon { margin-right: 0; font-size: 1.5rem; }
+        }
+    }
+}
+
+// --- MOBİL (Responsive Override) ---
+@media (max-width: 991px) {
+    .sidebar-wrapper {
+        top: 0; // Navbar'ın bittiği yerden başla
+        height: 100vh; // Tam ekran boyu
+        z-index: 1100; // Navbar'ın (genelde 1020) üzerine çık
+        width: 280px; // Mobil genişliği
+        transform: translateX(0); // Açıkken görünür
+        box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+
+        &.collapsed {
+            width: 280px; // Genişlik değişmez
+            transform: translateX(-100%); // Soldan dışarı kaydırarak gizle
+            
+            // İçerikleri gizleme, sadece menüyü kaydır
+            .menu-text, .menu-header, .sidebar-divider, .logo-area, .dropdown-arrow, .sub-menu {
+                display: block !important; 
+            }
+            .sidebar-header { justify-content: space-between; padding: 15px 20px; }
+            .menu-link { 
+                justify-content: flex-start; padding: 12px 25px; 
+                .menu-icon { margin-right: 15px; font-size: 1.25rem; }
+            }
+        }
+    }
+}
+
+// --- OVERLAY (Sadece Mobilde) ---
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.5);
+    z-index: 1090; // Sidebar'ın hemen altında
+    opacity: 0;
+    transition: opacity 0.3s;
+
+    &.show {
+        display: block;
+        opacity: 1;
+    }
+}
+
+// Diğer stiller (Header, Linkler vb. aynı kalıyor)
+.sidebar-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
+    .toggle-btn { color: #fff; font-size: 1.5rem; padding: 0; &:hover { color: $primary-color; } }
+}
+.sidebar-content { padding: 10px 0; }
+.menu-header { font-size: 0.75rem; text-transform: uppercase; color: #6c757d; font-weight: 700; padding: 10px 25px 5px; letter-spacing: 1px; }
+.menu-link {
+    display: flex; align-items: center; padding: 12px 25px; color: #d1d7dc; text-decoration: none; transition: all 0.2s; font-size: 0.95rem; border-left: 3px solid transparent; cursor: pointer;
+    .menu-icon { font-size: 1.25rem; margin-right: 15px; width: 20px; text-align: center; }
+    &:hover { background-color: $hover-bg; color: #fff; }
+    &.active { background-color: rgba($primary-color, 0.15); color: $primary-color; border-left-color: $primary-color; font-weight: 600; .menu-icon { color: $primary-color; } }
+    &.has-dropdown { justify-content: space-between; }
+}
+.sidebar-divider { border-color: rgba(255,255,255,0.1); margin: 10px 20px; }
+.sub-menu {
+    display: none; background-color: rgba(0,0,0,0.2);
+    &.show { display: block; }
+    .sub-link { display: block; padding: 10px 20px 10px 55px; color: #adb5bd; font-size: 0.9rem; text-decoration: none; &:hover { color: #fff; } &.active { color: $primary-color; } }
+}
+.dropdown-arrow { transition: transform 0.3s; &.rotate { transform: rotate(180deg); } }

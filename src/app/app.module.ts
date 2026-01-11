@@ -93,6 +93,9 @@ import { CoursePricingComponent } from './components/pages/instructor/course-man
 import { UserMenuComponent } from './components/common/user-menu/user-menu.component';
 import { ResetPasswordPageComponent } from './components/pages/reset-password-page/reset-password-page.component';
 import { ToastrModule } from 'ngx-toastr';
+import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+import { PlayerLayoutComponent } from './layouts/player-layout/player-layout.component';
+import { SidebarComponent } from './components/common/sidebar/sidebar.component';
 @NgModule({
     declarations: [
         AppComponent,
@@ -170,8 +173,11 @@ import { ToastrModule } from 'ngx-toastr';
         CourseLandingComponent,
         CoursePricingComponent,
         CourseComponent,
+                SidebarComponent,
         UserMenuComponent,
-        ResetPasswordPageComponent
+        ResetPasswordPageComponent,
+                MainLayoutComponent,  
+        PlayerLayoutComponent
     ],
     imports: [
         BrowserModule,

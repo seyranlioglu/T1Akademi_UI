@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
-import { catchError, finalize, map, tap } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { UserApiService } from '../api/user-api.service';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
@@ -25,6 +25,7 @@ export class AuthService {
         const auth = this.getAuthFromLocalStorage().subscribe();
         this.unsubscribe.push(auth);
     }
+
     get currentUserValue(): any {
         return this.currentUserSubject.value;
     }
@@ -33,9 +34,15 @@ export class AuthService {
         this.currentUserSubject.next(user);
     }
 
+    // --- GÜNCELLENDİ: Hem Local hem Session Storage kontrolü ---
     private getAuthFromLocalStorage(): Observable<any> {
         try {
-            const lsValue = sessionStorage.getItem(this.authLocalStorageToken);
+            // Önce LocalStorage (Kalıcı), Yoksa SessionStorage (Geçici) bak
+            let lsValue = localStorage.getItem(this.authLocalStorageToken);
+            if (!lsValue) {
+                lsValue = sessionStorage.getItem(this.authLocalStorageToken);
+            }
+
             if (!lsValue) {
                 this.logout();
                 return this.currentUser$;
@@ -52,14 +59,8 @@ export class AuthService {
 
     login(payload: any): Observable<any> {
         this.isLoadingSubject.next(true);
-
         return this.userApiService.signIn({ ...payload }).pipe(
             map((response: any) => {
-                // if (response.header.result) {
-                //     response.body.message && this.toastr.success(response.body.message);
-                //   } else {
-                //     this.toastr.error(response.header.msg);
-                //   }
                 return response;
             }),
             catchError((error: any) => {
@@ -71,27 +72,22 @@ export class AuthService {
 
     register(payload: any): Observable<any> {
         this.isLoadingSubject.next(true);
-
         return this.userApiService.signUp({ ...payload }).pipe(
             map((response: any) => {
-                // if (response.header.result) {
-                //     response.body.message && this.toastr.success(response.body.message);
-                //   } else {
-                //     this.toastr.error(response.header.msg);
-                //   }
                 return response;
             }),
             catchError((error: any) => {
                 throw error;
-            }),
-            //finalize(() => this.isLoadingSubject.next(false))
+            })
         );
     }
 
+    // --- GÜNCELLENDİ: Çıkış yaparken her iki yeri de temizle ---
     logout() {
         sessionStorage.removeItem(this.authLocalStorageToken);
+        localStorage.removeItem(this.authLocalStorageToken);
         this.currentUserSubject.next(undefined);
-        
+
         if (
             !window.location.pathname.includes('verify') &&
             !window.location.pathname.includes('register')
@@ -128,12 +124,15 @@ export class AuthService {
         );
     }
 
-    verify(userName: string, code: string): Observable<any> {
+    // --- GÜNCELLENDİ: rememberMe parametresi eklendi ---
+    verify(userName: string, code: string, rememberMe: boolean): Observable<any> {
         this.isLoadingSubject.next(true);
+        // Not: userApiService.verifySignIn metodun değişmedi, sadece buradaki logic değişti
         return this.userApiService.verifySignIn({ userName, code }).pipe(
             map((response: any) => {
                 if (response.header.result) {
-                    this.saveUserData(response.body, userName);
+                    // Kaydederken tercihi gönderiyoruz
+                    this.saveUserData(response.body, userName, rememberMe);
                 }
                 return response;
             }),
@@ -183,7 +182,8 @@ export class AuthService {
         );
     }
 
-    saveUserData(userData: any, email: string) {
+    // --- GÜNCELLENDİ: rememberMe parametresi ve Storage seçimi ---
+    saveUserData(userData: any, email: string, rememberMe: boolean = false) {
         const user: any = {
             id: userData.id,
             currAccId: userData.currAccId,
@@ -198,10 +198,16 @@ export class AuthService {
             email: email,
         };
 
-        sessionStorage.setItem(
-            this.authLocalStorageToken,
-            JSON.stringify(user)
-        );
+        const userString = JSON.stringify(user);
+
+        if (rememberMe) {
+            // Beni Hatırla: LocalStorage (Kalıcı)
+            localStorage.setItem(this.authLocalStorageToken, userString);
+        } else {
+            // Hatırlama: SessionStorage (Geçici)
+            sessionStorage.setItem(this.authLocalStorageToken, userString);
+        }
+
         this.currentUserSubject.next(user);
     }
 }
