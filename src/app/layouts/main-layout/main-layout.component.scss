@@ -1,0 +1,34 @@
+$navbar-total-height: 140px;
+$sidebar-width: 260px;
+$sidebar-collapsed-width: 70px;
+
+.layout-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f4f7f6; // Kurumsal hafif gri arka plan
+}
+
+.main-content {
+    flex: 1;
+    transition: all 0.3s ease-in-out;
+    
+    // NAVBAR'IN ALTINDA KALMAYI ENGELLEYEN KOD
+    margin-top: $navbar-total-height;
+    
+    // SIDEBAR GENİŞLİĞİ KADAR SOLDAN BOŞLUK (Masaüstü)
+    margin-left: $sidebar-width;
+
+    // Sidebar kapalıyken boşluğu daralt
+    &.sidebar-collapsed {
+        margin-left: $sidebar-collapsed-width;
+    }
+}
+
+// MOBİL UX DÜZENLEMESİ
+@media (max-width: 991px) {
+    .main-content {
+        margin-left: 0 !important; // Mobilde sidebar üstte açıldığı için boşluğa gerek yok
+        margin-top: 70px; // Mobilde navbar genellikle daha incedir
+        padding: 10px;
+    }
+}

@@ -5,19 +5,17 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class SidebarService {
-  // Başlangıç durumu: false (Yani AÇIK/GENİŞ)
-  private collapseSubject = new BehaviorSubject<boolean>(false);
-  
-  // Componentlerin dinleyeceği değişken
+  // true: Kapalı, false: Açık. Default AÇIK olması için false yaptık.
+  private collapseSubject = new BehaviorSubject<boolean>(false); 
   isCollapsed$ = this.collapseSubject.asObservable();
 
-  // Aç/Kapa işlemi
+  constructor() { }
+
   toggle() {
     this.collapseSubject.next(!this.collapseSubject.value);
   }
 
-  // Durumu direkt set etme (örn: Mobildeyken direkt kapat demek için)
-  setCollapseState(isCollapsed: boolean) {
+  setCollapsed(isCollapsed: boolean) {
     this.collapseSubject.next(isCollapsed);
   }
 }

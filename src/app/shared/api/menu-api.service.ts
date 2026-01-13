@@ -3,24 +3,22 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { UserMenu } from '../models/user-menu.model';
+import { UserMenuResponse, MenuItemDto } from '../models/user-menu.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MenuApiService {
-
-  private apiUrl = environment.apiUrl; // environment.ts'de tanımlı olmalı
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
-  // Backend'deki MenuController/GetMyMenu endpoint'ini çağırır
-  getMyMenu(): Observable<UserMenu[]> {
-    return this.http.get<any>(this.apiUrl + '/Menu/my-menu').pipe(
+  getMyMenu(): Observable<MenuItemDto[]> {
+    return this.http.get<UserMenuResponse>(`${this.apiUrl}/Menu/my-menu`).pipe(
       map(response => {
-        // Backend Response<T> döndüğü için response.data veya response.body'yi alıyoruz
-        if (response && response.isSuccess) {
-            return response.data; 
+        // Backend'den gelen 'header.result' kontrol ediliyor
+        if (response && response.header && response.header.result) {
+          return response.body.menuItems;
         }
         return [];
       })

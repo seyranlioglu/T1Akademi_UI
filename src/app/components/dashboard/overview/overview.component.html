@@ -1,0 +1,193 @@
+<div class="overview-container p-4">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold m-0 text-dark">Genel Bakış</h2>
+            <p class="text-muted mb-0">Eğitim gelişimini buradan takip edebilirsin.</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="btn-group p-1 bg-white rounded-pill border shadow-sm">
+                <button class="btn btn-sm rounded-pill px-3" 
+                        [class.btn-dark]="viewMode === 'list'" 
+                        [class.btn-light]="viewMode !== 'list'"
+                        (click)="viewMode = 'list'">
+                    <i class='bx bx-list-ul me-1'></i> Liste
+                </button>
+                <button class="btn btn-sm rounded-pill px-3" 
+                        [class.btn-dark]="viewMode === 'calendar'" 
+                        [class.btn-light]="viewMode !== 'calendar'"
+                        (click)="viewMode = 'calendar'">
+                    <i class='bx bx-calendar me-1'></i> Takvim
+                </button>
+            </div>
+            
+            <div class="text-end border-start ps-3 ms-2 d-none d-md-block">
+                <h5 class="m-0 fw-bold text-primary">{{ today | date:'dd MMMM yyyy' }}</h5>
+                <small class="text-muted">{{ today | date:'EEEE' }}</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5" *ngIf="stats">
+        <div class="col-md-4">
+            <div class="stat-card card border-0 shadow-sm p-4 border-start border-primary border-5">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box bg-primary-light text-primary me-3"><i class='bx bx-play-circle fs-1'></i></div>
+                    <div>
+                        <h3 class="mb-0 fw-bold">{{stats.inProgressTrainingsCount}}</h3>
+                        <small class="text-muted fw-bold">Devam Eden</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card card border-0 shadow-sm p-4 border-start border-success border-5">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box bg-success-light text-success me-3"><i class='bx bx-check-double fs-1'></i></div>
+                    <div>
+                        <h3 class="mb-0 fw-bold">{{stats.completedTrainingsCount}}</h3>
+                        <small class="text-muted fw-bold">Tamamlanan</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card card border-0 shadow-sm p-4 border-start border-warning border-5">
+                <div class="d-flex align-items-center">
+                    <div class="icon-box bg-warning-light text-warning me-3"><i class='bx bx-medal fs-1'></i></div>
+                    <div>
+                        <h3 class="mb-0 fw-bold">{{stats.totalCertificates}}</h3>
+                        <small class="text-muted fw-bold">Sertifikalar</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div [ngSwitch]="viewMode">
+        
+        <div *ngSwitchCase="'list'" class="animate__animated animate__fadeIn">
+            
+            <div class="row g-4">
+                <div class="col-lg-12">
+                    
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white border-0 py-3">
+                            <h5 class="fw-bold m-0"><i class='bx bx-pin text-danger me-2'></i>Sana Atanan Zorunlu Eğitimler</h5>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4">Eğitim</th>
+                                        <th>Eğitmen</th>
+                                        <th>Durum</th>
+                                        <th class="text-end pe-4">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of assignedTrainings">
+                                        <td class="ps-4">
+                                            <div class="d-flex align-items-center">
+                                                <img [src]="item.imageUrl || 'assets/images/courses/course1.jpg'" class="rounded me-3" width="40" height="40" style="object-fit: cover;">
+                                                <span class="fw-bold small">{{item.title}}</span>
+                                            </div>
+                                        </td>
+                                        <td class="small text-muted">{{item.instructorName}}</td>
+                                        <td>
+                                            <span *ngIf="item.accessStatus === 'Active'" class="badge bg-success-light text-success">Aktif</span>
+                                            <span *ngIf="item.accessStatus === 'NotStarted'" class="badge bg-secondary-light text-secondary">Başlamadı</span>
+                                            <span *ngIf="item.accessStatus === 'Expired'" class="badge bg-danger-light text-danger">Süresi Doldu</span>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <button *ngIf="item.accessStatus !== 'Expired'" class="btn btn-outline-dark btn-sm" [routerLink]="['/course', item.id]">Detay</button>
+                                            <button *ngIf="item.accessStatus === 'Expired'" class="btn btn-danger btn-sm shadow-sm">
+                                                <i class='bx bx-time-five me-1'></i> Süre Uzat
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="assignedTrainings.length === 0">
+                                        <td colspan="4" class="text-center py-4 text-muted small">Atanmış zorunlu eğitim bulunmamaktadır.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white border-0 py-3">
+                            <h5 class="fw-bold m-0"><i class='bx bx-medal text-warning me-2'></i>Kazanılan Sertifikalar</h5>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="ps-4">Eğitim Adı</th>
+                                        <th>Sertifika Tipi</th>
+                                        <th>Eğitmen</th>
+                                        <th>Tarih</th>
+                                        <th class="text-end pe-4">İşlem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let cert of myCertificates">
+                                        <td class="ps-4 fw-bold small text-dark">{{cert.trainingName}}</td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border">{{cert.templateTitle}}</span>
+                                        </td>
+                                        <td class="small text-muted">{{cert.trainerName}}</td>
+                                        <td class="small text-muted">{{cert.certificateDate | date:'dd.MM.yyyy'}}</td>
+                                        <td class="text-end pe-4">
+                                            <a *ngIf="cert.verificationURL" [href]="cert.verificationURL" target="_blank" class="btn btn-primary btn-sm shadow-sm">
+                                                <i class='bx bx-download me-1'></i> İndir
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="myCertificates.length === 0">
+                                        <td colspan="5" class="text-center py-4 text-muted small">Henüz kazanılmış bir sertifika yok.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div *ngSwitchCase="'calendar'" class="animate__animated animate__fadeIn">
+            <app-calendar-view [trainings]="assignedTrainings"></app-calendar-view>
+        </div>
+
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm bg-white">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold m-0"><i class='bx bx-star text-primary me-2'></i>Senin İçin Önerilenler</h5>
+                    <a routerLink="/courses-grid" class="text-primary small text-decoration-none">Tümünü Gör</a>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <div *ngIf="recommendedTrainings.length > 0; else noData">
+                        <owl-carousel-o [options]="customOptions">
+                            <ng-template carouselSlide *ngFor="let item of recommendedTrainings">
+                                <div class="p-1 h-100">
+                                    <app-course-card [training]="item"></app-course-card>
+                                </div>
+                            </ng-template>
+                        </owl-carousel-o>
+                    </div>
+
+                    <ng-template #noData>
+                        <div class="alert alert-light text-center border">
+                            <i class='bx bx-info-circle me-2'></i>Şu an için önerilecek yeni eğitim bulunmamaktadır.
+                        </div>
+                    </ng-template>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>

@@ -1,0 +1,49 @@
+.overview-container { background-color: transparent; }
+
+.stat-card {
+    transition: transform 0.3s ease;
+    border-radius: 15px;
+    &:hover { transform: translateY(-5px); }
+    .icon-box {
+        width: 60px; height: 60px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 15px;
+    }
+}
+
+.bg-primary-light { background-color: rgba(255, 25, 73, 0.1); }
+.bg-success-light { background-color: rgba(25, 135, 84, 0.1); }
+.bg-warning-light { background-color: rgba(255, 193, 7, 0.1); }
+.bg-secondary-light { background-color: rgba(108, 117, 125, 0.1); }
+.bg-danger-light { background-color: rgba(220, 53, 69, 0.1); }
+
+// Animasyon
+.animate__animated { --animate-duration: 0.5s; }
+
+// --- YENİ EKLENEN: Owl Carousel Ok Stilleri ---
+::ng-deep .owl-carousel {
+    .owl-nav {
+        position: absolute;
+        top: -50px; // Başlığın yanına taşıma veya kartın ortasına alma tercihi
+        right: 0;
+        
+        .owl-prev, .owl-next {
+            background-color: #f8f9fa !important;
+            color: #1c1d1f !important;
+            border: 1px solid #d1d7dc !important;
+            border-radius: 50% !important;
+            width: 32px;
+            height: 32px;
+            line-height: 32px !important;
+            margin: 0 4px;
+            font-size: 18px !important;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background-color: #1c1d1f !important;
+                color: #fff !important;
+                border-color: #1c1d1f !important;
+            }
+        }
+    }
+}

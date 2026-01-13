@@ -1,0 +1,44 @@
+<div class="course-card" [routerLink]="['/course-details', training.id]">
+    <div class="card-image">
+        <img [src]="training.headerImage || 'assets/images/courses/course1.jpg'" [alt]="training.title">
+        <span *ngIf="training.discountRate > 0" class="badge-discount">
+            %{{ training.discountRate }} İndirim
+        </span>
+    </div>
+
+    <div class="card-content">
+        <div class="meta-tags">
+            <span class="category">{{ training.categoryTitle }}</span>
+            <span class="level dot-separator">{{ training.trainingLevelTitle }}</span>
+        </div>
+
+        <h3 class="title" [title]="training.title">
+            {{ training.title }}
+        </h3>
+
+        <div class="instructor">
+            <span class="name">{{ training.instructorTitle }}</span>
+        </div>
+
+        <div class="rating-box">
+            <span class="rating-number">{{ training.rating | number:'1.1-1' }}</span>
+            <div class="stars">
+                <i class="bx bxs-star" *ngFor="let s of [1,2,3,4,5]" 
+                   [ngClass]="{'checked': s <= training.rating, 'bx-star': s > training.rating}"></i>
+            </div>
+            <span class="review-count">({{ training.reviewCount }})</span>
+        </div>
+
+        <div class="price-box">
+            <ng-container *ngIf="training.currentAmount > 0; else freeCourse">
+                <span class="current-price">{{ training.currentAmount | currency:'TRY':'symbol-narrow':'1.2-2' }}</span>
+                <span *ngIf="training.discountRate > 0" class="original-price">
+                    {{ training.amount | currency:'TRY':'symbol-narrow':'1.2-2' }}
+                </span>
+            </ng-container>
+            <ng-template #freeCourse>
+                <span class="free-badge">Ücretsiz</span>
+            </ng-template>
+        </div>
+    </div>
+</div>

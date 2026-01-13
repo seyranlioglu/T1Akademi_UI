@@ -1,103 +1,73 @@
-<div class="sidebar-overlay" 
-     [class.show]="!isCollapsed && isMobile" 
-     (click)="closeMobileMenu()">
-</div>
-
 <div class="sidebar-wrapper" [class.collapsed]="isCollapsed">
     
     <div class="sidebar-header">
-        <div class="logo-area" *ngIf="!isCollapsed">
-            <span class="fw-bold fs-5 text-white">HrHub</span>
+        <div class="toggle-btn-container" (click)="toggleSidebar()">
+            <i class='bx' [ngClass]="isCollapsed ? 'bx-menu' : 'bx-chevron-left'"></i>
         </div>
-        <button class="btn btn-icon toggle-btn" (click)="toggleSidebar()">
-            <i class='bx' [class.bx-menu-alt-left]="!isCollapsed" [class.bx-menu]="isCollapsed"></i>
-        </button>
     </div>
 
-    <div class="sidebar-content">
-        
-        <ul class="list-unstyled components">
-            <li class="menu-header" *ngIf="!isCollapsed">Genel</li>
-            <li *ngFor="let item of staticMenuItems">
-                <a [routerLink]="item.path" routerLinkActive="active" 
-                   [routerLinkActiveOptions]="{exact: true}" 
-                   class="menu-link"
-                   (click)="closeMobileMenu()">
-                    <i [class]="item.icon" class="menu-icon"></i>
-                    <span class="menu-text">{{ item.title }}</span>
+    <div class="sidebar-body">
+        <ul class="sidebar-nav">
+            
+            <li class="menu-label" *ngIf="!isCollapsed">Genel</li>
+            <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                <a routerLink="/dashboard">
+                    <i class='bx bx-home-circle'></i>
+                    <span class="link-text" *ngIf="!isCollapsed">Genel Bakış</span>
                 </a>
             </li>
-        </ul>
 
-        <hr class="sidebar-divider" *ngIf="dynamicMenuItems.length > 0">
-
-        <ul class="list-unstyled components">
-            <li class="menu-header" *ngIf="!isCollapsed && dynamicMenuItems.length > 0">Yönetim</li>
-
-            <li *ngFor="let item of dynamicMenuItems">
-                <a *ngIf="!item.children || item.children.length === 0" 
-                   [routerLink]="item.path" routerLinkActive="active" 
-                   class="menu-link"
-                   (click)="closeMobileMenu()">
-                    <i [class]="item.icon" class="menu-icon"></i>
-                    <span class="menu-text">{{ item.title }}</span>
-                </a>
-
-                <div *ngIf="item.children && item.children.length > 0" class="dropdown-wrapper">
-                    <a href="javascript:void(0)" class="menu-link has-dropdown" (click)="item['isOpen'] = !item['isOpen']">
-                        <div class="d-flex align-items-center">
-                            <i [class]="item.icon" class="menu-icon"></i>
-                            <span class="menu-text">{{ item.title }}</span>
-                        </div>
-                        <i class='bx bx-chevron-down dropdown-arrow' [class.rotate]="item['isOpen']"></i>
-                    </a>
-                    
-                    <ul class="sub-menu list-unstyled" [class.show]="item['isOpen']" *ngIf="!isCollapsed">
-                        <li *ngFor="let sub of item.children">
-                            <a [routerLink]="sub.path" routerLinkActive="active" class="sub-link" (click)="closeMobileMenu()">
-                                <i class='bx bx-radio-circle me-2'></i>{{ sub.title }}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </li>
-        </ul>
-
-        <ng-container *ngIf="isMobile">
-            <hr class="sidebar-divider">
-            <ul class="list-unstyled components">
-                <li class="menu-header">Kategoriler</li>
-                
-                <li *ngFor="let cat of categories">
-                    <a href="javascript:void(0)" class="menu-link has-dropdown" (click)="toggleMobileCategory(cat.id)">
-                        <div class="d-flex align-items-center">
-                            <i class='bx bx-folder menu-icon'></i> 
-                            <span class="menu-text">{{ cat.title }}</span>
-                        </div>
-                        <i *ngIf="cat.subCategories && cat.subCategories.length > 0" 
-                           class='bx bx-chevron-down dropdown-arrow' 
-                           [class.rotate]="activeMobileCategory === cat.id">
-                        </i>
+            <ng-container *ngIf="userMenuItems && userMenuItems.length > 0">
+                <li class="sidebar-divider"></li>
+                <li *ngFor="let item of userMenuItems">
+                    <a *ngIf="!item.children || item.children.length === 0" 
+                       [routerLink]="item.path" routerLinkActive="active">
+                        <i [class]="item.icon"></i>
+                        <span class="link-text" *ngIf="!isCollapsed">{{ item.title }}</span>
                     </a>
 
-                    <ul class="sub-menu list-unstyled" 
-                        [class.show]="activeMobileCategory === cat.id" 
-                        *ngIf="cat.subCategories && cat.subCategories.length > 0">
-                        <li *ngFor="let sub of cat.subCategories">
-                            <a routerLink="/courses-grid" [queryParams]="{subcategory: sub.id}" 
-                               class="sub-link" (click)="closeMobileMenu()">
-                                <i class='bx bx-right-arrow-alt me-2'></i>{{ sub.title }}
-                            </a>
-                        </li>
-                    </ul>
+                    <div *ngIf="item.children && item.children.length > 0">
+                        <a href="javascript:void(0)" (click)="toggleItem(item)" [class.active]="item.expanded">
+                            <i [class]="item.icon"></i>
+                            <span class="link-text" *ngIf="!isCollapsed">{{ item.title }}</span>
+                            <i class='bx arrow-icon' [ngClass]="item.expanded ? 'bx-chevron-down' : 'bx-chevron-right'" *ngIf="!isCollapsed"></i>
+                        </a>
+                        <ul class="sub-menu" [class.show]="item.expanded && !isCollapsed">
+                            <li *ngFor="let child of item.children">
+                                <a [routerLink]="child.path" routerLinkActive="active" class="sub-link">{{ child.title }}</a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
-            </ul>
-        </ng-container>
-        
-        <div class="p-3 d-lg-none mt-4 border-top border-secondary">
-             <a href="javascript:void(0)" class="btn btn-danger w-100 btn-sm">
-                <i class='bx bx-log-out me-2'></i> Çıkış Yap
-             </a>
-        </div>
+            </ng-container>
+
+            <li class="sidebar-divider"></li>
+            <li class="menu-label" *ngIf="!isCollapsed">Kategoriler</li>
+            <li *ngFor="let cat of categories">
+                <a (click)="toggleItem(cat)" href="javascript:void(0)" class="category-root-link" [class.active]="cat.expanded">
+                    <span class="link-text" *ngIf="!isCollapsed">{{ cat.title }}</span>
+                    <i *ngIf="cat.subCategories && cat.subCategories.length > 0 && !isCollapsed" 
+                       class='bx arrow-icon' 
+                       [ngClass]="cat.expanded ? 'bx-chevron-down' : 'bx-chevron-right'"></i>
+                </a>
+                
+                <ul class="sub-menu" [class.show]="cat.expanded && !isCollapsed" *ngIf="cat.subCategories && cat.subCategories.length > 0">
+                    <li *ngFor="let sub of cat.subCategories">
+                        <a [routerLink]="['/courses']" [queryParams]="{category: sub.id}" class="sub-link">{{ sub.title }}</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="sidebar-footer">
+        <ul class="sidebar-nav">
+            <li>
+                <a routerLink="/auth/logout">
+                    <i class='bx bx-log-out'></i>
+                    <span class="link-text" *ngIf="!isCollapsed">Çıkış Yap</span>
+                </a>
+            </li>
+        </ul>
     </div>
 </div>

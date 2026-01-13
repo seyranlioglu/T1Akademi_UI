@@ -1,9 +1,9 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { SidebarService } from 'src/app/shared/services/sidebar.service';
-import { MenuService } from 'src/app/shared/services/menu.service';
-import { CategoryService } from 'src/app/shared/services/category.service'; // YENİ EKLENDİ
-import { UserMenuDto } from 'src/app/shared/models/user-menu.model';
-import { TrainingCategory } from 'src/app/shared/models/training-category.model'; // Modelin yeri burası varsayıldı
+import { CategoryService } from 'src/app/shared/services/category.service';
+import { MenuApiService } from 'src/app/shared/api/menu-api.service';
+import { MenuItemDto } from 'src/app/shared/models/user-menu.model';
 
 @Component({
   selector: 'app-sidebar',
@@ -11,89 +11,49 @@ import { TrainingCategory } from 'src/app/shared/models/training-category.model'
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit {
-
-  isCollapsed = false;
-  isMobile = false;
-
-  // --- SABİT MENÜLER ---
-  staticMenuItems: UserMenuDto[] = [
-    { title: 'Kontrol Paneli', path: '/dashboard', icon: 'bx bx-home-circle' },
-    { title: 'Profilim', path: '/dashboard/my-profile', icon: 'bx bx-user' },
-    { title: 'Eğitimlerim', path: '/dashboard/enrolled-courses', icon: 'bx bx-book-bookmark' },
-    { title: 'İstek Listesi', path: '/dashboard/wishlist', icon: 'bx bx-heart' },
-    { title: 'Siparişlerim', path: '/dashboard/orders-list', icon: 'bx bx-cart' },
-    { title: 'Ayarlar', path: '/dashboard/edit-profile', icon: 'bx bx-cog' },
-  ];
-
-  // --- DİNAMİK ROLLER MENÜSÜ ---
-  dynamicMenuItems: UserMenuDto[] = [];
-  isInstructor = false;
-
-  // --- KATEGORİLER (Sadece Mobil İçin) ---
-  categories: TrainingCategory[] = [];
-  activeMobileCategory: number | null = null; // Mobilde açılan kategori accordion'u için
+  isCollapsed: boolean = true;
+  userMenuItems: MenuItemDto[] = [];
+  categories: any[] = [];
 
   constructor(
+    public router: Router,
     private sidebarService: SidebarService,
-    private menuService: MenuService,
-    private categoryService: CategoryService // Inject ettik
-  ) { }
+    private categoryService: CategoryService,
+    private menuService: MenuApiService
+  ) {}
 
-  ngOnInit(): void {
-    this.checkScreenSize();
-    
-    this.sidebarService.isCollapsed$.subscribe(state => {
-      this.isCollapsed = state;
+  ngOnInit() {
+    this.sidebarService.isCollapsed$.subscribe(status => {
+      this.isCollapsed = status;
     });
 
-    this.getMenuFromApi();
-    this.getCategories(); // Kategorileri çek
+    this.fetchUserMenu();
+    this.fetchCategories();
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.checkScreenSize();
-  }
-
-  checkScreenSize() {
-    this.isMobile = window.innerWidth <= 991;
-  }
-
-  // --- API İŞLEMLERİ ---
-  getMenuFromApi() {
+  fetchUserMenu() {
     this.menuService.getMyMenu().subscribe({
-      next: (response: any) => {
-        const data = response.data || response; 
-        if (data) {
-          this.isInstructor = data.isInstructor;
-          this.dynamicMenuItems = data.menuItems || [];
-        }
+      next: (menuData) => {
+        this.userMenuItems = menuData;
+        console.log("Menü Başarıyla Yüklendi:", this.userMenuItems);
+      },
+      error: (err) => {
+        console.error("Menü yüklenirken hata oluştu:", err);
       }
     });
   }
 
-  getCategories() {
-    this.categoryService.getCategories().subscribe({
-        next: (response: any) => {
-            // Backend yapına göre response.body veya response.data olabilir, kontrol et
-            this.categories = response.body || response.data || response;
-        }
+  fetchCategories() {
+    this.categoryService.getCategories().subscribe((res: any) => {
+      const data = res.data || res.body || res;
+      if (Array.isArray(data)) {
+        this.categories = data;
+      }
     });
   }
 
-  // --- AKSİYONLAR ---
-  toggleMobileCategory(catId: number) {
-    if (this.activeMobileCategory === catId) {
-      this.activeMobileCategory = null;
-    } else {
-      this.activeMobileCategory = catId;
-    }
-  }
-
-  closeMobileMenu() {
-    if (this.isMobile) {
-      this.sidebarService.setCollapseState(true);
-    }
+  toggleItem(item: any) {
+    item.expanded = !item.expanded;
   }
 
   toggleSidebar() {

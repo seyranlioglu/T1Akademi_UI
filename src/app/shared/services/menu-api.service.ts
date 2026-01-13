@@ -7,15 +7,16 @@ import { UserMenuResponseDto } from '../models/user-menu.model';
 @Injectable({
   providedIn: 'root'
 })
-export class MenuService {
+export class MenuApiService { // Class ismini dosya ismiyle uyumlu yaptım
+  
   // Backend API adresin environment'tan gelir
   private apiUrl = `${environment.apiUrl}/Menu`;
 
   constructor(private http: HttpClient) { }
 
   getMyMenu(): Observable<any> {
-    // Backend Wrapper ile dönüyordu: { data: { isInstructor: true, menuItems: [...] }, success: true }
-    // Response yapına göre burayı map'leyebiliriz ama genelde direkt çağırıyoruz.
+    // Backend Wrapper ile dönüyorsa (Result<T>) response yapısına göre düzenlenebilir.
+    // Şimdilik senin istediğin gibi direkt çağırıyoruz.
     return this.http.get<UserMenuResponseDto>(`${this.apiUrl}/my-menu`);
   }
 }

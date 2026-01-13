@@ -2,113 +2,121 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+ import { TrainingCard } from '../models/training-card.model'; 
 
 const API_TRAINING_URL = `${environment.apiUrl}/Training`;
 const API_TRAINING_CATEGORY_URL = `${environment.apiUrl}/TrainingCategory`;
 const API_TRAINING_CONTENT_URL = `${environment.apiUrl}/TrainingContent`;
 const API_TRAINING_SECTION_URL = `${environment.apiUrl}/TrainingSection`;
-
 const API_WHAT_YOU_WILL_LEARN_URL = `${environment.apiUrl}/WhatYouWillLearn`;
 
 @Injectable({
-    providedIn: 'root',
+  providedIn: 'root',
 })
 export class TrainingApiService {
-    constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
-    addTraining(payload: any): Observable<any> {
-        return this.http.post<any>(`${API_TRAINING_URL}/AddTraining`, payload);
-    }
+  getRecommendedTrainings(): Observable<TrainingCard> {
+    return this.http.get<any>(`${API_TRAINING_URL}/get-recommended-trainings`);
+  }
+  // --------------------------
 
-    updateTraining(payload: any): Observable<any> {
-        return this.http.put<any>(
-            `${API_TRAINING_URL}/UpdateTraining`,
-            payload
-        );
-    }
+  addTraining(payload: any): Observable<any> {
+    return this.http.post<any>(`${API_TRAINING_URL}/AddTraining`, payload);
+  }
 
-    getTrainings(): Observable<any[]> {
-        return this.http.get<any>(`${API_TRAINING_URL}/GetList`);
-    }
+  updateTraining(payload: any): Observable<any> {
+    return this.http.put<any>(
+      `${API_TRAINING_URL}/UpdateTraining`,
+      payload
+    );
+  }
 
-    getTrainingById(id: number): Observable<any> {
-        return this.http.get<any>(`${API_TRAINING_URL}/GetById?id=${id}`);
-    }
+  getTrainings(): Observable<any[]> {
+    return this.http.get<any>(`${API_TRAINING_URL}/GetList`);
+  }
 
-    deleteTraining(id: number): Observable<any> {
-        return this.http.delete<any>(`${API_TRAINING_URL}/DeleteTraining/${id}`);
-    }
+  getTrainingById(id: number): Observable<any> {
+    return this.http.get<any>(`${API_TRAINING_URL}/GetById?id=${id}`);
+  }
 
-    addTrainingCategory(payload: any): Observable<any> {
-        return this.http.post<any>(`${API_TRAINING_CATEGORY_URL}/AddTrainingCategory`, payload);
-    }
+  deleteTraining(id: number): Observable<any> {
+    return this.http.delete<any>(`${API_TRAINING_URL}/DeleteTraining/${id}`);
+  }
 
-    updateTrainingCategory(payload: any): Observable<any> {
-        return this.http.put<any>(`${API_TRAINING_CATEGORY_URL}/UpdateTrainingCategory`, payload);
-    }
+  addTrainingCategory(payload: any): Observable<any> {
+    return this.http.post<any>(`${API_TRAINING_CATEGORY_URL}/AddTrainingCategory`, payload);
+  }
 
-    getTrainingCategories(): Observable<any[]> {
-        return this.http.get<any[]>(`${API_TRAINING_CATEGORY_URL}/GetList`);
-    }
+  updateTrainingCategory(payload: any): Observable<any> {
+    return this.http.put<any>(`${API_TRAINING_CATEGORY_URL}/UpdateTrainingCategory`, payload);
+  }
 
-    getTrainingCategoryById(id: number): Observable<any> {
-        return this.http.get<any>(`${API_TRAINING_CATEGORY_URL}/GetById/${id}`);
-    }
+  getTrainingCategories(): Observable<any[]> {
+    return this.http.get<any[]>(`${API_TRAINING_CATEGORY_URL}/GetList`);
+  }
 
-    deleteTrainingCategory(id: number): Observable<any> {
-        return this.http.delete<any>(`${API_TRAINING_CATEGORY_URL}/DeleteTrainingCategory/${id}`);
-    }
+  getTrainingCategoryById(id: number): Observable<any> {
+    return this.http.get<any>(`${API_TRAINING_CATEGORY_URL}/GetById/${id}`);
+  }
 
-    addTrainingContent(payload: any): Observable<any> {
-        return this.http.post<any>(`${API_TRAINING_CONTENT_URL}/AddTrainingContent`, payload);
-    }
+  deleteTrainingCategory(id: number): Observable<any> {
+    return this.http.delete<any>(`${API_TRAINING_CATEGORY_URL}/DeleteTrainingCategory/${id}`);
+  }
 
-    updateTrainingContent(payload: any): Observable<any> {
-        return this.http.put<any>(`${API_TRAINING_CONTENT_URL}/UpdateTrainingContent`, payload);
-    }
+  addTrainingContent(payload: any): Observable<any> {
+    return this.http.post<any>(`${API_TRAINING_CONTENT_URL}/AddTrainingContent`, payload);
+  }
 
-    getTrainingContents(): Observable<any[]> {
-        return this.http.get<any[]>(`${API_TRAINING_CONTENT_URL}/GetList`);
-    }
+  updateTrainingContent(payload: any): Observable<any> {
+    return this.http.put<any>(`${API_TRAINING_CONTENT_URL}/UpdateTrainingContent`, payload);
+  }
 
-    getTrainingContentById(id: number): Observable<any> {
-        return this.http.get<any>(`${API_TRAINING_CONTENT_URL}/GetById/${id}`);
-    }
+  getTrainingContents(): Observable<any[]> {
+    return this.http.get<any[]>(`${API_TRAINING_CONTENT_URL}/GetList`);
+  }
 
-    deleteTrainingContent(id: number): Observable<any> {
-        return this.http.delete<any>(`${API_TRAINING_CONTENT_URL}/DeleteTrainingContent`, { body:  id  });
-    }
+  getTrainingContentById(id: number): Observable<any> {
+    return this.http.get<any>(`${API_TRAINING_CONTENT_URL}/GetById/${id}`);
+  }
 
-    addTrainingSection(payload: any): Observable<any> {
-        return this.http.post<any>(`${API_TRAINING_SECTION_URL}/AddTrainingSection`, payload);
-    }
+  deleteTrainingContent(id: number): Observable<any> {
+    return this.http.delete<any>(`${API_TRAINING_CONTENT_URL}/DeleteTrainingContent`, { body:  id  });
+  }
 
-    updateTrainingSection(payload: any): Observable<any> {
-        return this.http.put<any>(`${API_TRAINING_SECTION_URL}/UpdateTrainingSection`, payload);
-    }
+  addTrainingSection(payload: any): Observable<any> {
+    return this.http.post<any>(`${API_TRAINING_SECTION_URL}/AddTrainingSection`, payload);
+  }
 
-    getTrainingSections(): Observable<any[]> {
-        return this.http.get<any[]>(`${API_TRAINING_SECTION_URL}/GetList`);
-    }
+  updateTrainingSection(payload: any): Observable<any> {
+    return this.http.put<any>(`${API_TRAINING_SECTION_URL}/UpdateTrainingSection`, payload);
+  }
 
-    getTrainingSectionById(id: number): Observable<any> {
-        return this.http.get<any>(`${API_TRAINING_SECTION_URL}/GetById/${id}`);
-    }
+  getTrainingSections(): Observable<any[]> {
+    return this.http.get<any[]>(`${API_TRAINING_SECTION_URL}/GetList`);
+  }
 
-    deleteTrainingSection(id: number): Observable<any> {
-        return this.http.delete<any>(`${API_TRAINING_SECTION_URL}/DeleteTrainingSection`, { body:  id  });
-    }
+  getTrainingSectionById(id: number): Observable<any> {
+    return this.http.get<any>(`${API_TRAINING_SECTION_URL}/GetById/${id}`);
+  }
 
-    addWhatYouWillLearn(payload: any): Observable<any> {
-        return this.http.post<any>(`${API_WHAT_YOU_WILL_LEARN_URL}/AddWhatYouWillLearn`, payload);
-    }
-    updateWhatYouWillLearn(payload: any): Observable<any> {
-        return this.http.put<any>(`${API_WHAT_YOU_WILL_LEARN_URL}/UpdateWhatYouWillLearn`, payload);
-    }
-    getWhatYouWillLearn(): Observable<any> {
-        return this.http.get<any[]>(`${API_WHAT_YOU_WILL_LEARN_URL}/GetList`);
-    }
-    deleteWhatYouWillLearn(id: number): Observable<any> {
-        return this.http.delete<any>(`${API_WHAT_YOU_WILL_LEARN_URL}/DeleteWhatYouWillLearn`, { body:  id  });
-    }
+  deleteTrainingSection(id: number): Observable<any> {
+    return this.http.delete<any>(`${API_TRAINING_SECTION_URL}/DeleteTrainingSection`, { body:  id  });
+  }
+
+  addWhatYouWillLearn(payload: any): Observable<any> {
+    return this.http.post<any>(`${API_WHAT_YOU_WILL_LEARN_URL}/AddWhatYouWillLearn`, payload);
+  }
+  
+  updateWhatYouWillLearn(payload: any): Observable<any> {
+    return this.http.put<any>(`${API_WHAT_YOU_WILL_LEARN_URL}/UpdateWhatYouWillLearn`, payload);
+  }
+  
+  getWhatYouWillLearn(): Observable<any> {
+    return this.http.get<any[]>(`${API_WHAT_YOU_WILL_LEARN_URL}/GetList`);
+  }
+  
+  deleteWhatYouWillLearn(id: number): Observable<any> {
+    return this.http.delete<any>(`${API_WHAT_YOU_WILL_LEARN_URL}/DeleteWhatYouWillLearn`, { body:  id  });
+  }
 }

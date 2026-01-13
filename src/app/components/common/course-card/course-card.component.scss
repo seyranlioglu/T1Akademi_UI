@@ -1,0 +1,133 @@
+.course-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #d1d7dc; /* Udemy gri border */
+    border-radius: 0; /* Udemy kartları genelde köşeli veya çok az radiusludur */
+    overflow: hidden;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease;
+    height: 100%; /* Slider içinde eşit boyda durması için */
+    min-height: 320px;
+
+    &:hover {
+        box-shadow: 0 2px 8px 2px rgba(20, 23, 28, .15);
+        
+        .card-image img {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+    }
+
+    .card-image {
+        position: relative;
+        height: 150px;
+        overflow: hidden;
+        
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .badge-discount {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background-color: #ec5252;
+            color: #fff;
+            padding: 2px 6px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 2px;
+        }
+    }
+
+    .card-content {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+
+        .title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1c1d1f;
+            margin: 8px 0;
+            line-height: 1.4;
+            
+            /* 2 satırdan sonrasını ... ile kes (Line Clamp) */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .meta-tags {
+            font-size: 11px;
+            color: #6a6f73;
+            margin-bottom: 4px;
+            
+            .category { font-weight: 600; color: #5624d0; } /* Udemy moru */
+            .dot-separator::before { content: "•"; margin: 0 4px; }
+        }
+
+        .instructor {
+            font-size: 12px;
+            color: #6a6f73;
+            margin-bottom: 8px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .rating-box {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+
+            .rating-number {
+                font-weight: 700;
+                color: #b4690e;
+                font-size: 14px;
+                margin-right: 4px;
+            }
+
+            .stars {
+                i { color: #e59819; font-size: 12px; margin-right: 1px; }
+                i.bx-star { color: #d1d7dc; } /* Boş yıldız rengi */
+            }
+
+            .review-count {
+                font-size: 12px;
+                color: #6a6f73;
+                margin-left: 4px;
+            }
+        }
+
+        .price-box {
+            margin-top: auto; /* En alta yapıştır */
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .current-price {
+                font-size: 18px;
+                font-weight: 800;
+                color: #1c1d1f;
+            }
+
+            .original-price {
+                font-size: 14px;
+                color: #6a6f73;
+                text-decoration: line-through;
+            }
+
+            .free-badge {
+                font-weight: 700;
+                color: #198754;
+            }
+        }
+    }
+}

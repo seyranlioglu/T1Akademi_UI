@@ -3,9 +3,18 @@
     font-family: 'Spartan', sans-serif;
 }
 
+// LOGO BÜYÜTME
+.navbar-brand {
+    .logo-img {
+        height: 60px !important; // Logoyu belirgin şekilde büyüttük
+        width: auto;
+        transition: all 0.3s ease;
+    }
+}
+
 // 1. ÜST DUYURU BARI
 .top-info-bar {
-    background-color: #eceff1;
+    background-color: #ffd000;
     color: #2d2f31;
     font-size: 13px;
     font-weight: 700;
@@ -21,169 +30,72 @@
     font-size: 14px;
     color: #2d2f31 !important;
     transition: color 0.2s;
-    &:hover { color: #5624d0 !important; }
+    &:hover { color: #ff1949 !important; }
 }
 
 .category-link {
     font-size: 14px;
     font-weight: 700; 
     padding: 15px 0;
-    &:hover { color: #5624d0 !important; }
+    &:hover { color: #ff1949 !important; }
 }
 
 .search-box {
     .input-group {
-        border: 1px solid #989ca4;
+        border: 1px solid #1c1d1f;
         border-radius: 999px;
         transition: all 0.2s;
         background-color: #f7f9fa;
         &:focus-within {
             background-color: #fff !important;
-            border-color: #1c1d1f !important;
+            border-color: #ff1949 !important;
             button, input { background-color: #fff !important; }
         }
     }
 }
 
-.profile-menu-wrapper {
-    padding-bottom: 10px; 
-    margin-bottom: -10px; 
-    cursor: pointer;
-}
-
 // 3. ALT KATEGORİ BARI & SİYAH MENÜ
-
 .category-nav {
     display: flex;
     justify-content: center;
-    width: auto !important;
-    margin: 0 auto;
-    padding: 0;
     list-style: none;
+    margin: 0; padding: 0;
 
-    .nav-item { 
-        position: static; 
-        flex: none; 
-    } 
+    .nav-item { position: static; } 
 
     .nav-link {
         font-size: 14px;
         color: #6a6f73 !important;
-        font-weight: 400;
         padding: 15px 20px;
-        display: block;
-        cursor: pointer;
         position: relative; 
-        
-        // Köprü
         &::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 20px; 
-            z-index: 800;
+            content: ''; position: absolute; bottom: 0; left: 0;
+            width: 100%; height: 20px; z-index: 800;
         }
-
         &:hover { color: #1c1d1f !important; }
     }
 
-    // --- ÜÇGEN (OK) ---
     .category-hover-item:hover .nav-link::before {
-        content: '';
-        position: absolute;
-        bottom: 0; 
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0; 
-        height: 0; 
-        border-left: 10px solid transparent;
-        border-right: 10px solid transparent;
-        border-bottom: 10px solid #1c1d1f; // Siyah bar rengi
+        content: ''; position: absolute; bottom: 0; left: 50%;
+        transform: translateX(-50%); border-left: 10px solid transparent;
+        border-right: 10px solid transparent; border-bottom: 10px solid #1c1d1f;
         z-index: 1002; 
     }
 
-    // Hover durumunda menüyü göster
     .category-hover-item:hover .hover-menu {
-        display: block;
-        opacity: 1;
-        visibility: visible;
-        pointer-events: auto; 
+        display: block; opacity: 1; visibility: visible;
     }
 }
 
-// SİYAH MENÜ (GÜNCEL SIKIŞIK YAPI)
 .hover-menu {
-    display: none;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none; 
-    
-    position: absolute;
-    top: 100%; 
-    left: 0;
-    width: 100%;
-    
-    background-color: #1c1d1f;
-    z-index: 1000;
-    transition: opacity 0.1s ease-in-out;
-    padding: 0px 0; // Padding'i azalttık (eskisi 15px)
+    display: none; position: absolute; top: 100%; left: 0; width: 100%;
+    background-color: #1c1d1f; z-index: 1000; padding: 10px 0;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    border-top: 1px solid rgba(255,255,255,0.1);
 
     .sub-cat-link {
-        color: #d1d7dc !important;
-        text-decoration: none;
-        font-size: 13.5px;
-        font-weight: 500;
-        white-space: nowrap; // Linklerin tek satırda kalmasını sağlar
-        
-        // Gap'i küçülttüğümüz için buraya hafif yan boşluk verelim ki birbirine yapışmasın
-        padding: 4px 10px; 
+        color: #d1d7dc !important; text-decoration: none;
+        font-size: 13.5px; font-weight: 500; padding: 6px 12px;
         border-radius: 4px;
-
-        &:hover {
-            color: #fff !important;
-            text-decoration: none !important;
-            background-color: rgba(255,255,255,0.15); // Hover efekti daha belirgin olsun
-            transition: all 0.2s;
-        }
+        &:hover { background-color: rgba(255,255,255,0.15); color: #fff !important; }
     }
-}
-
-// MASAÜSTÜ: DROPDOWN
-.dropdown-submenu {
-    position: relative;
-    &:hover {
-        > .submenu { display: block; }
-        > .dropdown-item {
-            background-color: #f7f9fa;
-            color: #5624d0; 
-        }
-    }
-    .submenu {
-        display: none;
-        position: absolute;
-        top: 0;
-        left: 100%; 
-        margin-top: -1px;
-        min-width: 220px;
-    }
-}
-
-// MOBİL MENÜ
-.mobile-menu {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-    &.open { transform: translateX(0); }
-}
-.mobile-menu-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 1040;
 }

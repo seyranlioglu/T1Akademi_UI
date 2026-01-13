@@ -4,6 +4,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { RouterModule } from '@angular/router'; // YENİ EKLENDİ
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -31,7 +32,7 @@ import { FunfactsComponent } from './components/common/funfacts/funfacts.compone
 import { FeaturedBoxesComponent } from './components/common/featured-boxes/featured-boxes.component';
 import { HometwoBannerComponent } from './components/pages/home-demo-two/hometwo-banner/hometwo-banner.component';
 import { TopHeaderComponent } from './components/common/top-header/top-header.component';
-import { OverviewComponent } from './components/common/overview/overview.component';
+import { OverviewComponent } from './components/dashboard/overview/overview.component'; // YOLU KONTROL EDİLDİ
 import { VideoComponent } from './components/common/video/video.component';
 import { HomethreeBannerComponent } from './components/pages/home-demo-three/homethree-banner/homethree-banner.component';
 import { ContactPageComponent } from './components/pages/contact-page/contact-page.component';
@@ -96,6 +97,11 @@ import { ToastrModule } from 'ngx-toastr';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 import { PlayerLayoutComponent } from './layouts/player-layout/player-layout.component';
 import { SidebarComponent } from './components/common/sidebar/sidebar.component';
+import { FullCalendarModule } from '@fullcalendar/angular';
+import { CalendarViewComponent } from './components/dashboard/calendar-view/calendar-view.component';
+import { CarouselModule } from 'ngx-owl-carousel-o';
+import { CourseCardComponent } from './components/common/course-card/course-card.component';
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -115,6 +121,7 @@ import { SidebarComponent } from './components/common/sidebar/sidebar.component'
         FeaturedComponent,
         CategoriesComponent,
         CoursesToledoComponent,
+        CoursesComponent,
         FeaturedCoursesComponent,
         HomeoneBannerComponent,
         TopRatedCoursesComponent,
@@ -130,6 +137,7 @@ import { SidebarComponent } from './components/common/sidebar/sidebar.component'
         FaqPageComponent,
         PrivacyPolicyPageComponent,
         TermsConditionsPageComponent,
+        RegisterPageComponent,
         TestimonialsPageComponent,
         ForgotPasswordPageComponent,
         InstructorsPageComponent,
@@ -160,7 +168,6 @@ import { SidebarComponent } from './components/common/sidebar/sidebar.component'
         CourseManageComponent,
         CurriculumComponent,
         InstructorComponent,
-        CoursesComponent,
         VerifyComponent,
         NewCourseFormComponent,
         ContentUploaderComponent,
@@ -173,11 +180,13 @@ import { SidebarComponent } from './components/common/sidebar/sidebar.component'
         CourseLandingComponent,
         CoursePricingComponent,
         CourseComponent,
-                SidebarComponent,
+        SidebarComponent,
         UserMenuComponent,
         ResetPasswordPageComponent,
-                MainLayoutComponent,  
-        PlayerLayoutComponent
+        MainLayoutComponent,  
+        PlayerLayoutComponent,
+        CalendarViewComponent,
+        CourseCardComponent
     ],
     imports: [
         BrowserModule,
@@ -191,9 +200,12 @@ import { SidebarComponent } from './components/common/sidebar/sidebar.component'
         NgbModule,
         DragDropModule,
         MatTabsModule,
+        RouterModule, // KRİTİK: routerLink'in çalışması için eklendi
         ToastrModule.forRoot({positionClass: 'toast-top-right'}),
         StoreModule.forRoot({ course: courseReducer }),
         EffectsModule.forRoot([CourseEffects]),
+        FullCalendarModule,
+        CarouselModule,
     ],
     providers: [
         {
@@ -202,7 +214,6 @@ import { SidebarComponent } from './components/common/sidebar/sidebar.component'
             multi: true,
         },
     ],
-
     bootstrap: [AppComponent],
 })
 export class AppModule { }

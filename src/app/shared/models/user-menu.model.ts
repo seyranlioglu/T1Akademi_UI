@@ -1,12 +1,22 @@
-export interface UserMenuDto {
+export interface MenuItemDto {
     title: string;
     path: string;
     icon: string;
-    children?: UserMenuDto[];
-isOpen?: boolean;
+    children?: MenuItemDto[];
+    expanded?: boolean; // UI için
 }
 
-export interface UserMenuResponseDto {
+export interface UserMenuBody {
     isInstructor: boolean;
-    menuItems: UserMenuDto[];
+    menuItems: MenuItemDto[];
+}
+
+export interface UserMenuResponse {
+    header: {
+        result: boolean;
+        msg: string | null;
+        resCode: number;
+        dt: string;
+    };
+    body: UserMenuBody;
 }
