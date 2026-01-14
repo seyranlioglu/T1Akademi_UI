@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators'; // DİKKAT: Bunu ekle
 import { environment } from 'src/environments/environment';
 
 const API_USER_URL = `${environment.apiUrl}/User`;
+
 @Injectable({
     providedIn: 'root',
 })
@@ -43,17 +45,14 @@ export class UserApiService {
     verifyConfirm(payload: any): Observable<any> {
         return this.http.post<any>(`${API_USER_URL}/VerifyConfirm`, payload);
     }
-    
 
-    // createUser(user: any): Observable<any> {
-    //     return this.http.post<any>(this.apiUrl, user);
-    // }
-
-    // updateUser(id: number, user: any): Observable<any> {
-    //     return this.http.put<any>(`${this.apiUrl}/${id}`, user);
-    // }
-
-    // deleteUser(id: number): Observable<void> {
-    //     return this.http.delete<void>(`${this.apiUrl}/${id}`);
-    // }
+    // YENİ METOD (DÜZELTİLMİŞ)
+    getManagedUsers(): Observable<any[]> {
+        // API_USER_URL zaten '.../User' ile bitiyor, o yüzden '/managed-users' yeterli.
+        return this.http.get<any>(`${API_USER_URL}/managed-users`)
+            .pipe(map(response => {
+                // Backend'den { data: [...], isSuccessful: true } dönüyor
+                return response.data || response.body || [];
+            }));
+    }
 }

@@ -20,18 +20,22 @@
                 </a>
 
                 <div class="dropdown d-none d-lg-block me-3" (mouseenter)="showCatMenu=true" (mouseleave)="showCatMenu=false">
-                    <a href="javascript:void(0)" class="text-dark text-decoration-none category-link fw-bold" (click)="showCatMenu=!showCatMenu">
+                    <a href="javascript:void(0)" class="text-dark text-decoration-none category-link fw-bold d-flex align-items-center" 
+                       (click)="showCatMenu=!showCatMenu">
                         Kategoriler
                     </a>
+                    
                     <ul class="dropdown-menu shadow border-0 mt-0 rounded-0 category-dropdown-menu" [class.show]="showCatMenu">
-                        <li *ngFor="let cat of categories" class="dropdown-submenu position-relative">
-                            <a class="dropdown-item py-2 d-flex justify-content-between align-items-center" routerLink="/courses-grid" [queryParams]="{category: cat.id}">
+                        <li *ngFor="let cat of categories" class="dropdown-submenu">
+                            <a class="dropdown-item d-flex justify-content-between align-items-center" 
+                               [routerLink]="['/courses']" [queryParams]="{category: cat.id}">
                                 {{ cat.title }} 
                                 <i *ngIf="cat.subCategories && cat.subCategories.length > 0" class='bx bx-chevron-right text-muted'></i>
                             </a>
+                            
                             <ul *ngIf="cat.subCategories && cat.subCategories.length > 0" class="dropdown-menu submenu shadow border-0 rounded-0">
                                 <li *ngFor="let sub of cat.subCategories">
-                                    <a class="dropdown-item py-2" routerLink="/courses-grid" [queryParams]="{subcategory: sub.id}">
+                                    <a class="dropdown-item" [routerLink]="['/courses']" [queryParams]="{subcategory: sub.id}">
                                         {{ sub.title }}
                                     </a>
                                 </li>
@@ -54,7 +58,7 @@
                     <a *ngIf="isInstructor" routerLink="/instructor" class="nav-link text-dark d-none d-lg-block fw-bold" style="font-size: 13px;">Eğitmen</a>
 
                     <div class="dropdown position-relative" (mouseenter)="showMyCourses=true" (mouseleave)="showMyCourses=false">
-                        <a href="javascript:void(0)" class="nav-link text-dark fw-bold d-none d-lg-block" style="font-size: 13px;" (click)="showMyCourses=!showMyCourses">Eğitimlerim</a>
+                        <a href="javascript:void(0)" class="nav-link text-dark fw-bold d-none d-lg-block" style="font-size: 13px;">Eğitimlerim</a>
                         <a href="javascript:void(0)" class="text-dark d-lg-none" (click)="showMyCourses=!showMyCourses">
                             <i class='bx bx-play-circle fs-2' style="position: relative; top: 2px;"></i>
                         </a>
@@ -73,7 +77,7 @@
                     <a routerLink="/dashboard/cart" class="text-dark position-relative" title="Sepet"><i class='bx bx-cart fs-3'></i></a>
                     
                     <div class="dropdown position-relative profile-menu-wrapper" (mouseenter)="isProfileMenuOpen=true" (mouseleave)="isProfileMenuOpen=false">
-                        <a href="javascript:void(0)" class="d-flex align-items-center text-decoration-none" (click)="toggleProfileMenu()">
+                        <a href="javascript:void(0)" class="d-flex align-items-center text-decoration-none">
                             <div class="user-avatar bg-dark text-white rounded-circle d-flex justify-content-center align-items-center fw-bold" style="width: 32px; height: 32px; font-size: 13px;">
                                 {{ userInitials }}
                             </div>
@@ -98,19 +102,8 @@
                             </div>
                             <li><hr class="dropdown-divider my-0"></li>
                             <div class="py-2">
-                                <li><a href="javascript:void(0)" class="dropdown-item py-2 px-3">Bildirimler</a></li>
-                                <li><a href="javascript:void(0)" class="dropdown-item py-2 px-3">Mesajlar</a></li>
-                            </div>
-                            <li><hr class="dropdown-divider my-0"></li>
-                            <div class="py-2">
-                                <li><a routerLink="/dashboard/edit-profile" class="dropdown-item py-2 px-3">Hesap Ayarları</a></li>
-                                <li><a href="javascript:void(0)" class="dropdown-item py-2 px-3">Ödeme Yöntemleri</a></li>
-                                <li><a href="javascript:void(0)" class="dropdown-item py-2 px-3">Satın Alma Geçmişi</a></li>
-                            </div>
-                            <li><hr class="dropdown-divider my-0"></li>
-                            <div class="py-2">
-                                <li><a routerLink="/dashboard/my-profile" class="dropdown-item py-2 px-3">Herkese açık profil</a></li>
-                                <li><a routerLink="/dashboard/edit-profile" class="dropdown-item py-2 px-3">Profili düzenle</a></li>
+                                <li><a routerLink="/dashboard/my-profile" class="dropdown-item py-2 px-3">Profilim</a></li>
+                                <li><a routerLink="/dashboard/edit-profile" class="dropdown-item py-2 px-3">Ayarlar</a></li>
                             </div>
                             <li><hr class="dropdown-divider my-0"></li>
                             <div class="py-2">
@@ -126,13 +119,13 @@
     <div class="d-none d-lg-block border-top bg-white position-relative" style="z-index: 900;">
         <ul class="nav justify-content-center category-nav m-0 p-0"> 
             <li class="nav-item category-hover-item" *ngFor="let cat of popularCategories">
-                <a class="nav-link py-2 px-3" routerLink="/courses-grid">{{ cat.title }}</a>
+                <a class="nav-link py-2 px-3" [routerLink]="['/courses']" [queryParams]="{category: cat.id}">{{ cat.title }}</a>
                 
                 <div class="hover-menu shadow" *ngIf="cat.subCategories && cat.subCategories.length > 0">
                     <div class="container-fluid px-3">
                         <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 py-2">
                             <a *ngFor="let sub of cat.subCategories" 
-                               routerLink="/courses-grid" 
+                               [routerLink]="['/courses']" 
                                [queryParams]="{subcategory: sub.id}"
                                class="sub-cat-link">
                                 {{ sub.title }}

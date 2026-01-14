@@ -31,6 +31,8 @@ import { CompletedCoursesComponent } from './components/dashboard/completed-cour
 import { CartComponent } from './components/dashboard/cart/cart.component';
 import { CourseDetailsPageComponent } from './components/pages/course-details-page/course-details-page.component';
 import { CourseComponent } from './components/pages/course/course.component';
+import { OverviewComponent } from './components/dashboard/overview/overview.component';
+import { CompanyEmployeesComponent } from './components/dashboard/company-employees/company-employees.component'; // EKLENDİ
 
 // Instructor
 import { InstructorComponent } from './components/pages/instructor/instructor.component';
@@ -40,7 +42,7 @@ import { CurriculumComponent } from './components/pages/instructor/course-manage
 import { WhatYouWillLearnComponent } from './components/pages/instructor/course-manage/what-you-will-learn/what-you-will-learn.component';
 import { CourseLandingComponent } from './components/pages/instructor/course-manage/course-landing/course-landing.component';
 import { CoursePricingComponent } from './components/pages/instructor/course-manage/course-pricing/course-pricing.component';
-import { OverviewComponent } from './components/dashboard/overview/overview.component';
+
 
 const routes: Routes = [
 
@@ -68,7 +70,6 @@ const routes: Routes = [
     },
 
     // 3. EĞİTİM YÖNETİMİ (BAĞIMSIZ - ÖZEL MENÜSÜ VAR)
-    // MainLayout dışında tanımlandığı için senin ana sidebar'ını görmez.
     {
         path: 'instructor/course-manage/:id',
         component: CourseManageComponent,
@@ -91,44 +92,46 @@ const routes: Routes = [
             { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
             
             // Dashboard Alanı
-                {
-                    path: 'dashboard',
-                    component: DashboardComponent,
-                    children: [
-                        { path: '', redirectTo: 'overview', pathMatch: 'full' },
-                        { path: 'overview', component: OverviewComponent }, // Overview'ı buraya ekledik
-                        { path: 'active-courses', component: ActiveCoursesComponent },
-                        { path: 'enrolled-courses', component: EnrolledCoursesComponent },
-                        { path: 'wishlist', component: WishlistComponent },
-                        { path: 'my-profile', component: MyProfileComponent },
-                        { path: 'edit-profile', component: EditProfileComponent },
-                        { path: 'orders-list', component: OrdersListComponent },
-                        { path: 'reviews', component: ReviewsComponent },
-                        { path: 'completed-courses', component: CompletedCoursesComponent },
-                        { path: 'cart', component: CartComponent },
-                    ]
-                },
+            {
+                path: 'dashboard',
+                component: DashboardComponent,
+                children: [
+                    { path: '', redirectTo: 'overview', pathMatch: 'full' },
+                    { path: 'overview', component: OverviewComponent },
+                    { path: 'active-courses', component: ActiveCoursesComponent },
+                    { path: 'enrolled-courses', component: EnrolledCoursesComponent },
+                    { path: 'wishlist', component: WishlistComponent },
+                    { path: 'my-profile', component: MyProfileComponent },
+                    { path: 'edit-profile', component: EditProfileComponent },
+                    { path: 'orders-list', component: OrdersListComponent },
+                    { path: 'reviews', component: ReviewsComponent },
+                    { path: 'completed-courses', component: CompletedCoursesComponent },
+                    { path: 'cart', component: CartComponent },
+                ]
+            },
 
-            // Kurs Listeleme ve Detay (Menüde var olanlar)
-            { path: 'courses', component: CourseDetailsPageComponent }, // Katalog sayfası bileşeniyle değişebilir
+            // Kurs Listeleme ve Detay
+            { path: 'courses', component: CourseDetailsPageComponent }, 
             { path: 'course/:id', component: CourseDetailsPageComponent, canActivate: [IdValidatorGuard] },
 
-            // Kurumsal Panel Linkleri (Backend'den gelen linklerin Sidebar içinde çalışması için)
-            { path: 'company/employees', component: ActiveCoursesComponent }, // İlgili personeller bileşeniyle değiştirilecek
-            { path: 'company/assign', component: ActiveCoursesComponent },    // İlgili atama bileşeniyle değiştirilecek
-            { path: 'company/reports', component: ActiveCoursesComponent },   // İlgili rapor bileşeniyle değiştirilecek
-            { path: 'company/requests', component: ActiveCoursesComponent },
+            // --- KURUMSAL PANEL ---
+            { 
+                path: 'company/employees', 
+                component: CompanyEmployeesComponent // ARTIK DOĞRU KOMPONENT
+            }, 
+            { path: 'company/assign', component: ActiveCoursesComponent },    // Geçici
+            { path: 'company/reports', component: ActiveCoursesComponent },   // Geçici
+            { path: 'company/requests', component: ActiveCoursesComponent },  // Geçici
 
             // Eğitmen Listesi
             { path: 'instructor/courses', component: CoursesComponent, canActivate: [InstructorGuard] },
             { path: 'instructor/dashboard', component: CoursesComponent },
 
-            // 404 Sayfası Layout İçinde kalsın
+            // 404 Sayfası
             { path: '404', component: NotFoundComponent },
         ]
     },
 
-    // Herhangi bir hata durumunda 404'e at
     { path: '**', redirectTo: '404' }
 ];
 

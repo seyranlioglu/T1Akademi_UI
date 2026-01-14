@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { CategoryService } from 'src/app/shared/services/category.service';
-import { SidebarService } from 'src/app/shared/services/sidebar.service'; // YENİ: Servisi ekle
+import { SidebarService } from 'src/app/shared/services/sidebar.service';
 import { TrainingCategory } from 'src/app/shared/models/training-category.model';
 
 @Component({
@@ -22,28 +22,29 @@ export class NavbarComponent implements OnInit {
   showMyCourses = false;
   isProfileMenuOpen = false;
   
-  // Eski isMobileMenuOpen değişkenini kaldırdık, artık SidebarService yönetiyor.
-
-  categories: TrainingCategory[] = [];
-  popularCategories: TrainingCategory[] = [];
+  categories: any[] = []; // Esnek tip
+  popularCategories: any[] = [];
 
   constructor(
     private authService: AuthService,
     private categoryService: CategoryService,
     private router: Router,
-    private sidebarService: SidebarService // YENİ: Inject et
+    private sidebarService: SidebarService
   ) { }
 
   ngOnInit(): void {
     const userJson = localStorage.getItem('currentUser');
     if (userJson) {
         this.isLoggedIn = true;
-        const user = JSON.parse(userJson);
-        this.userName = user.firstName ? `${user.firstName} ${user.lastName}` : 'Öğrenci';
-        this.userEmail = user.email || '';
-        this.userInitials = this.userName.match(/\b(\w)/g)?.join('').substring(0, 2).toUpperCase() || 'U';
-        
-        this.checkUserRole(user);
+        try {
+            const user = JSON.parse(userJson);
+            this.userName = user.firstName ? `${user.firstName} ${user.lastName}` : 'Öğrenci';
+            this.userEmail = user.email || '';
+            this.userInitials = this.userName.match(/\b(\w)/g)?.join('').substring(0, 2).toUpperCase() || 'U';
+            this.checkUserRole(user);
+        } catch (e) {
+            console.error('User parse error', e);
+        }
     }
 
     this.getCategoriesFromApi();
@@ -60,11 +61,13 @@ export class NavbarComponent implements OnInit {
 
   getCategoriesFromApi() {
     this.categoryService.getCategories().subscribe({
-      next: (response) => {
-        const incomingData = response.body || response.body || response; 
-        if (incomingData) {
+      next: (response: any) => {
+        // Backend'den { header:..., body: [...] } veya direkt [...] dönebilir
+        const incomingData = response.body || response.data || response; 
+        
+        if (Array.isArray(incomingData)) {
             this.categories = incomingData;
-            this.popularCategories = incomingData; 
+            this.popularCategories = incomingData.slice(0, 8); // İlk 8 tanesi popüler olsun
         }
       },
       error: (err) => {
@@ -73,9 +76,8 @@ export class NavbarComponent implements OnInit {
     });
   }
 
-  // YENİ: Mobilde menü butonuna basılınca çalışır
   toggleMobileMenu() {
-    this.sidebarService.toggle(); // Sidebar'a "Açıl/Kapan" emri gönder
+    this.sidebarService.toggle();
   }
 
   toggleProfileMenu() {

@@ -1,0 +1,110 @@
+<div class="company-employees-area ptb-25 bg-f9f9f9">
+    <div class="container">
+        
+        <div class="section-title d-flex justify-content-between align-items-center">
+            <div class="text-start">
+                <h2>Personel Listesi</h2>
+                <p>Şirket personellerinin durum ve yetki yönetimi.</p>
+            </div>
+            <div class="action-btn">
+                <button class="btn btn-primary">
+                    <i class='bx bx-plus'></i> Personel Ekle
+                </button>
+            </div>
+        </div>
+
+        <div *ngIf="errorMessage" class="alert alert-danger mb-4">
+            <i class='bx bx-error-circle me-2'></i> {{ errorMessage }}
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <div class="table-responsive shadow-sm p-3 mb-5 bg-white rounded">
+                    
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" style="width: 60px;">#</th>
+                                <th scope="col">Ad Soyad</th>
+                                <th scope="col">Unvan / Şirket</th>
+                                <th scope="col">İletişim</th>
+                                <th scope="col">Durum</th>
+                                <th scope="col" class="text-end">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr *ngIf="isLoading">
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Yükleniyor...</span>
+                                    </div>
+                                    <p class="mt-2 text-muted small">Personel listesi getiriliyor...</p>
+                                </td>
+                            </tr>
+
+                            <ng-container *ngIf="!isLoading && users && users.length > 0">
+                                <tr *ngFor="let user of users; let i = index">
+                                    <td>{{ i + 1 }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-2 bg-light text-primary d-flex align-items-center justify-content-center fw-bold rounded-circle border" 
+                                                 style="width: 40px; height: 40px;">
+                                                {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
+                                            </div>
+                                            <span class="fw-bold text-dark">{{ user.firstName }} {{ user.lastName }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-semibold text-dark">{{ user.title || '-' }}</span>
+                                            <span class="text-muted small">{{ user.companyName }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column text-muted small">
+                                            <span><i class='bx bx-envelope me-1'></i> {{ user.email || 'E-posta Yok' }}</span>
+                                            <span *ngIf="user.phoneNumber"><i class='bx bx-phone me-1'></i> {{ user.phoneNumber }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge" [ngClass]="getStatusClass(user.status)">
+                                            {{ user.status }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-icon btn-outline-secondary btn-sm me-1" title="Düzenle">
+                                            <i class='bx bx-edit-alt'></i>
+                                        </button>
+                                        <button class="btn btn-icon btn-outline-danger btn-sm" title="Sil">
+                                            <i class='bx bx-trash'></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-container>
+
+                            <tr *ngIf="!isLoading && (!users || users.length === 0) && !errorMessage">
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="empty-state">
+                                        <div class="mb-3">
+                                            <i class='bx bx-user-x' style="font-size: 4rem; color: #e4e6ea;"></i>
+                                        </div>
+                                        <h5 class="text-muted">Henüz Bir Personel Kaydı Yok!</h5>
+                                        <p class="text-secondary small mb-3">
+                                            Listelenecek personel bulunamadı. Yeni kayıt ekleyerek başlayabilirsiniz.
+                                        </p>
+                                        <button class="btn btn-sm btn-outline-primary" (click)="fetchUsers()">
+                                            <i class='bx bx-refresh'></i> Listeyi Yenile
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

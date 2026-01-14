@@ -1,0 +1,41 @@
+.dashboard-content-wrap {
+    padding: 20px;
+}
+
+.table {
+    margin-bottom: 0;
+    
+    th {
+        font-weight: 600;
+        color: #555;
+        font-size: 14px;
+        border-bottom: 2px solid #eee;
+    }
+
+    td {
+        font-size: 14px;
+        color: #333;
+        vertical-align: middle;
+    }
+}
+
+.avatar-circle {
+    background-color: #ebf4ff; // Soft Primary
+    color: #007bff;
+    font-size: 14px;
+    border-radius: 50%;
+}
+
+.badge-success { background-color: #d1e7dd; color: #0f5132; }
+.badge-danger { background-color: #f8d7da; color: #842029; }
+.badge-info { background-color: #cff4fc; color: #055160; }
+.badge-secondary { background-color: #e2e3e5; color: #41464b; }
+
+.dropdown-item {
+    font-size: 13px;
+    padding: 8px 16px;
+    cursor: pointer;
+    &:hover { background-color: #f8f9fa; color: #ff1949; }
+    
+    i { vertical-align: middle; font-size: 16px; }
+}

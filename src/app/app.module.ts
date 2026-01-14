@@ -101,6 +101,7 @@ import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarViewComponent } from './components/dashboard/calendar-view/calendar-view.component';
 import { CarouselModule } from 'ngx-owl-carousel-o';
 import { CourseCardComponent } from './components/common/course-card/course-card.component';
+import { CompanyEmployeesComponent } from './components/dashboard/company-employees/company-employees.component';
 
 @NgModule({
     declarations: [
@@ -157,6 +158,7 @@ import { CourseCardComponent } from './components/common/course-card/course-card
         EnrolledCoursesComponent,
         WishlistComponent,
         MyProfileComponent,
+        CompanyEmployeesComponent,
         ActiveCoursesComponent,
         ReviewsComponent,
         CompletedCoursesComponent,
