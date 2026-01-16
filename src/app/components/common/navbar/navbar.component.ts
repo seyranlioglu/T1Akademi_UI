@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { CategoryService } from 'src/app/shared/services/category.service';
+// DİKKAT: SidebarService importu burada kesinlikle olmalı
 import { SidebarService } from 'src/app/shared/services/sidebar.service';
-import { TrainingCategory } from 'src/app/shared/models/training-category.model';
 
 @Component({
   selector: 'app-navbar',
@@ -22,13 +22,14 @@ export class NavbarComponent implements OnInit {
   showMyCourses = false;
   isProfileMenuOpen = false;
   
-  categories: any[] = []; // Esnek tip
+  categories: any[] = []; 
   popularCategories: any[] = [];
 
   constructor(
     private authService: AuthService,
     private categoryService: CategoryService,
     private router: Router,
+    // Servisi buraya private olarak enjekte ediyoruz
     private sidebarService: SidebarService
   ) { }
 
@@ -62,12 +63,10 @@ export class NavbarComponent implements OnInit {
   getCategoriesFromApi() {
     this.categoryService.getCategories().subscribe({
       next: (response: any) => {
-        // Backend'den { header:..., body: [...] } veya direkt [...] dönebilir
         const incomingData = response.body || response.data || response; 
-        
         if (Array.isArray(incomingData)) {
             this.categories = incomingData;
-            this.popularCategories = incomingData.slice(0, 8); // İlk 8 tanesi popüler olsun
+            this.popularCategories = incomingData.slice(0, 8); 
         }
       },
       error: (err) => {
@@ -76,6 +75,7 @@ export class NavbarComponent implements OnInit {
     });
   }
 
+  // Mobil menü butonu tıklandığında çalışacak fonksiyon
   toggleMobileMenu() {
     this.sidebarService.toggle();
   }

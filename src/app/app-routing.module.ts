@@ -53,7 +53,6 @@ const routes: Routes = [
             { path: '', redirectTo: 'login', pathMatch: 'full' },
             { path: 'login', component: LoginPageComponent },
             { path: 'register', component: RegisterPageComponent },
-            { path: 'forgot-password', component: ForgotPasswordPageComponent },
             { path: 'reset-password', component: ResetPasswordPageComponent },
             { path: 'verify', component: VerifyComponent }
         ]

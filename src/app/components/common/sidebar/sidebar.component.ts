@@ -4,6 +4,8 @@ import { SidebarService } from 'src/app/shared/services/sidebar.service';
 import { CategoryService } from 'src/app/shared/services/category.service';
 import { MenuApiService } from 'src/app/shared/api/menu-api.service';
 import { MenuItemDto } from 'src/app/shared/models/user-menu.model';
+// Çıkış işlemi için AuthService eklendi
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -11,6 +13,7 @@ import { MenuItemDto } from 'src/app/shared/models/user-menu.model';
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit {
+  
   isCollapsed: boolean = true;
   userMenuItems: MenuItemDto[] = [];
   categories: any[] = [];
@@ -19,7 +22,8 @@ export class SidebarComponent implements OnInit {
     public router: Router,
     private sidebarService: SidebarService,
     private categoryService: CategoryService,
-    private menuService: MenuApiService
+    private menuService: MenuApiService,
+    private authService: AuthService // Eklendi
   ) {}
 
   ngOnInit() {
@@ -58,5 +62,11 @@ export class SidebarComponent implements OnInit {
 
   toggleSidebar() {
     this.sidebarService.toggle();
+  }
+
+  // Navbar'daki çıkış fonksiyonunun aynısı buraya eklendi
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']).then(() => window.location.reload());
   }
 }

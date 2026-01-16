@@ -24,6 +24,8 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   remainingTime = 120; 
   timerSub: Subscription | null = null;
 
+  isForgotPasswordModalOpen = false;
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -39,17 +41,43 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     this.loginForm = this.fb.group({
       emailOrPhone: [null, [Validators.required]],
       password: [null, [Validators.required]],
-      rememberMe: [false] // Checkbox için alan
+      rememberMe: [false] 
     });
 
     this.verifyForm = this.fb.group({
       code: [null, [Validators.required, Validators.minLength(4)]]
     });
+
+    // --- YENİ EKLENEN: Kayıtlı kullanıcıyı kontrol et ---
+    this.checkRememberedUser();
   }
 
   get f() { return this.loginForm.controls; }
 
-  // --- DİNAMİK MASKELEME ---
+  // --- YENİ EKLENEN: Hafızadaki kullanıcıyı yükle ---
+  checkRememberedUser() {
+    const savedUser = localStorage.getItem('rememberedUser');
+    if (savedUser) {
+        this.loginForm.patchValue({
+            emailOrPhone: savedUser,
+            rememberMe: true
+        });
+    }
+  }
+
+  openForgotPasswordModal() {
+    this.isForgotPasswordModalOpen = true;
+  }
+
+  closeForgotPasswordModal() {
+    this.isForgotPasswordModalOpen = false;
+  }
+
+  onPasswordResetSuccess() {
+    this.isForgotPasswordModalOpen = false;
+    this.toastr.success('Şifreniz başarıyla değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.');
+  }
+
   onDynamicInput(event: any) {
     const input = event.target;
     const originalValue = input.value;
@@ -85,7 +113,6 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  // --- ADIM 1: GİRİŞ YAP ---
   onSubmit() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -131,22 +158,29 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- ADIM 2: KODU DOĞRULA ---
   onVerifySubmit() {
     if (this.verifyForm.invalid) return;
 
     const code = this.verifyForm.get('code')?.value;
-    // Beni Hatırla değerini al
     const rememberMeValue = this.loginForm.get('rememberMe')?.value || false;
     
     this.authService.isLoadingSubject.next(true);
 
-    // 3 parametre ile çağırıyoruz: (Kullanıcı Adı, Kod, Beni Hatırla)
     this.authService.verify(this.pendingUserName, code, rememberMeValue).subscribe({
         next: (res: any) => {
             this.authService.isLoadingSubject.next(false);
             
             if (res.header.result) {
+                
+                // --- YENİ EKLENEN: Beni Hatırla Logic ---
+                if (rememberMeValue) {
+                    // Kullanıcı adını ham haliyle kaydedelim (maskelenmiş halini de kaydedebilirsin)
+                    localStorage.setItem('rememberedUser', this.loginForm.get('emailOrPhone')?.value);
+                } else {
+                    localStorage.removeItem('rememberedUser');
+                }
+                // ----------------------------------------
+
                 this.toastr.success("Giriş Başarılı!");
                 this.router.navigate(['/']);
             } else {

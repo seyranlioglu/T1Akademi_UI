@@ -8,7 +8,6 @@
 
     <div class="sidebar-body">
         <ul class="sidebar-nav">
-            
             <li class="menu-label" *ngIf="!isCollapsed">Genel</li>
             <li routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
                 <a routerLink="/dashboard">
@@ -25,7 +24,6 @@
                         <i [class]="item.icon"></i>
                         <span class="link-text" *ngIf="!isCollapsed">{{ item.title }}</span>
                     </a>
-
                     <div *ngIf="item.children && item.children.length > 0">
                         <a href="javascript:void(0)" (click)="toggleItem(item)" [class.active]="item.expanded">
                             <i [class]="item.icon"></i>
@@ -50,7 +48,6 @@
                        class='bx arrow-icon' 
                        [ngClass]="cat.expanded ? 'bx-chevron-down' : 'bx-chevron-right'"></i>
                 </a>
-                
                 <ul class="sub-menu" [class.show]="cat.expanded && !isCollapsed" *ngIf="cat.subCategories && cat.subCategories.length > 0">
                     <li *ngFor="let sub of cat.subCategories">
                         <a [routerLink]="['/courses']" [queryParams]="{category: sub.id}" class="sub-link">{{ sub.title }}</a>
@@ -61,13 +58,24 @@
     </div>
 
     <div class="sidebar-footer">
-        <ul class="sidebar-nav">
-            <li>
-                <a routerLink="/auth/logout">
-                    <i class='bx bx-log-out'></i>
-                    <span class="link-text" *ngIf="!isCollapsed">Çıkış Yap</span>
-                </a>
-            </li>
-        </ul>
+        <div class="footer-capsule">
+            
+            <a routerLink="/dashboard/my-profile" class="capsule-btn" title="Profilim" routerLinkActive="active">
+                <i class='bx bx-user'></i>
+            </a>
+            
+            <div class="capsule-divider"></div>
+
+            <a routerLink="/dashboard/edit-profile" class="capsule-btn" title="Ayarlar" routerLinkActive="active">
+                <i class='bx bx-cog'></i>
+            </a>
+
+            <div class="capsule-divider"></div>
+
+            <a href="javascript:void(0)" (click)="logout()" class="capsule-btn logout-btn" title="Çıkış Yap">
+                <i class='bx bx-log-out'></i>
+            </a>
+
+        </div>
     </div>
 </div>

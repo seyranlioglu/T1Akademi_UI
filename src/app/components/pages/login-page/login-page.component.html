@@ -49,11 +49,14 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="rememberMe" formControlName="rememberMe">
-                                <label class="form-check-label small text-muted" for="rememberMe">Beni Hatırla</label>
+                            <div class="form-check" style="position: relative; z-index: 10;">
+                                <input class="form-check-input" type="checkbox" id="rememberMe" formControlName="rememberMe" style="cursor: pointer;">
+                                <label class="form-check-label small text-muted" for="rememberMe" style="cursor: pointer;">Beni Hatırla</label>
                             </div>
-                            <a routerLink="/auth/forgot-password" class="text-decoration-none small fw-bold text-warning-dark">Şifremi Unuttum?</a>
+                            
+                            <a href="javascript:void(0)" (click)="openForgotPasswordModal()" class="text-decoration-none small fw-bold text-warning-dark" style="position: relative; z-index: 10;">
+                                Şifremi Unuttum?
+                            </a>
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold shadow-sm border-0 mb-3" 
@@ -107,6 +110,25 @@
                 <small class="text-muted" style="font-size: 0.75rem;">
                     &copy; 2026 T1 Akademi. Tüm hakları saklıdır.
                 </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" [ngClass]="{'show d-block': isForgotPasswordModalOpen}" 
+     tabindex="-1" role="dialog" 
+     style="background: rgba(0,0,0,0.5);" 
+     *ngIf="isForgotPasswordModalOpen">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0 justify-content-end">
+                <button type="button" class="btn-close" (click)="closeForgotPasswordModal()"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <app-forgot-password-page 
+                    (close)="closeForgotPasswordModal()" 
+                    (success)="onPasswordResetSuccess()">
+                </app-forgot-password-page>
             </div>
         </div>
     </div>
