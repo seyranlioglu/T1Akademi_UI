@@ -1,139 +1,143 @@
 <div class="navbar-area fixed-top bg-white border-bottom shadow-sm" style="z-index: 1020;">
     
-    <div class="top-info-bar text-center py-2 border-bottom bg-light d-none d-md-block">
+    <div class="top-info-bar text-center py-1 border-bottom bg-light d-none d-md-block">
         <div class="container-fluid">
-             <small class="fw-bold text-dark">Yazılım dünyasına hızlı bir giriş yapın! <a href="javascript:void(0)" class="text-primary text-decoration-none">Yeni kursları incele.</a></small>
+             <small class="fw-bold text-dark" style="font-size: 12px;">
+                 Yazılım dünyasına hızlı bir giriş yapın! 
+                 <a routerLink="/courses" class="text-primary text-decoration-none ms-1">Kursları incele.</a>
+             </small>
         </div>
     </div>
 
     <div class="main-navbar">
-        <div class="container-fluid px-2 px-md-4">
-            <nav class="navbar navbar-expand-lg navbar-light p-0" style="min-height: 65px;">
+        <div class="container-fluid px-3 px-md-4">
+            
+            <nav class="navbar navbar-expand-lg navbar-light p-0 d-flex align-items-center justify-content-between" style="min-height: 75px;">
                 
-                <button class="navbar-toggler me-2 d-lg-none border-0 p-0" type="button" (click)="toggleMobileMenu()">
-                    <i class='bx bx-menu fs-1'></i>
-                </button>
+                <div class="d-flex align-items-center">
+                    <button class="navbar-toggler me-3 d-lg-none border-0 p-0" type="button" (click)="toggleMobileMenu()">
+                        <i class='bx bx-menu fs-1 text-dark'></i>
+                    </button>
 
-                <a class="navbar-brand me-3 me-lg-5 py-2" routerLink="/">
-                    <img src="assets/images/logos/t1-logo-text.png" alt="Logo" style="height: 30px; width: auto;" class="d-lg-none"> 
-                    <img src="assets/images/logos/t1-logo-text.png" alt="Logo" style="height: 38px; width: auto;" class="d-none d-lg-block"> 
-                </a>
-
-                <div class="dropdown d-none d-lg-block me-3" (mouseenter)="showCatMenu=true" (mouseleave)="showCatMenu=false">
-                    <a href="javascript:void(0)" class="text-dark text-decoration-none category-link fw-bold d-flex align-items-center" 
-                       (click)="showCatMenu=!showCatMenu">
-                        Kategoriler
+                    <a class="navbar-brand py-0 me-4" routerLink="/">
+                        <img src="assets/images/logos/t1-logo-text.png" alt="T1 Akademi" class="d-lg-none" style="height: 35px;"> 
+                        <img src="assets/images/logos/t1-logo-text.png" alt="T1 Akademi" class="d-none d-lg-block" style="height: 45px;"> 
                     </a>
-                    
-                    <ul class="dropdown-menu shadow border-0 mt-0 rounded-0 category-dropdown-menu" [class.show]="showCatMenu">
-                        <li *ngFor="let cat of categories" class="dropdown-submenu">
-                            <a class="dropdown-item d-flex justify-content-between align-items-center" 
-                               [routerLink]="['/courses']" [queryParams]="{category: cat.id}">
-                                {{ cat.title }} 
-                                <i *ngIf="cat.subCategories && cat.subCategories.length > 0" class='bx bx-chevron-right text-muted'></i>
-                            </a>
-                            
-                            <ul *ngIf="cat.subCategories && cat.subCategories.length > 0" class="dropdown-menu submenu shadow border-0 rounded-0">
-                                <li *ngFor="let sub of cat.subCategories">
-                                    <a class="dropdown-item" [routerLink]="['/courses']" [queryParams]="{subcategory: sub.id}">
-                                        {{ sub.title }}
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+
+                    <div class="dropdown d-none d-lg-block" (mouseenter)="showCatMenu=true" (mouseleave)="showCatMenu=false">
+                        <a href="javascript:void(0)" class="text-dark text-decoration-none fw-bold d-flex align-items-center px-3 py-2 rounded hover-effect" 
+                           (click)="showCatMenu=!showCatMenu">
+                            <i class='bx bx-grid-alt me-2 fs-5'></i> Kategoriler
+                        </a>
+                    </div>
                 </div>
 
-                <form class="search-box flex-grow-1 mx-2 mx-lg-4" style="max-width: 800px;">
-                    <div class="input-group rounded-pill border position-relative overflow-hidden bg-white">
-                        <button class="btn btn-link text-muted border-0 ps-3 bg-transparent" type="button">
-                            <i class='bx bx-search fs-5 pt-1'></i>
+                <div class="search-box flex-grow-1 mx-3 mx-lg-5 position-relative d-none d-md-block" style="max-width: 600px;">
+                    <div class="input-group rounded-pill border bg-light overflow-hidden">
+                        <button class="btn border-0 ps-3 pe-2" type="button">
+                            <i class='bx bx-search text-muted fs-5'></i>
                         </button>
-                        <input type="text" class="form-control bg-transparent border-0 shadow-none ps-0" placeholder="Ara..." style="height: 40px; font-size: 14px;">
+                        <input type="text" 
+                               class="form-control bg-transparent border-0 shadow-none ps-1 py-2" 
+                               placeholder="Eğitim, eğitmen veya konu ara..." 
+                               style="font-size: 14px;"
+                               (keyup)="onSearchKeyUp($event)">
+                        
+                        <span class="input-group-text border-0 bg-transparent pe-3" *ngIf="isSearching">
+                            <span class="spinner-border spinner-border-sm text-primary"></span>
+                        </span>
                     </div>
-                </form>
 
-                <div class="others-options d-flex align-items-center gap-2 gap-lg-3 ms-auto">
-                    <a routerLink="/pricing" class="nav-link text-dark d-none d-xl-block fw-bold" style="font-size: 13px;">Planlar</a>
-                    <a *ngIf="isInstructor" routerLink="/instructor" class="nav-link text-dark d-none d-lg-block fw-bold" style="font-size: 13px;">Eğitmen</a>
-
-                    <div class="dropdown position-relative" (mouseenter)="showMyCourses=true" (mouseleave)="showMyCourses=false">
-                        <a href="javascript:void(0)" class="nav-link text-dark fw-bold d-none d-lg-block" style="font-size: 13px;">Eğitimlerim</a>
-                        <a href="javascript:void(0)" class="text-dark d-lg-none" (click)="showMyCourses=!showMyCourses">
-                            <i class='bx bx-play-circle fs-2' style="position: relative; top: 2px;"></i>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0 mt-0" [class.show]="showMyCourses" style="width: 300px; max-width: 90vw; position: absolute; right: 0;">
-                            <div class="p-3 border-bottom bg-light">
-                                <h6 class="m-0 fw-bold">Öğrenim İçeriğim</h6>
-                            </div>
-                            <div class="p-4 text-center text-muted">Henüz kayıt yok.</div>
-                            <div class="p-2 text-center bg-light border-top">
-                                <a routerLink="/dashboard/enrolled-courses" class="fw-bold text-dark text-decoration-none small">Tümüne Git</a>
-                            </div>
+                    <div class="search-results shadow-lg rounded border-0 position-absolute w-100 bg-white mt-2" 
+                         *ngIf="showSearchResults" style="z-index: 1050;">
+                        
+                        <div class="p-3 text-center text-muted" *ngIf="!isSearching && searchResults.length === 0">
+                            <small>Sonuç bulunamadı.</small>
                         </div>
-                    </div>
 
-                    <a routerLink="/dashboard/wishlist" class="text-dark d-none d-sm-block" title="İstek Listesi"><i class='bx bx-heart fs-4'></i></a>
-                    <a routerLink="/dashboard/cart" class="text-dark position-relative" title="Sepet"><i class='bx bx-cart fs-3'></i></a>
+                        <ul class="list-group list-group-flush" *ngIf="searchResults.length > 0">
+                            <li class="list-group-item list-group-item-action cursor-pointer py-2 px-3 border-0" 
+                                *ngFor="let result of searchResults"
+                                (click)="goToCourseDetail(result.id)">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 me-3">
+                                        <img [src]="result.headerImage || 'assets/images/courses/course1.jpg'" 
+                                             class="rounded" width="40" height="40" style="object-fit: cover;">
+                                    </div>
+                                    <div class="flex-grow-1 overflow-hidden">
+                                        <h6 class="mb-0 text-truncate text-dark" style="font-size: 14px;">{{ result.title }}</h6>
+                                        <small class="text-muted d-block text-truncate" *ngIf="result.instructorTitle">
+                                            {{ result.instructorTitle }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item text-center bg-light p-2 cursor-pointer border-top" (click)="goToSearchPage(searchTerm$.getValue())">
+                                <small class="fw-bold text-primary">Tüm sonuçları gör</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="others-options d-flex align-items-center gap-3">
                     
-                    <div class="dropdown position-relative profile-menu-wrapper" (mouseenter)="isProfileMenuOpen=true" (mouseleave)="isProfileMenuOpen=false">
-                        <a href="javascript:void(0)" class="d-flex align-items-center text-decoration-none">
-                            <div class="user-avatar bg-dark text-white rounded-circle d-flex justify-content-center align-items-center fw-bold" style="width: 32px; height: 32px; font-size: 13px;">
+                    <a routerLink="/pricing" class="nav-link text-dark d-none d-xl-block fw-bold small">Planlar</a>
+                    
+                    <div class="dropdown position-relative profile-menu-wrapper" 
+                         (mouseenter)="isProfileMenuOpen=true" (mouseleave)="isProfileMenuOpen=false">
+                        
+                        <a href="javascript:void(0)" class="d-flex align-items-center text-decoration-none py-1" (click)="toggleProfileMenu()">
+                            <div class="user-avatar bg-dark text-white rounded-circle d-flex justify-content-center align-items-center fw-bold shadow-sm" 
+                                 style="width: 42px; height: 42px; font-size: 15px; border: 2px solid #fff;">
                                 {{ userInitials }}
                             </div>
+                            <div class="d-none d-lg-block ms-2 text-start" style="max-width: 140px;">
+                                <span class="d-block fw-bold text-dark lh-1 mb-1 text-truncate" style="font-size: 13px;">{{ userName }}</span>
+                                <span class="d-block text-muted x-small">Öğrenci</span>
+                            </div>
+                            <i class='bx bx-chevron-down ms-1 text-muted d-none d-lg-block'></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2 p-0" [class.show]="isProfileMenuOpen" style="width: 280px; position: absolute; right: 0;">
-                             <li class="p-3 border-bottom">
+                        
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-3 p-0 animate__animated animate__fadeIn" 
+                            [class.show]="isProfileMenuOpen" 
+                            style="width: 280px; position: absolute; right: 0;">
+                             
+                             <li class="p-3 border-bottom bg-light rounded-top">
                                 <div class="d-flex align-items-center">
                                     <div class="user-avatar bg-dark text-white rounded-circle d-flex justify-content-center align-items-center fw-bold me-3" style="width: 50px; height: 50px; font-size: 18px;">
                                         {{ userInitials }}
                                     </div>
                                     <div class="overflow-hidden">
-                                        <h6 class="m-0 fw-bold text-truncate">{{ userName }}</h6>
+                                        <h6 class="m-0 fw-bold text-truncate text-dark">{{ userName }}</h6>
                                         <small class="text-muted text-truncate d-block">{{ userEmail }}</small>
                                     </div>
                                 </div>
                             </li>
+
                             <div class="py-2">
-                                <li><a routerLink="/dashboard/active-courses" class="dropdown-item py-2 px-3">Öğrenim İçeriğim</a></li>
-                                <li><a routerLink="/dashboard/cart" class="dropdown-item py-2 px-3">Sepetim</a></li>
-                                <li><a routerLink="/dashboard/wishlist" class="dropdown-item py-2 px-3">İstek Listesi</a></li>
-                                <li *ngIf="isInstructor"><a routerLink="/instructor" class="dropdown-item py-2 px-3 fw-bold text-primary">Eğitmen Paneli</a></li>
+                                <li><a routerLink="/dashboard/active-courses" class="dropdown-item py-2 px-3"><i class='bx bx-book-open me-2'></i> Öğrenim İçeriğim</a></li>
+                                <li><a routerLink="/dashboard/cart" class="dropdown-item py-2 px-3"><i class='bx bx-cart me-2'></i> Sepetim</a></li>
+                                <li><a routerLink="/dashboard/wishlist" class="dropdown-item py-2 px-3"><i class='bx bx-heart me-2'></i> İstek Listesi</a></li>
+                                <li *ngIf="isInstructor"><a routerLink="/instructor" class="dropdown-item py-2 px-3 fw-bold text-primary"><i class='bx bx-chalkboard me-2'></i> Eğitmen Paneli</a></li>
                             </div>
+
                             <li><hr class="dropdown-divider my-0"></li>
+
                             <div class="py-2">
-                                <li><a routerLink="/dashboard/my-profile" class="dropdown-item py-2 px-3">Profilim</a></li>
-                                <li><a routerLink="/dashboard/edit-profile" class="dropdown-item py-2 px-3">Ayarlar</a></li>
+                                <li><a routerLink="/dashboard/my-profile" class="dropdown-item py-2 px-3"><i class='bx bx-user me-2'></i> Profilim</a></li>
+                                <li><a routerLink="/dashboard/edit-profile" class="dropdown-item py-2 px-3"><i class='bx bx-cog me-2'></i> Ayarlar</a></li>
                             </div>
+
                             <li><hr class="dropdown-divider my-0"></li>
+
                             <div class="py-2">
-                                <li><a href="javascript:void(0)" (click)="logout()" class="dropdown-item py-2 px-3 text-danger fw-bold">Oturumu Kapat</a></li>
+                                <li><a href="javascript:void(0)" (click)="logout()" class="dropdown-item py-2 px-3 text-danger fw-bold"><i class='bx bx-log-out me-2'></i> Oturumu Kapat</a></li>
                             </div>
                         </ul>
                     </div>
                 </div>
+
             </nav>
         </div>
-    </div>
-
-    <div class="d-none d-lg-block border-top bg-white position-relative" style="z-index: 900;">
-        <ul class="nav justify-content-center category-nav m-0 p-0"> 
-            <li class="nav-item category-hover-item" *ngFor="let cat of popularCategories">
-                <a class="nav-link py-2 px-3" [routerLink]="['/courses']" [queryParams]="{category: cat.id}">{{ cat.title }}</a>
-                
-                <div class="hover-menu shadow" *ngIf="cat.subCategories && cat.subCategories.length > 0">
-                    <div class="container-fluid px-3">
-                        <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 py-2">
-                            <a *ngFor="let sub of cat.subCategories" 
-                               [routerLink]="['/courses']" 
-                               [queryParams]="{subcategory: sub.id}"
-                               class="sub-cat-link">
-                                {{ sub.title }}
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </li>
-        </ul>
     </div>
 </div>

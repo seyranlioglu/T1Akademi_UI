@@ -1,41 +1,276 @@
-.dashboard-content-wrap {
-    padding: 20px;
+// --- Değişkenler ---
+$primary-color: #ff1949; // T1 Akademi Kırmızısı
+$text-color: #2d2f31;
+$text-muted: #6c757d;
+$border-color: #eeeeee;
+$bg-light: #f9f9f9;
+
+// --- Ana Kapsayıcı ---
+.company-employees-area {
+    position: relative;
+    z-index: 1;
+    background-color: $bg-light;
+    min-height: 80vh; // İçerik az olsa bile footer yukarı kaymasın
 }
 
+// --- Üst Başlık Bölümü ---
+.section-title {
+    margin-bottom: 25px;
+
+    h2 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: $text-color;
+        letter-spacing: -0.5px;
+    }
+
+    p {
+        font-size: 14px;
+        color: $text-muted;
+    }
+
+    // Personel Ekle Butonu
+    .btn-primary {
+        background-color: $primary-color;
+        border-color: $primary-color;
+        color: #fff;
+        border-radius: 50px; // Tam yuvarlak köşeler
+        padding: 10px 24px;
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: 0 4px 6px rgba($primary-color, 0.2);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+
+        &:hover {
+            background-color: darken($primary-color, 10%);
+            border-color: darken($primary-color, 10%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba($primary-color, 0.3);
+        }
+
+        &:focus {
+            box-shadow: 0 0 0 0.25rem rgba($primary-color, 0.5);
+        }
+
+        i {
+            font-size: 18px;
+        }
+    }
+}
+
+// --- Tablo Kapsayıcı (Kart Görünümü) ---
+.table-responsive {
+    background: #ffffff;
+    border: 1px solid $border-color;
+    border-radius: 12px; // Modern köşe
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.03) !important; // Hafif gölge
+    overflow: hidden; // Taşan kenarları gizle
+}
+
+// --- Tablo Stilleri ---
 .table {
     margin-bottom: 0;
     
-    th {
-        font-weight: 600;
-        color: #555;
-        font-size: 14px;
-        border-bottom: 2px solid #eee;
+    thead {
+        th {
+            background-color: #fcfcfc;
+            border-bottom: 1px solid $border-color;
+            color: #555;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            padding: 16px 15px;
+            letter-spacing: 0.5px;
+        }
     }
 
-    td {
-        font-size: 14px;
-        color: #333;
-        vertical-align: middle;
+    tbody {
+        tr {
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: #fffbfb; // Hover'da çok hafif pembemsi/beyaz
+            }
+
+            &:last-child td {
+                border-bottom: none; // Son satır çizgisini kaldır
+            }
+        }
+
+        td {
+            padding: 16px 15px;
+            vertical-align: middle;
+            color: $text-color;
+            font-size: 14px;
+            border-bottom: 1px solid #f4f4f4;
+        }
     }
 }
 
+// --- Avatar (İsim Baş Harfleri) ---
 .avatar-circle {
-    background-color: #ebf4ff; // Soft Primary
-    color: #007bff;
-    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    flex-shrink: 0; // Tablo daralınca ezilmesin
+
+    // HTML'de kullandığımız bg-soft-primary sınıfı için özel stil
+    &.bg-soft-primary {
+        background-color: rgba($primary-color, 0.1); // %10 opaklıkta kırmızı
+        color: $primary-color;
+        border: 1px solid rgba($primary-color, 0.15);
+    }
 }
 
-.badge-success { background-color: #d1e7dd; color: #0f5132; }
-.badge-danger { background-color: #f8d7da; color: #842029; }
-.badge-info { background-color: #cff4fc; color: #055160; }
-.badge-secondary { background-color: #e2e3e5; color: #41464b; }
+// --- İşlem Butonları (Edit, Delete vb.) ---
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px; // Kareye yakın yuvarlak
+    background-color: transparent;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    color: #777;
 
-.dropdown-item {
-    font-size: 13px;
-    padding: 8px 16px;
-    cursor: pointer;
-    &:hover { background-color: #f8f9fa; color: #ff1949; }
+    i {
+        font-size: 19px;
+    }
+
+    // Hover Efektleri
+    &:hover {
+        background-color: #f0f0f0;
+        transform: translateY(-2px);
+    }
+
+    // Renk Varyasyonları (HTML'deki text-primary vb. ile birleşince)
+    &.text-primary:hover {
+        background-color: rgba($primary-color, 0.1);
+        color: $primary-color !important;
+    }
+
+    &.text-danger:hover {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545 !important;
+    }
+
+    &.text-info:hover {
+        background-color: rgba(13, 202, 240, 0.1);
+        color: #0dcaf0 !important;
+    }
+}
+
+// --- Durum Rozetleri (Modern Soft UI) ---
+.badge {
+    font-weight: 600;
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 30px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+
+    &.bg-success {
+        background-color: rgba(25, 135, 84, 0.1) !important;
+        color: #198754;
+        border: 1px solid rgba(25, 135, 84, 0.2);
+    }
+
+    &.bg-danger {
+        background-color: rgba(220, 53, 69, 0.1) !important;
+        color: #dc3545;
+        border: 1px solid rgba(220, 53, 69, 0.2);
+    }
+
+    &.bg-info {
+        background-color: rgba(13, 202, 240, 0.1) !important;
+        color: #0dcaf0;
+        border: 1px solid rgba(13, 202, 240, 0.2);
+    }
+
+    &.bg-secondary {
+        background-color: #e9ecef !important;
+        color: #495057;
+        border: 1px solid #dee2e6;
+    }
+}
+
+// --- Boş Durum (Empty State) ---
+.empty-state {
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    .rounded-circle {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        background-color: #f8f9fa;
+    }
+
+    h6 {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: $text-color;
+    }
+
+    p {
+        font-size: 14px;
+        color: $text-muted;
+        max-width: 300px;
+        margin: 0 auto 20px;
+    }
+}
+
+// --- Küçük Metin Yardımcısı ---
+.x-small {
+    font-size: 11px;
+    display: block;
+    margin-top: 2px;
+}
+
+// --- Mobil Uyumluluk ---
+@media only screen and (max-width: 767px) {
+    .section-title {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 15px;
+
+        .action-btn {
+            width: 100%;
+            .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    }
+
+    // Mobilde tablo taşmasını yönetmek için
+    .table-responsive {
+        border: none;
+        box-shadow: none !important;
+        background: transparent;
+    }
     
-    i { vertical-align: middle; font-size: 16px; }
+    // İsteğe bağlı: Mobilde tablo yerine kart görünümü için ekstra stiller gerekebilir,
+    // şimdilik yatay scroll ile idare eder.
 }

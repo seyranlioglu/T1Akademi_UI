@@ -158,7 +158,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  onVerifySubmit() {
+onVerifySubmit() {
     if (this.verifyForm.invalid) return;
 
     const code = this.verifyForm.get('code')?.value;
@@ -166,31 +166,29 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     
     this.authService.isLoadingSubject.next(true);
 
+    // Verify metodu zaten saveUserData'yı çağırıyor, ekstra bir şey yapmaya gerek yok.
     this.authService.verify(this.pendingUserName, code, rememberMeValue).subscribe({
-        next: (res: any) => {
-            this.authService.isLoadingSubject.next(false);
-            
-            if (res.header.result) {
-                
-                // --- YENİ EKLENEN: Beni Hatırla Logic ---
-                if (rememberMeValue) {
-                    // Kullanıcı adını ham haliyle kaydedelim (maskelenmiş halini de kaydedebilirsin)
-                    localStorage.setItem('rememberedUser', this.loginForm.get('emailOrPhone')?.value);
-                } else {
-                    localStorage.removeItem('rememberedUser');
-                }
-                // ----------------------------------------
+      next: (res: any) => {
+        this.authService.isLoadingSubject.next(false);
+        
+        if (res.header.result) {
+          // Sadece "Beni Hatırla" için kullanıcı adını sakla (Token işine karışma)
+          if (rememberMeValue) {
+            localStorage.setItem('rememberedUser', this.loginForm.get('emailOrPhone')?.value);
+          } else {
+            localStorage.removeItem('rememberedUser');
+          }
 
-                this.toastr.success("Giriş Başarılı!");
-                this.router.navigate(['/']);
-            } else {
-                this.toastr.error("Kod hatalı veya süresi dolmuş.");
-            }
-        },
-        error: (err) => {
-            this.authService.isLoadingSubject.next(false);
-            this.toastr.error("Doğrulama başarısız.");
+          this.toastr.success("Giriş Başarılı!");
+          this.router.navigate(['/']);
+        } else {
+          this.toastr.error("Kod hatalı veya süresi dolmuş.");
         }
+      },
+      error: (err) => {
+        this.authService.isLoadingSubject.next(false);
+        this.toastr.error("Doğrulama başarısız.");
+      }
     });
   }
 

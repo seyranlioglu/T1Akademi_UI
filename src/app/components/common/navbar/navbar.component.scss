@@ -1,170 +1,130 @@
-// Font ve Temel
+// Temel Font
 .navbar-area {
     font-family: 'Spartan', sans-serif;
 }
 
-// LOGO BÜYÜTME
-.navbar-brand {
-    img {
-        transition: all 0.3s ease;
-    }
+// Hover Efekti (Gri Arka Plan)
+.hover-effect {
+    transition: background-color 0.2s;
+    &:hover { background-color: #f0f0f0; color: #ff1949 !important; }
 }
 
-// 1. ÜST DUYURU BARI
-.top-info-bar {
-    background-color: #ffd000;
-    color: #2d2f31;
-    font-size: 13px;
-    font-weight: 700;
-    a {
-        color: #5624d0;
-        &:hover { text-decoration: underline !important; }
-    }
-}
-
-// 2. ANA NAVBAR
-.nav-link {
-    font-weight: 400;
-    font-size: 14px;
-    color: #2d2f31 !important;
-    transition: color 0.2s;
-    &:hover { color: #ff1949 !important; }
-}
-
-.category-link {
-    font-size: 14px;
-    font-weight: 700; 
-    padding: 15px 0;
-    cursor: pointer;
-    &:hover { color: #ff1949 !important; }
-}
-
+// Arama Kutusu Stilleri
 .search-box {
     .input-group {
-        border: 1px solid #1c1d1f;
-        border-radius: 999px;
-        transition: all 0.2s;
-        background-color: #f7f9fa;
+        border-color: #e9ecef !important;
+        transition: all 0.3s ease;
+        
         &:focus-within {
             background-color: #fff !important;
             border-color: #ff1949 !important;
-            button, input { background-color: #fff !important; }
+            box-shadow: 0 0 0 3px rgba(255, 25, 73, 0.1); // Hafif focus halkası
         }
     }
-}
 
-// --- DROPDOWN MENÜ DÜZELTMELERİ (KRİTİK KISIM) ---
-.dropdown-menu {
-    margin-top: 0 !important; // Boşluğu kesin olarak sıfırla
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border: 1px solid #eee;
-    padding: 0;
-    
-    // --- HOVER KÖPRÜSÜ (Menü kapanmasını engeller) ---
-    &::before {
-        content: '';
-        position: absolute;
-        top: -10px; // Yukarıya doğru görünmez alan uzat
-        left: 0;
-        width: 100%;
-        height: 10px;
-        background: transparent;
-        z-index: 1;
-    }
-
-    // Ana Menü Linkleri
-    .dropdown-item {
-        padding: 8px 15px; // Biraz daha ferah ama kompakt
-        color: #555;
-        font-size: 14px;
-        display: flex;
-        align-items: center; // İkon ve yazıyı hizala
-        border-bottom: 1px solid #f9f9f9;
-        transition: all 0.2s;
-
-        &:hover {
-            color: #ff1949;
-            background-color: #fff5f7; // Hafif pembe hover
-            i { color: #ff1949; }
-        }
-
-        i { font-size: 18px; color: #888; transition: color 0.2s; }
-    }
-
-    // --- İÇ İÇE (NESTED) MENÜ MANTIĞI ---
-    .dropdown-submenu {
-        position: relative; 
-
-        &:hover > .submenu {
-            display: block;
-        }
-
-        .submenu {
-            display: none; 
-            position: absolute;
-            left: 100%; 
-            top: 0;     
-            margin-top: -1px; 
-            min-width: 250px;
-            background: #fff;
-            box-shadow: 4px 4px 12px rgba(0,0,0,0.1);
-            border: 1px solid #eee;
-            z-index: 10000; 
-        }
-    }
-}
-
-// 3. ALT KATEGORİ BARI (İNCELTİLMİŞ HALİ)
-.category-nav {
-    display: flex;
-    justify-content: center;
-    list-style: none;
-    margin: 0; 
-    padding: 0; // Container padding'ini sıfırla
-
-    .nav-item { position: static; } 
-
-    .nav-link {
-        font-size: 13px; // Fontu küçült
-        font-weight: 600;
-        color: #6a6f73 !important;
+    .search-results {
+        max-height: 400px;
+        overflow-y: auto;
         
-        // --- BURASI BARI İNCELTİR ---
-        padding: 10px 18px !important; // Dikey boşluğu kontrol et
-        line-height: 1; // Satır yüksekliğini düşür
-        // ----------------------------
+        &::-webkit-scrollbar { width: 5px; }
+        &::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
 
-        position: relative; 
-        transition: all 0.3s ease;
-        &:hover { 
-            color: #1c1d1f !important; 
-            background-color: #f7f9fa;
+        .list-group-item {
+            transition: background-color 0.2s;
+            &:hover { background-color: #f8f9fa; }
         }
     }
+}
 
-    // Alt bar hover menüsü
-    .category-hover-item:hover .hover-menu {
-        display: block; opacity: 1; visibility: visible;
-        top: 100%; // Tam yapışması için
+// Profil Menüsü
+.profile-menu-wrapper {
+    .dropdown-menu {
+        margin-top: 10px !important;
+        border-radius: 12px;
+        overflow: hidden;
+        
+        // Menü ile buton arasındaki boşluğu dolduran köprü (Hover kopmasın diye)
+        &::before {
+            content: '';
+            position: absolute;
+            top: -15px; left: 0; width: 100%; height: 15px; background: transparent;
+        }
+
+        .dropdown-item {
+            font-size: 14px;
+            color: #555;
+            transition: all 0.2s;
+            
+            &:hover { 
+                background-color: #fff5f7; 
+                color: #ff1949; 
+                i { color: #ff1949; }
+            }
+            
+            i { font-size: 18px; vertical-align: middle; transition: color 0.2s; color: #999; }
+        }
     }
 }
 
-.hover-menu {
-    display: none; position: absolute; top: 100%; left: 0; width: 100%;
-    background-color: #1c1d1f; z-index: 1000; padding: 0px 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+// Mobil Buton Focus İptali
+.navbar-toggler:focus {
+    box-shadow: none;
+    outline: none;
+}
 
-    .sub-cat-link {
-        color: #d1d7dc !important; text-decoration: none;
-        font-size: 13.5px; font-weight: 500; padding: 6px 12px;
-        border-radius: 4px;
-        display: inline-block;
-        &:hover { background-color: rgba(255,255,255,0.15); color: #fff !important; }
+// Küçük Ekranlar (Mobil) İçin Arama Kutusunu Göster
+@media (max-width: 767px) {
+    .search-box {
+        display: none !important; // Mobilde üst bar çok şişmesin diye gizledim, istersen açabiliriz.
     }
 }
 
-// Mobil Toggle Butonu
-.navbar-toggler {
-    &:focus { box-shadow: none; outline: none; }
+.profile-menu-wrapper {
+    position: relative; // Dropdown buna göre konumlanacak
+    
+    // Dropdown Menü
+    .dropdown-menu {
+        margin-top: 0 !important; // Boşluğu sıfırla
+        top: 100%; // Tam altına yapışsın
+        right: 0;
+        border-radius: 12px;
+        overflow: visible; // Before elementi dışarı taşabilsin
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        border: none;
+        
+        // --- SİHİRLİ KÖPRÜ (Mouse kaçmasın diye) ---
+        &::before {
+            content: '';
+            position: absolute;
+            top: -20px; // Yukarı doğru 20px uzat
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: transparent; // Görünmez
+            z-index: 1;
+        }
+        // ------------------------------------------
+
+        .dropdown-item {
+            font-size: 14px;
+            color: #555;
+            padding: 10px 20px;
+            transition: all 0.2s;
+            display: flex; 
+            align-items: center;
+            
+            &:hover { 
+                background-color: #fff5f7; 
+                color: #ff1949; 
+                i { color: #ff1949; }
+            }
+            
+            i { 
+                font-size: 18px; 
+                margin-right: 10px; // İkon ile yazı arası
+                color: #999; 
+                transition: color 0.2s; 
+            }
+        }
+    }
 }

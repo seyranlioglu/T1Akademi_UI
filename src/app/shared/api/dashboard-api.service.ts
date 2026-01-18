@@ -7,7 +7,7 @@ import {
   ContinueTrainingDto, 
   DashboardStatsDto, 
   TrainingCardDto, 
-  UserCertificateDto // <-- YENİ: Model import edildi
+  UserCertificateDto 
 } from '../models/dashboard.model';
 
 @Injectable({
@@ -22,33 +22,57 @@ export class DashboardApiService {
 
   constructor(private http: HttpClient) { }
 
+  // 1. DÜZELTME: Backend 'continue-learning' bekliyor
   getContinueLearning(): Observable<ContinueTrainingDto | null> {
-    return this.http.get<any>(`${this.dashboardUrl}/GetLastActiveTraining`).pipe(
-      map(res => (res && res.header && res.header.result) ? res.body : null)
+    return this.http.get<any>(`${this.dashboardUrl}/continue-learning`).pipe(
+      map(res => {
+          // Backend Response yapısına göre datayı al
+          // Genelde: { success: true, data: {...} } veya direkt result
+          const data = res.data || res.result || res.body;
+          return data ? data : null;
+      })
     );
   }
 
+  // 2. DÜZELTME: Backend 'stats' bekliyor
   getStats(): Observable<DashboardStatsDto | null> {
-    return this.http.get<any>(`${this.dashboardUrl}/GetUserStats`).pipe(
-      map(res => (res && res.header && res.header.result) ? res.body : null)
+    return this.http.get<any>(`${this.dashboardUrl}/stats`).pipe(
+      map(res => {
+          const data = res.data || res.result || res.body;
+          return data ? data : null;
+      })
     );
   }
 
+  // 3. DÜZELTME: Backend 'assigned-trainings' bekliyor
   getAssignedTrainings(): Observable<TrainingCardDto[]> {
-    return this.http.get<any>(`${this.dashboardUrl}/GetAssignedTrainings`).pipe(
-      map(res => (res && res.header && res.header.result) ? res.body : [])
+    return this.http.get<any>(`${this.dashboardUrl}/assigned-trainings`).pipe(
+      map(res => {
+          const data = res.data || res.result || res.body;
+          return Array.isArray(data) ? data : [];
+      })
     );
   }
 
+  // 4. DÜZELTME: Backend 'recommended-trainings' bekliyor
   getRecommendedTrainings(): Observable<TrainingCardDto[]> {
-    return this.http.get<any>(`${this.dashboardUrl}/GetRecommendedTrainings`).pipe(
-      map(res => (res && res.header && res.header.result) ? res.body : [])
+    return this.http.get<any>(`${this.dashboardUrl}/recommended-trainings`).pipe(
+      map(res => {
+          const data = res.data || res.result || res.body;
+          return Array.isArray(data) ? data : [];
+      })
     );
   }
 
+  // Sertifikalar farklı controller'da olduğu için URL yapısı farklı olabilir
+  // Ama UserCertificateController'da endpoint adı muhtemelen GetMyCertificates veya get-my-certificates'tir.
+  // Şimdilik standart PascalCase bırakıyorum, hata alırsan burayı da kontrol ederiz.
   getMyCertificates(): Observable<UserCertificateDto[]> {
     return this.http.get<any>(`${this.baseUrl}/UserCertificate/GetMyCertificates`).pipe(
-      map(res => (res && res.header && res.header.result) ? res.body : [])
+      map(res => {
+          const data = res.data || res.result || res.body;
+          return Array.isArray(data) ? data : [];
+      })
     );
   }
 }

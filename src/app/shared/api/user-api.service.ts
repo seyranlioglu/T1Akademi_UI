@@ -55,4 +55,21 @@ export class UserApiService {
                 return response.data || response.body || [];
             }));
     }
+
+addUser(payload: any): Observable<any> {
+    return this.http.post<any>(`${API_USER_URL}/AddUser`, payload);
+  }
+
+  deleteUser(id: number): Observable<any> {
+    return this.http.delete<any>(`${API_USER_URL}/Delete/${id}`);
+  }
+
+  setUserStatus(userId: number, isActive: boolean): Observable<any> {
+    // Backend'de SetStatus endpoint'i bir DTO bekliyorsa ona göre, 
+    // yoksa query string veya anonim obje gönderebiliriz.
+    // Senin backend: public async Task<Response<CommonResponse>> SetStatus([FromBody] SetUserStatusDto setUserStatusDto)
+    // O yüzden bir obje gönderiyoruz:
+    const payload = { userId: userId, isActive: isActive };
+    return this.http.post<any>(`${API_USER_URL}/SetStatus`, payload);
+  }
 }
