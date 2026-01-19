@@ -102,6 +102,7 @@ import { CalendarViewComponent } from './components/dashboard/calendar-view/cale
 import { CarouselModule } from 'ngx-owl-carousel-o';
 import { CourseCardComponent } from './components/common/course-card/course-card.component';
 import { CompanyEmployeesComponent } from './components/dashboard/company-employees/company-employees.component';
+import { NgSelectModule } from '@ng-select/ng-select'; // <-- Import
 
 @NgModule({
     declarations: [
@@ -208,6 +209,7 @@ import { CompanyEmployeesComponent } from './components/dashboard/company-employ
         EffectsModule.forRoot([CourseEffects]),
         FullCalendarModule,
         CarouselModule,
+        NgSelectModule
     ],
     providers: [
         {

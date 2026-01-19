@@ -4,6 +4,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { UserApiService } from 'src/app/shared/api/user-api.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
+import { CurrAccApiService, CompanyDto } from 'src/app/shared/api/curr-acc-api.service';
+import { Subject, Observable, of } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, switchMap, tap, startWith } from 'rxjs/operators';
 
 export interface ManagedUser {
   id: number;
@@ -36,10 +39,18 @@ export class CompanyEmployeesComponent implements OnInit {
   selectedUserId: number | null = null;
   isSaving = false;
   
+  // Yetki ve Firma Yönetimi
   currentCompanyId: number = 0;
+  isAdmin = false;
+  
+  // NG-SELECT (Firma Arama) Değişkenleri
+  companyList$: Observable<CompanyDto[]> | undefined;
+  companyLoading = false;
+  companyInput$ = new Subject<string>();
 
   constructor(
     private userApiService: UserApiService,
+    private currAccApiService: CurrAccApiService,
     private modalService: NgbModal,
     private fb: FormBuilder,
     private toastr: ToastrService,
@@ -50,22 +61,49 @@ export class CompanyEmployeesComponent implements OnInit {
         name: ['', [Validators.required, Validators.minLength(2)]],
         surName: ['', [Validators.required, Validators.minLength(2)]],
         email: ['', [Validators.required, Validators.email]],
-        phoneNumber: ['', [Validators.required, Validators.minLength(14)]], // Formatlı uzunluk kontrolü
-        currAccId: [0]
+        phoneNumber: ['', [Validators.required, Validators.minLength(14)]],
+        currAccId: [null, Validators.required]
     });
 
-    // Giriş yapan kullanıcının firma ID'sini al
+    // --- YETKİ VE ROL KONTROLÜ ---
     const currentUser = this.authService.currentUserValue;
-    if(currentUser && currentUser.currAccId) {
-        this.currentCompanyId = currentUser.currAccId;
+    if(currentUser) {
+        // Roles dizisi kontrolü
+        if (currentUser.roles && Array.isArray(currentUser.roles)) {
+            const lowerRoles = currentUser.roles.map((r: any) => r.toString().toLowerCase());
+            if (lowerRoles.includes('superadmin') || lowerRoles.includes('admin') || lowerRoles.includes('sa')) {
+                this.isAdmin = true;
+            }
+        }
+        // Token decode kontrolü (Yedek)
+        if (!this.isAdmin && currentUser.accessToken) {
+            try {
+                const payload = JSON.parse(atob(currentUser.accessToken.split('.')[1]));
+                const roleClaim = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload['role'];
+                if (roleClaim) {
+                    const rolesArray = Array.isArray(roleClaim) ? roleClaim : [roleClaim];
+                    const lowerRoles = rolesArray.map((r: any) => r ? r.toString().toLowerCase() : '');
+                    if (lowerRoles.includes('sa') || lowerRoles.includes('superadmin') || lowerRoles.includes('admin')) {
+                        this.isAdmin = true;
+                    }
+                }
+            } catch (e) {
+                console.error('Token yetki kontrolü sırasında hata:', e);
+            }
+        }
+        if (currentUser.currAccId) {
+            this.currentCompanyId = currentUser.currAccId;
+        }
     }
   }
 
   ngOnInit(): void {
     this.fetchUsers();
+    if (this.isAdmin) {
+        this.loadCompanies();
+    }
   }
 
-  // Form getter (HTML'de f.name diyebilmek için)
   get f() { return this.userForm.controls; }
 
   // 1. LİSTELEME
@@ -78,46 +116,75 @@ export class CompanyEmployeesComponent implements OnInit {
         this.errorMessage = '';
       },
       error: (err) => {
-        console.error('Listeleme hatası:', err);
         this.errorMessage = 'Personel listesi yüklenirken bir hata oluştu.';
         this.isLoading = false;
       }
     });
   }
 
-  // 2. MODAL AÇMA (EKLEME)
+  // 2. FİRMA ARAMA
+  loadCompanies() {
+      this.companyList$ = this.companyInput$.pipe(
+          startWith(''), // Başlangıçta boş değer ile tetikle
+          debounceTime(500),
+          distinctUntilChanged(),
+          tap(() => this.companyLoading = true),
+          switchMap(term => {
+              // Boş gelirse backend'e boş string gider, backend hepsini döner
+              return this.currAccApiService.getCompanies(term).pipe(
+                  catchError(() => of([])),
+                  tap(() => this.companyLoading = false)
+              );
+          })
+      );
+  }
+
+  // 3. MODAL AÇMA (EKLEME)
   openAddModal() {
     this.isEditMode = false;
     this.selectedUserId = null;
     this.userForm.reset();
     
-    this.userForm.patchValue({ currAccId: this.currentCompanyId });
+    if (this.isAdmin) {
+        this.userForm.get('currAccId')?.enable();
+        this.userForm.patchValue({ currAccId: null }); 
+        
+        // Modalın animasyonu bitip DOM'a yerleşmesi için biraz bekle ve listeyi tetikle
+        setTimeout(() => {
+            this.companyInput$.next(''); 
+        }, 200); 
+    } else {
+        this.userForm.patchValue({ currAccId: this.currentCompanyId });
+    }
+    
     this.userForm.get('email')?.enable();
 
     this.modalService.open(this.userModal, { backdrop: 'static', size: 'lg', centered: true });
   }
 
-  // 3. MODAL AÇMA (DÜZENLEME)
+  // ... (Diğer metodlar aynı: openEditModal, saveUser, deleteUser, toggleUserStatus, onDynamicInput vb.)
+  // Bunlar değişmediği için kod kalabalığı yapmamak adına tekrar yazmıyorum.
+  // Eski dosyadaki diğer fonksiyonları olduğu gibi koruyabilirsin.
+  
+  // 4. MODAL AÇMA (DÜZENLEME)
   openEditModal(user: ManagedUser) {
     this.isEditMode = true;
     this.selectedUserId = user.id;
     
-    // Telefon numarasını formatlı göstermek isteyebilirsin, şimdilik direkt veriyoruz
     this.userForm.patchValue({
         name: user.firstName,
         surName: user.lastName,
         email: user.email,
-        phoneNumber: user.phoneNumber, // Formatız gelirse formatlamak gerekebilir
-        currAccId: this.currentCompanyId
+        phoneNumber: user.phoneNumber,
+        currAccId: this.currentCompanyId 
     });
 
     this.userForm.get('email')?.disable();
-
     this.modalService.open(this.userModal, { backdrop: 'static', size: 'lg', centered: true });
   }
 
-  // 4. KAYDET (Add veya Update)
-saveUser() {
+  // 5. KAYDET
+  saveUser() {
     if (this.userForm.invalid) {
         this.userForm.markAllAsTouched();
         return;
@@ -127,21 +194,18 @@ saveUser() {
     const formData = this.userForm.getRawValue();
 
     if (this.isEditMode && this.selectedUserId) {
-        // --- GÜNCELLEME ---
         const updatePayload = {
             id: this.selectedUserId,
             name: formData.name,
             surName: formData.surName,
-            currAccId: this.currentCompanyId
+            currAccId: formData.currAccId
         };
-
         this.userApiService.updateUser(updatePayload).subscribe({
             next: (res: any) => { 
-                // GÜNCELLEME: Response yapısına göre kontrol (header.result veya body.result)
                 if(res && res.header && res.header.result) {
                     this.toastr.success(res.body?.message || 'Personel bilgileri güncellendi.');
                     this.modalService.dismissAll();
-                    this.fetchUsers(); // Listeyi yenile
+                    this.fetchUsers();
                 } else {
                     this.toastr.error(res.header?.msg || 'Güncelleme başarısız.');
                 }
@@ -152,32 +216,26 @@ saveUser() {
                 this.isSaving = false;
             }
         });
-
     } else {
-        // --- EKLEME ---
         const addPayload = {
             name: formData.name,
             surName: formData.surName,
             email: formData.email,
             phoneNumber: formData.phoneNumber, 
-            currAccId: this.currentCompanyId
+            currAccId: formData.currAccId
         };
-
         this.userApiService.addUser(addPayload).subscribe({
             next: (res: any) => {
-                // GÜNCELLEME: Backend { header: { result: true }, body: {...} } dönüyor.
-                // Biz yanlışlıkla res.result bakıyorduk, o yüzden hata sanıyordu.
                 if(res && res.header && res.header.result) {
                     this.toastr.success(res.body?.message || 'Personel eklendi ve şifresi gönderildi.');
-                    this.modalService.dismissAll(); // Modalı kapat
-                    this.fetchUsers(); // LİSTEYİ YENİLE
+                    this.modalService.dismissAll();
+                    this.fetchUsers(); 
                 } else {
                     this.toastr.error(res.header?.msg || 'Ekleme başarısız.');
                 }
                 this.isSaving = false;
             },
             error: (err: any) => {
-                // Backend validasyon hatası dönerse mesajı yakala
                 const errorMsg = err.error?.header?.msg || 'Bir hata oluştu.';
                 this.toastr.error(errorMsg);
                 this.isSaving = false;
@@ -186,16 +244,15 @@ saveUser() {
     }
   }
 
-  // 5. SİLME
   deleteUser(user: ManagedUser) {
     if(confirm(`${user.firstName} ${user.lastName} personelini silmek istediğinize emin misiniz?`)) {
         this.userApiService.deleteUser(user.id).subscribe({
             next: (res: any) => {
-                if(res.result) {
+                if(res && res.header && res.header.result) {
                     this.toastr.success('Personel silindi.');
                     this.fetchUsers();
                 } else {
-                    this.toastr.error(res.message);
+                    this.toastr.error(res.header?.msg || res.message || 'Hata oluştu');
                 }
             },
             error: (err: any) => this.toastr.error('Silme işleminde hata oluştu.')
@@ -203,7 +260,6 @@ saveUser() {
     }
   }
 
-  // 6. DURUM DEĞİŞTİRME
   toggleUserStatus(user: ManagedUser) {
     const newStatus = !user.isActive;
     const actionName = newStatus ? 'Aktifleştirmek' : 'Pasife almak';
@@ -211,11 +267,11 @@ saveUser() {
     if(confirm(`${user.firstName} ${user.lastName} kullanıcısını ${actionName} istediğinize emin misiniz?`)) {
         this.userApiService.setUserStatus(user.id, newStatus).subscribe({
             next: (res: any) => {
-                if(res.result) {
+                if(res && res.header && res.header.result) {
                     this.toastr.success(`Kullanıcı durumu güncellendi.`);
                     this.fetchUsers();
                 } else {
-                    this.toastr.error(res.message);
+                    this.toastr.error(res.header?.msg || res.message || 'Hata oluştu');
                 }
             },
             error: (err: any) => this.toastr.error('Durum değiştirilemedi.')
@@ -223,26 +279,21 @@ saveUser() {
     }
   }
 
-  // --- TELEFON FORMATLAMA ---
   onDynamicInput(event: any) {
     const input = event.target;
     const originalValue = input.value;
     if (!originalValue) return;
 
-    // Sadece rakamları al
     let numbers = originalValue.replace(/\D/g, '');
 
-    // Başlangıç kontrolü (05... formatı)
     if (numbers.startsWith('0')) { 
         if (numbers.length > 1 && numbers[1] !== '5') { numbers = '0'; } 
     } 
     else if (numbers.startsWith('5')) { numbers = '0' + numbers; } 
     else { numbers = '05' + numbers; }
 
-    // Maksimum uzunluk (11 hane: 05XX...)
     if (numbers.length > 11) { numbers = numbers.substring(0, 11); }
 
-    // Formatlama: 05XX XXX XX XX
     let formatted = "";
     if (numbers.length > 0) formatted = numbers.substring(0, 4);
     if (numbers.length > 4) formatted += " " + numbers.substring(4, 7);

@@ -137,6 +137,32 @@
         <form [formGroup]="userForm">
             <div class="row g-3">
                 
+                <div class="col-12" *ngIf="isAdmin && !isEditMode">
+                    <label class="form-label fw-bold small">Firma Seçimi <span class="text-danger">*</span></label>
+                    
+                    <ng-select [items]="companyList$ | async"
+                               bindLabel="title"
+                               bindValue="id"
+                               [loading]="companyLoading"
+                               [typeahead]="companyInput$"
+                               formControlName="currAccId"
+                               appendTo="body" 
+                               placeholder="Firma adı yazarak arayın..."
+                               [class.is-invalid]="f['currAccId'].touched && f['currAccId'].invalid">
+                        
+                        <ng-template ng-option-tmp let-item="item">
+                            <div>
+                                <span class="fw-bold">{{ item.title }}</span>
+                            </div>
+                        </ng-template>
+
+                    </ng-select>
+                    
+                    <div class="invalid-feedback d-block" *ngIf="f['currAccId'].touched && f['currAccId'].invalid">
+                        Lütfen personelin ekleneceği firmayı seçiniz.
+                    </div>
+                </div>
+
                 <div class="col-md-6">
                     <label class="form-label fw-bold small">Ad <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" formControlName="name" placeholder="Ad"

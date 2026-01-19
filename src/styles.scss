@@ -3,6 +3,8 @@
 @import './assets/styles/_forms.scss';
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
+/* 1. Kütüphanenin varsayılan temasını yükle */
+@import "@ng-select/ng-select/themes/default.theme.css";
  
 $custom-palette: (
  50: #e8eaf6,
@@ -543,6 +545,17 @@ p {
         }
     }
 
+}
+
+/* 2. Listeyi Modal'ın önüne getir (Z-Index Fix) */
+.ng-dropdown-panel {
+    z-index: 9999 !important; /* Modal'ın (1050) üstüne çık */
+}
+
+/* 3. Dropdown kutusunun yüksekliğini ve hizasını düzelt */
+.ng-select .ng-select-container {
+    min-height: 48px; /* Input yüksekliği */
+    align-items: center; /* Yazıyı ortala */
 }
 
 /* Min width 992px to Max width 1199px */

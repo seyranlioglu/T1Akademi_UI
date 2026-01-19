@@ -16,10 +16,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
   isInstructor = false;
   
-  // Varsayılan değer
+  // Varsayılan değerler
   userName = 'Kullanıcı'; 
   userEmail = '';
   userInitials = 'U';
+  userRole = 'Öğrenci'; // YENİ: Rol Gösterimi İçin
 
   showCatMenu = false;
   isProfileMenuOpen = false;
@@ -29,6 +30,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showSearchResults = false;
   isSearching = false;
   searchSubscription: Subscription | undefined;
+  userSubscription: Subscription | undefined;
 
   constructor(
     private authService: AuthService,
@@ -38,76 +40,99 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.loadUserData();
+    // LocalStorage yerine AuthService üzerinden dinliyoruz (En garantisi)
+    this.userSubscription = this.authService.currentUser$.subscribe(user => {
+        if (user) {
+            this.isLoggedIn = true;
+            this.processUserData(user);
+        } else {
+            this.isLoggedIn = false;
+            this.userName = 'Misafir';
+            this.userInitials = 'M';
+        }
+    });
+
     this.initSearchListener();
   }
 
-  // --- KULLANICI VERİSİNİ OKUMA (GÜÇLENDİRİLMİŞ) ---
-  loadUserData() {
-    // 1. Önce olası anahtarları kontrol et
-    let userJson = localStorage.getItem('currentUser');
-    if (!userJson) userJson = localStorage.getItem('user');
-    if (!userJson) userJson = localStorage.getItem('User'); // Bazen büyük harf olabilir
+  // --- KULLANICI VERİSİNİ İŞLEME ---
+  processUserData(user: any) {
+      console.log('Navbar User Data:', user); // Debug için
 
-    if (userJson) {
-      this.isLoggedIn = true;
-      try {
-        const parsedData = JSON.parse(userJson);
-
-        // 2. Veri yapısını çöz (Bazen user objesi 'data' veya 'user' propertysi içinde olabilir)
-        // Eğer direkt obje ise 'parsedData', içinde user varsa 'parsedData.user'
-        const user = parsedData.user || parsedData.data || parsedData;
-
-        // 3. İsim alanlarını kontrol et
-        if (user.firstName && user.lastName) {
-            this.userName = `${user.firstName} ${user.lastName}`;
-        } 
-        else if (user.name && user.surName) { // Bazen backend 'surName' döner
-            this.userName = `${user.name} ${user.surName}`;
-        }
-        else if (user.name && user.surname) { 
-            this.userName = `${user.name} ${user.surname}`;
-        }
-        else if (user.fullName) {
-            this.userName = user.fullName;
-        }
-        else if (user.userName) {
-            this.userName = user.userName;
-        }
-        else if (user.email) {
-            this.userName = user.email; // Hiçbir şey yoksa email göster
-        }
-
-        this.userEmail = user.email || '';
-
-        // 4. Baş harfleri hesapla
-        this.calculateInitials();
-
-        // 5. Rol Kontrolü
-        this.checkUserRole(user);
-
-      } catch (e) {
-        console.error('Kullanıcı verisi okunamadı:', e);
+      // 1. İSİM BELİRLEME (Loglara göre öncelik: name + surname)
+      if (user.name && user.surname) {
+          this.userName = `${user.name} ${user.surname}`;
+      } 
+      else if (user.firstName && user.lastName) {
+          this.userName = `${user.firstName} ${user.lastName}`;
       }
-    }
+      else if (user.fullName) {
+          this.userName = user.fullName;
+      }
+      else if (user.email) {
+          this.userName = user.email;
+      }
+
+      this.userEmail = user.email || '';
+
+      // 2. BAŞ HARFLERİ HESAPLA
+      this.calculateInitials();
+
+      // 3. ROL VE YETKİ BELİRLEME
+      this.determineUserRole(user);
   }
 
   calculateInitials() {
-      if (this.userName && this.userName !== 'Kullanıcı') {
+      if (this.userName && this.userName !== 'Kullanıcı' && this.userName !== 'Misafir') {
           const parts = this.userName.trim().split(' ');
           if (parts.length > 1) {
-              // Ad ve Soyadın ilk harfleri
               const first = parts[0].charAt(0);
               const last = parts[parts.length - 1].charAt(0);
               this.userInitials = (first + last).toUpperCase();
           } else {
-              // Sadece tek isim varsa ilk 2 harf
               this.userInitials = this.userName.substring(0, 2).toUpperCase();
           }
       } else if (this.userEmail) {
           this.userInitials = this.userEmail.charAt(0).toUpperCase();
+      }
+  }
+
+  determineUserRole(user: any) {
+      // Token'dan veya user objesinden rolü anlamaya çalışalım
+      let roles: string[] = [];
+
+      // User objesinde roles dizisi varsa
+      if (user.roles && Array.isArray(user.roles)) {
+          roles = user.roles.map((r: any) => r.toString().toLowerCase());
+      }
+      
+      // Token varsa decode edip bakalım (Yedek kontrol)
+      if (roles.length === 0 && user.accessToken) {
+          try {
+              const payload = JSON.parse(atob(user.accessToken.split('.')[1]));
+              const roleClaim = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload['role'];
+              if (roleClaim) {
+                  const rolesArray = Array.isArray(roleClaim) ? roleClaim : [roleClaim];
+                  roles = rolesArray.map((r: any) => r.toString().toLowerCase());
+              }
+          } catch (e) {
+              console.error('Navbar token decode hatası:', e);
+          }
+      }
+
+      // Rol Etiketini Belirle
+      if (roles.includes('sa') || roles.includes('superadmin')) {
+          this.userRole = 'Süper Yönetici';
+          this.isInstructor = true; // Adminler de panel erişimine sahip olsun
+      } else if (roles.includes('admin')) {
+          this.userRole = 'Yönetici';
+          this.isInstructor = true;
+      } else if (roles.includes('instructor')) {
+          this.userRole = 'Eğitmen';
+          this.isInstructor = true;
       } else {
-          this.userInitials = 'U';
+          this.userRole = 'Öğrenci';
+          this.isInstructor = false;
       }
   }
 
@@ -133,7 +158,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.isSearching = false;
-        console.error('Arama hatası:', err);
         this.searchResults = [];
       }
     });
@@ -141,19 +165,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   onSearchKeyUp(event: any) {
     const term = event.target.value;
-    
     if (!term || term.trim().length === 0) {
         this.showSearchResults = false;
         this.searchResults = [];
         this.searchTerm$.next('');
         return;
     }
-
     if (event.key === 'Enter') {
         this.goToSearchPage(term);
         return;
     }
-
     this.searchTerm$.next(term);
   }
 
@@ -165,15 +186,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   goToCourseDetail(courseId: number) {
       this.showSearchResults = false;
       this.router.navigate(['/course-details', courseId]);
-  }
-
-  checkUserRole(user: any) {
-    // Rol kontrolü: roles array mi, yoksa string mi, yoksa boolean mı?
-    if (user.roles && Array.isArray(user.roles)) {
-        this.isInstructor = user.roles.includes('Instructor') || user.roles.includes('Admin');
-    } else if (user.isInstructor === true) {
-        this.isInstructor = true;
-    }
   }
 
   toggleMobileMenu() {
@@ -191,8 +203,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-      if (this.searchSubscription) {
-          this.searchSubscription.unsubscribe();
-      }
+      if (this.searchSubscription) this.searchSubscription.unsubscribe();
+      if (this.userSubscription) this.userSubscription.unsubscribe();
   }
 }
