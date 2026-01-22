@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { TrainingCard } from '../models/training-card.model'; 
-import { PagedList, SearchTrainingRequest, TrainingListItem } from '../models/training-list.model'; // Yolu düzeltirsin
+import { SearchTrainingRequest } from '../models/training-list.model';
 
 const API_TRAINING_URL = `${environment.apiUrl}/Training`;
 const API_TRAINING_CATEGORY_URL = `${environment.apiUrl}/TrainingCategory`;
@@ -122,7 +122,7 @@ export class TrainingApiService {
     return this.http.get<any>(`${API_TRAINING_URL}/Search`, { params });
   }
 
-  // --- YENİ EKLENEN METOD (Navbar İçin) ---
+  // --- Navbar İçin ---
   getNavbarRecentTrainings(count: number = 5): Observable<any> {
     const params = new HttpParams().set('count', count);
     return this.http.get<any>(`${API_TRAINING_URL}/GetNavbarRecentTrainings`, { params }).pipe(
@@ -130,6 +130,14 @@ export class TrainingApiService {
     );
   }
 
+  // --- Filtre Seçenekleri (DÜZELTİLDİ: body içinden alıyor) ---
+  getFilterOptions(): Observable<any> {
+    return this.http.get<any>(`${API_TRAINING_URL}/GetFilterOptions`).pipe(
+        map(res => res.body || res.data || res)
+    );
+  }
+
+  // --- Gelişmiş Listeleme ---
   getAdvancedList(request: SearchTrainingRequest): Observable<any> {
     let params = new HttpParams()
         .set('pageIndex', request.pageIndex.toString())
@@ -139,15 +147,21 @@ export class TrainingApiService {
     if (request.searchText) params = params.set('searchText', request.searchText);
     if (request.minRating) params = params.set('minRating', request.minRating.toString());
 
-    // Array parametreleri (backend [FromQuery] ile list bekliyorsa)
     if (request.categoryIds) {
         request.categoryIds.forEach(id => params = params.append('categoryIds', id.toString()));
     }
     if (request.levelIds) {
         request.levelIds.forEach(id => params = params.append('levelIds', id.toString()));
     }
-    // LanguageIds vb. eklenebilir
+    if (request.languageIds) {
+        request.languageIds.forEach(id => params = params.append('languageIds', id.toString()));
+    }
+    if (request.instructorIds) { // Eğer backend desteklerse
+        request.instructorIds.forEach(id => params = params.append('instructorIds', id.toString()));
+    }
 
-    return this.http.get<any>(`${API_TRAINING_URL}/GetAdvancedList`, { params });
+    return this.http.get<any>(`${API_TRAINING_URL}/GetAdvancedList`, { params }).pipe(
+        map(res => res.body || res.data || res) // Burada da body'den çıkarıyoruz
+    );
   }
 }

@@ -6,11 +6,16 @@
                 <i class='bx bx-filter-alt'></i> 
                 <span class="d-none d-sm-inline">Filtreler</span>
             </button>
-            <h5 class="fw-bold m-0 text-dark">Eğitim Kataloğu</h5>
+            
+            <div class="position-relative d-none d-md-block" style="width: 250px;">
+                <input type="text" class="form-control form-control-sm ps-4" placeholder="Eğitimlerde ara..." 
+                       [(ngModel)]="filterRequest.searchText" (keyup.enter)="onSearch()">
+                <i class='bx bx-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted'></i>
+            </div>
         </div>
         
         <span class="text-muted small">
-            <strong>{{ totalRecords }}</strong> eğitim bulundu
+            <strong>{{ totalRecords }}</strong> sonuç
         </span>
     </div>
 
@@ -25,31 +30,89 @@
                     </button>
                 </div>
 
-                <div class="form-check form-switch mb-4 p-2 bg-light rounded border">
-                    <input class="form-check-input" type="checkbox" id="privateSwitch" 
-                           (change)="onPrivateChange($event)" [checked]="filterRequest.onlyPrivate">
-                    <label class="form-check-label small fw-bold text-primary" for="privateSwitch">
-                        <i class='bx bxs-lock-alt me-1'></i> Sadece Kurumuma Özel
-                    </label>
-                </div>
-
-                <div class="mb-4">
-                    <h6 class="small fw-bold text-muted mb-2 text-uppercase ls-1">Kategoriler</h6>
-                    <div class="filter-scroll-area">
-                        <div *ngFor="let cat of categories" class="form-check mb-1">
-                            <input class="form-check-input" type="checkbox" [id]="'cat'+cat.id"
-                                   (change)="onCategoryChange(cat.id, $event)">
-                            <label class="form-check-label small" [for]="'cat'+cat.id">{{ cat.title }}</label>
+                <div class="card bg-light border-0 mb-4">
+                    <div class="card-body p-2">
+                        <div class="form-check form-switch d-flex align-items-center justify-content-between ps-0">
+                            <label class="form-check-label small fw-bold text-primary mb-0 cursor-pointer" for="privateSwitch">
+                                <i class='bx bxs-lock-alt me-1'></i> Kuruma Özel
+                            </label>
+                            <input class="form-check-input ms-0 cursor-pointer" type="checkbox" id="privateSwitch" 
+                                   style="width: 40px; height: 20px;"
+                                   (change)="onPrivateChange($event)" [checked]="filterRequest.onlyPrivate">
                         </div>
                     </div>
                 </div>
 
+<div class="mb-4" *ngIf="allCategories.length > 0">
+    <h6 class="small fw-bold text-muted mb-2 text-uppercase ls-1">Kategoriler</h6>
+    
+    <div class="mb-2 position-relative">
+        <input type="text" class="form-control form-control-sm" placeholder="Kategori ara..."
+                [(ngModel)]="categorySearchText" (keyup)="filterCategoriesOnUI()">
+        <i class='bx bx-search position-absolute top-50 end-0 translate-middle-y me-2 text-muted'></i>
+    </div>
+
+    <div class="filter-scroll-area custom-scrollbar" style="max-height: 300px; overflow-y: auto;">
+        <div *ngFor="let cat of filteredCategories" class="form-check mb-1 position-relative"
+                [style.padding-left.px]="(cat.level * 20) + 24"> 
+            
+            <div *ngIf="cat.level > 0" class="position-absolute border-start border-bottom"
+                    [style.left.px]="(cat.level * 20) + 5"
+                    style="top: -12px; bottom: 12px; width: 15px; border-color: #ddd !important;">
+            </div>
+
+            <input class="form-check-input" type="checkbox" [id]="'cat'+cat.id" [value]="cat.id"
+                    [checked]="isCategorySelected(cat.id)"
+                    (change)="onCategoryChange(cat, $event)"> <label class="form-check-label small" [for]="'cat'+cat.id" 
+                    [class.fw-bold]="cat.level === 0">
+                {{ cat.title }}
+            </label>
+        </div>
+    </div>
+</div>
+
                 <div class="mb-4">
+                    <h6 class="small fw-bold text-muted mb-2 text-uppercase ls-1">Puan</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li *ngFor="let rate of ratings" 
+                            class="cursor-pointer mb-1 p-1 rounded transition-all" 
+                            [class.bg-light-primary]="filterRequest.minRating === rate"
+                            [class.border-start]="filterRequest.minRating === rate"
+                            [style.border-left-width.px]="filterRequest.minRating === rate ? 3 : 0"
+                            style="border-color: var(--primaryColor);"
+                            (click)="onRatingChange(rate)">
+                            
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center">
+                                    <span class="d-inline-block me-2">
+                                        <i class='bx bxs-star text-warning' *ngFor="let s of [1,2,3,4,5]" 
+                                           [ngClass]="{'bx-star text-muted': s > rate}"></i>
+                                    </span>
+                                    <span class="small text-muted">{{ rate }} & Üzeri</span>
+                                </div>
+                                <i *ngIf="filterRequest.minRating === rate" class='bx bx-check text-primary'></i>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mb-4" *ngIf="levels.length > 0">
                     <h6 class="small fw-bold text-muted mb-2 text-uppercase ls-1">Seviye</h6>
                     <div *ngFor="let lvl of levels" class="form-check mb-1">
-                        <input class="form-check-input" type="checkbox" [id]="'lvl'+lvl.id"
-                               (change)="onLevelChange(lvl.id, $event)">
-                        <label class="form-check-label small" [for]="'lvl'+lvl.id">{{ lvl.name }}</label>
+                        <input class="form-check-input" type="checkbox" [id]="'lvl'+lvl.id" [value]="lvl.id"
+                               (change)="onFilterChange($event, 'level')">
+                        <label class="form-check-label small" [for]="'lvl'+lvl.id">{{ lvl.title }}</label>
+                    </div>
+                </div>
+
+                <div class="mb-4" *ngIf="instructors.length > 0">
+                    <h6 class="small fw-bold text-muted mb-2 text-uppercase ls-1">Eğitmenler</h6>
+                    <div class="filter-scroll-area custom-scrollbar" style="max-height: 200px; overflow-y: auto;">
+                        <div *ngFor="let inst of instructors" class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox" [id]="'inst'+inst.id" [value]="inst.id"
+                                   (change)="onFilterChange($event, 'instructor')">
+                            <label class="form-check-label small" [for]="'inst'+inst.id">{{ inst.title }}</label>
+                        </div>
                     </div>
                 </div>
 
@@ -57,22 +120,25 @@
         </div>
 
         <div class="col px-lg-4 transition-all">
-            
             <div *ngIf="isLoading" class="text-center py-5">
                 <div class="spinner-border text-primary" role="status"></div>
-                <p class="text-muted mt-2">Eğitimler yükleniyor...</p>
+                <p class="text-muted mt-2">Yükleniyor...</p>
             </div>
 
             <div *ngIf="!isLoading && trainings.length === 0" class="text-center py-5 bg-light rounded border border-dashed">
                 <i class='bx bx-search-alt fs-1 text-muted mb-3'></i>
                 <h5>Sonuç Bulunamadı</h5>
-                <p class="text-muted">Arama kriterlerinize uygun eğitim yok.</p>
+                <p class="text-muted">Arama kriterlerinize uygun eğitim bulunamadı.</p>
+                <button class="btn btn-sm btn-outline-danger mt-2" (click)="ngOnInit()">Filtreleri Temizle</button>
             </div>
 
             <div *ngFor="let item of trainings" class="card course-card border mb-3 shadow-sm hover-elevate">
                 <div class="row g-0">
                     <div class="col-md-4 col-xl-3 position-relative">
-                        <img [src]="item.headerImage" class="img-fluid rounded-start h-100 object-fit-cover" alt="Course">
+                        <a [routerLink]="['/course-details', item.id]" class="d-block h-100">
+                            <img [src]="item.headerImage || 'assets/images/courses/course1.jpg'" 
+                                 class="img-fluid rounded-start h-100 object-fit-cover w-100" alt="Course">
+                        </a>
                         
                         <div *ngIf="item.isPrivate" class="position-absolute top-0 start-0 m-2 badge bg-danger shadow-sm">
                             <i class='bx bxs-lock-alt'></i> Kuruma Özel
@@ -86,20 +152,20 @@
                                 <div>
                                     <span class="badge bg-light text-primary border mb-2">{{ item.categoryName }}</span>
                                     <h5 class="card-title fw-bold text-dark mb-1">
-                                        <a [routerLink]="['/course', item.id]" class="text-decoration-none text-dark hover-text-primary">
+                                        <a [routerLink]="['/course-details', item.id]" class="text-decoration-none text-dark hover-text-primary">
                                             {{ item.title }}
                                         </a>
                                     </h5>
                                     <p class="card-text text-muted small clamp-2 mb-2">{{ item.description }}</p>
                                 </div>
                                 
-                                <div class="text-end ms-3" *ngIf="item.currentAmount > 0">
+                                <div class="text-end ms-3 flex-shrink-0" *ngIf="item.currentAmount > 0">
                                     <h5 class="fw-bold text-dark mb-0">{{ item.currentAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}</h5>
-                                    <small *ngIf="item.discountRate > 0" class="text-muted text-decoration-line-through">
+                                    <small *ngIf="item.discountRate > 0" class="text-muted text-decoration-line-through d-block">
                                         {{ item.amount | currency:'TRY':'symbol-narrow':'1.0-0' }}
                                     </small>
                                 </div>
-                                <div class="text-end ms-3" *ngIf="item.currentAmount === 0">
+                                <div class="text-end ms-3 flex-shrink-0" *ngIf="item.currentAmount === 0">
                                     <span class="badge bg-success">ÜCRETSİZ</span>
                                 </div>
                             </div>
@@ -112,20 +178,14 @@
                                     <small class="text-muted fw-bold">{{ item.instructorName }}</small>
                                 </div>
 
-                                <div class="d-flex gap-3 text-muted small">
-                                    <span class="d-flex align-items-center gap-1">
-                                        <i class='bx bx-time-five text-warning'></i> {{ item.totalMinutes }} dk
-                                    </span>
-                                    <span class="d-flex align-items-center gap-1">
-                                        <i class='bx bx-book-open text-info'></i> {{ item.lessonCount }} ders
-                                    </span>
-                                    <span class="d-flex align-items-center gap-1">
-                                        <i class='bx bxs-star text-warning'></i> {{ item.rating | number:'1.1-1' }}
-                                    </span>
+                                <div class="d-flex gap-3 text-muted small align-items-center">
+                                    <span title="Süre"><i class='bx bx-time-five text-warning'></i> {{ item.totalMinutes }} dk</span>
+                                    <span title="Ders Sayısı"><i class='bx bx-book-open text-info'></i> {{ item.lessonCount }} ders</span>
+                                    <span title="Puan"><i class='bx bxs-star text-warning'></i> {{ item.rating | number:'1.1-1' }}</span>
                                 </div>
 
-                                <a [routerLink]="['/course-details', item.id]" class="btn btn-sm btn-outline-primary fw-bold">
-                                    İncele <i class='bx bx-right-arrow-alt'></i>
+                                <a [routerLink]="['/course-details', item.id]" class="btn btn-sm btn-outline-primary fw-bold rounded-pill px-3">
+                                    İncele
                                 </a>
                             </div>
 
@@ -133,19 +193,28 @@
                     </div>
                 </div>
             </div>
-
+            
             <div class="d-flex justify-content-center mt-4" *ngIf="totalRecords > filterRequest.pageSize">
-                <button class="btn btn-outline-secondary me-2" 
-                        [disabled]="filterRequest.pageIndex === 0"
-                        (click)="onPageChange(filterRequest.pageIndex - 1)">
-                    <i class='bx bx-chevron-left'></i> Önceki
-                </button>
-                <button class="btn btn-outline-secondary" 
-                        (click)="onPageChange(filterRequest.pageIndex + 1)">
-                    Sonraki <i class='bx bx-chevron-right'></i>
-                </button>
-            </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" [class.disabled]="filterRequest.pageIndex === 0">
+                            <a class="page-link" href="javascript:void(0)" (click)="onPageChange(filterRequest.pageIndex - 1)">
+                                <i class='bx bx-chevron-left'></i>
+                            </a>
+                        </li>
+                        
+                        <li class="page-item" *ngFor="let p of pageArray" [class.active]="p === filterRequest.pageIndex">
+                            <a class="page-link" href="javascript:void(0)" (click)="onPageChange(p)">{{ p + 1 }}</a>
+                        </li>
 
+                        <li class="page-item" [class.disabled]="filterRequest.pageIndex >= totalPages - 1">
+                            <a class="page-link" href="javascript:void(0)" (click)="onPageChange(filterRequest.pageIndex + 1)">
+                                <i class='bx bx-chevron-right'></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </div>

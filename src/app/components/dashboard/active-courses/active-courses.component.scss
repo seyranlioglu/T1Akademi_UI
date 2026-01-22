@@ -59,3 +59,22 @@
     // Büyük ekranda sidebar push edebilir veya overlay olabilir
     // Şu an overlay mantığında (üstüne biniyor), content'i itmesini istersen margin-left oynanabilir.
 }
+
+.bg-light-primary {
+    background-color: rgba(86, 36, 208, 0.1); // Temanın primary renginin açığı
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+// Scrollbar İyileştirme
+.custom-scrollbar {
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: #ddd;
+        border-radius: 4px;
+    }
+}
