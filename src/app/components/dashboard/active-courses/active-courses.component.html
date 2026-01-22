@@ -1,405 +1,151 @@
+<div class="container-fluid py-4 position-relative">
 
-<div class="row">
-    <div *ngFor="let course of courseList" class="col-lg-6 col-xl-4 col-sm-6 col-md-6">
-        <div class="single-course-item position-relative">
-            <div class="image position-relative">
-                <a [routerLink]="'/course/'+course.id" class="d-block">
-                    <img [src]="course.courseImage ?? 'https://angular.hibootstrap.com/toledo/assets/images/courses/course8.jpg'" alt="course-image">
-                </a>
-                <!-- <span class="price">$19</span> -->
-            </div>
-            <div class="content">
-                <div class="meta justify-content-between align-items-center d-flex">
-                    <a   class="user d-flex align-items-center">
-                        <img [src]="course.instructorPicturePath ?? 'assets/images/users/user3.jpg'"   width="30" height="30" class="rounded-circle" alt="user-image" style="width: 30px;height: 30px;">
-                        {{course.instructorTitle|| 'Eğitmen Bilgisi Yok'}}
-                    </a>
-                    <!-- <div class="rating">
-                        <i class='bx bxs-star'></i>
-                        (5.0)
-                    </div> -->
-                </div>
-                <h3>
-                    <a [routerLink]="'/course/'+course.id">
-                        {{course.title}}
-                    </a>
-                </h3>
-                <!-- <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
-                    <li>
-                        <i class="flaticon-open-book"></i>
-                        12 Lessons
-                    </li>
-                    <li>
-                        <i class="flaticon-young-man"></i>
-                        20 Students
-                    </li>
-                </ul> -->
-                <!-- <div class="btn-box mt-3">
-                    <a routerLink="/course-details" class="default-btn two">Edit</a>
-                    <a routerLink="/course-details" class="default-btn ms-3">Remove</a>
-                </div> -->
-            </div>
-            <!-- <div class="hover-box">
-                <h3>
-                    <a routerLink="/course-details">
-                        Agile Crash Course Agile Project Management
-                    </a>
-                </h3>
-                <span class="sub-title d-block">What you'll learn</span>
-                <ul class="features-list ps-0 list-unstyled mb-0">
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Get familiar with almosconcepts of business statistics
-                    </li>
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Master statistical tools which can be used for data analysis
-                    </li>
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Master the art of presenting data using different tools
-                    </li>
-                </ul>
-                <div class="btn-box d-flex align-items-center">
-                    <button type="button" class="default-btn">Add To Cart</button>
-                    <button type="button" class="fav-btn"><i class="flaticon-heart"></i></button>
-                </div>
-            </div> -->
+    <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm border">
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-primary d-flex align-items-center gap-2" (click)="toggleFilter()">
+                <i class='bx bx-filter-alt'></i> 
+                <span class="d-none d-sm-inline">Filtreler</span>
+            </button>
+            <h5 class="fw-bold m-0 text-dark">Eğitim Kataloğu</h5>
         </div>
+        
+        <span class="text-muted small">
+            <strong>{{ totalRecords }}</strong> eğitim bulundu
+        </span>
     </div>
-    <!-- <div class="col-lg-6 col-xl-4 col-sm-6 col-md-6">
-        <div class="single-course-item position-relative">
-            <div class="image position-relative">
-                <a routerLink="/course-details" class="d-block">
-                    <img src="assets/images/courses/course6.jpg" alt="course-image">
-                </a>
-                <span class="price">$29</span>
-            </div>
-            <div class="content">
-                <div class="meta justify-content-between align-items-center d-flex">
-                    <a routerLink="/instructor-profile" class="user d-flex align-items-center">
-                        <img src="assets/images/users/user4.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
-                        Sergio Osborn
-                    </a>
-                    <div class="rating">
-                        <i class='bx bxs-star'></i>
-                        (4.0)
+
+    <div class="row g-0">
+        
+        <div class="filter-sidebar bg-white border-end shadow-sm" [class.open]="isFilterOpen">
+            <div class="p-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold m-0">Filtrele</h6>
+                    <button class="btn btn-sm btn-light rounded-circle" (click)="toggleFilter()">
+                        <i class='bx bx-x'></i>
+                    </button>
+                </div>
+
+                <div class="form-check form-switch mb-4 p-2 bg-light rounded border">
+                    <input class="form-check-input" type="checkbox" id="privateSwitch" 
+                           (change)="onPrivateChange($event)" [checked]="filterRequest.onlyPrivate">
+                    <label class="form-check-label small fw-bold text-primary" for="privateSwitch">
+                        <i class='bx bxs-lock-alt me-1'></i> Sadece Kurumuma Özel
+                    </label>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="small fw-bold text-muted mb-2 text-uppercase ls-1">Kategoriler</h6>
+                    <div class="filter-scroll-area">
+                        <div *ngFor="let cat of categories" class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox" [id]="'cat'+cat.id"
+                                   (change)="onCategoryChange(cat.id, $event)">
+                            <label class="form-check-label small" [for]="'cat'+cat.id">{{ cat.title }}</label>
+                        </div>
                     </div>
                 </div>
-                <h3>
-                    <a routerLink="/course-details">
-                        Deep Learning a-z Hands on Artificial Neural Networks
-                    </a>
-                </h3>
-                <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
-                    <li>
-                        <i class="flaticon-open-book"></i>
-                        09 Lessons
-                    </li>
-                    <li>
-                        <i class="flaticon-young-man"></i>
-                        65 Students
-                    </li>
-                </ul>
-                <div class="btn-box mt-3">
-                    <a routerLink="/course-details" class="default-btn two">Edit</a>
-                    <a routerLink="/course-details" class="default-btn ms-3">Remove</a>
-                </div>
-            </div>
-            <div class="hover-box">
-                <h3>
-                    <a routerLink="/course-details">
-                        Deep Learning a-z Hands on Artificial Neural Networks
-                    </a>
-                </h3>
-                <span class="sub-title d-block">What you'll learn</span>
-                <ul class="features-list ps-0 list-unstyled mb-0">
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Get familiar with almosconcepts of business statistics
-                    </li>
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Master statistical tools which can be used for data analysis
-                    </li>
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Master the art of presenting data using different tools
-                    </li>
-                </ul>
-                <div class="btn-box d-flex align-items-center">
-                    <button type="button" class="default-btn">Add To Cart</button>
-                    <button type="button" class="fav-btn"><i class="flaticon-heart"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6 col-xl-4 col-sm-6 col-md-6">
-        <div class="single-course-item position-relative">
-            <div class="image position-relative">
-                <a routerLink="/course-details" class="d-block">
-                    <img src="assets/images/courses/course7.jpg" alt="course-image">
-                </a>
-                <span class="price">$39</span>
-            </div>
-            <div class="content">
-                <div class="meta justify-content-between align-items-center d-flex">
-                    <a routerLink="/instructor-profile" class="user d-flex align-items-center">
-                        <img src="assets/images/users/user5.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
-                        Stewart Burgess
-                    </a>
-                    <div class="rating">
-                        <i class='bx bxs-star'></i>
-                        (4.5)
+
+                <div class="mb-4">
+                    <h6 class="small fw-bold text-muted mb-2 text-uppercase ls-1">Seviye</h6>
+                    <div *ngFor="let lvl of levels" class="form-check mb-1">
+                        <input class="form-check-input" type="checkbox" [id]="'lvl'+lvl.id"
+                               (change)="onLevelChange(lvl.id, $event)">
+                        <label class="form-check-label small" [for]="'lvl'+lvl.id">{{ lvl.name }}</label>
                     </div>
                 </div>
-                <h3>
-                    <a routerLink="/course-details">
-                        The Data Science Courses Complete Data Science
-                    </a>
-                </h3>
-                <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
-                    <li>
-                        <i class="flaticon-open-book"></i>
-                        10 Lessons
-                    </li>
-                    <li>
-                        <i class="flaticon-young-man"></i>
-                        33 Students
-                    </li>
-                </ul>
-                <div class="btn-box mt-3">
-                    <a routerLink="/course-details" class="default-btn two">Edit</a>
-                    <a routerLink="/course-details" class="default-btn ms-3">Remove</a>
-                </div>
-            </div>
-            <div class="hover-box">
-                <h3>
-                    <a routerLink="/course-details">
-                        The Data Science Courses Complete Data Science
-                    </a>
-                </h3>
-                <span class="sub-title d-block">What you'll learn</span>
-                <ul class="features-list ps-0 list-unstyled mb-0">
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Get familiar with almosconcepts of business statistics
-                    </li>
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Master statistical tools which can be used for data analysis
-                    </li>
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Master the art of presenting data using different tools
-                    </li>
-                </ul>
-                <div class="btn-box d-flex align-items-center">
-                    <button type="button" class="default-btn">Add To Cart</button>
-                    <button type="button" class="fav-btn"><i class="flaticon-heart"></i></button>
-                </div>
+
             </div>
         </div>
-    </div>
-    <div class="col-lg-6 col-xl-4 col-sm-6 col-md-6">
-        <div class="single-course-item position-relative">
-            <div class="image position-relative">
-                <a routerLink="/course-details" class="d-block">
-                    <img src="assets/images/courses/course8.jpg" alt="course-image">
-                </a>
-                <span class="price">$49</span>
+
+        <div class="col px-lg-4 transition-all">
+            
+            <div *ngIf="isLoading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="text-muted mt-2">Eğitimler yükleniyor...</p>
             </div>
-            <div class="content">
-                <div class="meta justify-content-between align-items-center d-flex">
-                    <a routerLink="/instructor-profile" class="user d-flex align-items-center">
-                        <img src="assets/images/users/user6.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
-                        Cornell Byrd
-                    </a>
-                    <div class="rating">
-                        <i class='bx bxs-star'></i>
-                        (3.5)
+
+            <div *ngIf="!isLoading && trainings.length === 0" class="text-center py-5 bg-light rounded border border-dashed">
+                <i class='bx bx-search-alt fs-1 text-muted mb-3'></i>
+                <h5>Sonuç Bulunamadı</h5>
+                <p class="text-muted">Arama kriterlerinize uygun eğitim yok.</p>
+            </div>
+
+            <div *ngFor="let item of trainings" class="card course-card border mb-3 shadow-sm hover-elevate">
+                <div class="row g-0">
+                    <div class="col-md-4 col-xl-3 position-relative">
+                        <img [src]="item.headerImage" class="img-fluid rounded-start h-100 object-fit-cover" alt="Course">
+                        
+                        <div *ngIf="item.isPrivate" class="position-absolute top-0 start-0 m-2 badge bg-danger shadow-sm">
+                            <i class='bx bxs-lock-alt'></i> Kuruma Özel
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-8 col-xl-9">
+                        <div class="card-body d-flex flex-column h-100">
+                            
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <span class="badge bg-light text-primary border mb-2">{{ item.categoryName }}</span>
+                                    <h5 class="card-title fw-bold text-dark mb-1">
+                                        <a [routerLink]="['/course', item.id]" class="text-decoration-none text-dark hover-text-primary">
+                                            {{ item.title }}
+                                        </a>
+                                    </h5>
+                                    <p class="card-text text-muted small clamp-2 mb-2">{{ item.description }}</p>
+                                </div>
+                                
+                                <div class="text-end ms-3" *ngIf="item.currentAmount > 0">
+                                    <h5 class="fw-bold text-dark mb-0">{{ item.currentAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}</h5>
+                                    <small *ngIf="item.discountRate > 0" class="text-muted text-decoration-line-through">
+                                        {{ item.amount | currency:'TRY':'symbol-narrow':'1.0-0' }}
+                                    </small>
+                                </div>
+                                <div class="text-end ms-3" *ngIf="item.currentAmount === 0">
+                                    <span class="badge bg-success">ÜCRETSİZ</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto d-flex flex-wrap align-items-center justify-content-between pt-3 border-top">
+                                
+                                <div class="d-flex align-items-center gap-2 mb-2 mb-lg-0">
+                                    <img [src]="item.instructorImage || 'assets/images/users/user-dummy.jpg'" 
+                                         class="rounded-circle border" width="30" height="30">
+                                    <small class="text-muted fw-bold">{{ item.instructorName }}</small>
+                                </div>
+
+                                <div class="d-flex gap-3 text-muted small">
+                                    <span class="d-flex align-items-center gap-1">
+                                        <i class='bx bx-time-five text-warning'></i> {{ item.totalMinutes }} dk
+                                    </span>
+                                    <span class="d-flex align-items-center gap-1">
+                                        <i class='bx bx-book-open text-info'></i> {{ item.lessonCount }} ders
+                                    </span>
+                                    <span class="d-flex align-items-center gap-1">
+                                        <i class='bx bxs-star text-warning'></i> {{ item.rating | number:'1.1-1' }}
+                                    </span>
+                                </div>
+
+                                <a [routerLink]="['/course-details', item.id]" class="btn btn-sm btn-outline-primary fw-bold">
+                                    İncele <i class='bx bx-right-arrow-alt'></i>
+                                </a>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
-                <h3>
-                    <a routerLink="/course-details">
-                        Node.js for Beginners Go From Zero Hero Nede.js
-                    </a>
-                </h3>
-                <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
-                    <li>
-                        <i class="flaticon-open-book"></i>
-                        11 Lessons
-                    </li>
-                    <li>
-                        <i class="flaticon-young-man"></i>
-                        39 Students
-                    </li>
-                </ul>
-                <div class="btn-box mt-3">
-                    <a routerLink="/course-details" class="default-btn two">Edit</a>
-                    <a routerLink="/course-details" class="default-btn ms-3">Remove</a>
-                </div>
             </div>
-            <div class="hover-box">
-                <h3>
-                    <a routerLink="/course-details">
-                        Node.js for Beginners Go From Zero Hero Nede.js
-                    </a>
-                </h3>
-                <span class="sub-title d-block">What you'll learn</span>
-                <ul class="features-list ps-0 list-unstyled mb-0">
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Get familiar with almosconcepts of business statistics
-                    </li>
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Master statistical tools which can be used for data analysis
-                    </li>
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Master the art of presenting data using different tools
-                    </li>
-                </ul>
-                <div class="btn-box d-flex align-items-center">
-                    <button type="button" class="default-btn">Add To Cart</button>
-                    <button type="button" class="fav-btn"><i class="flaticon-heart"></i></button>
-                </div>
+
+            <div class="d-flex justify-content-center mt-4" *ngIf="totalRecords > filterRequest.pageSize">
+                <button class="btn btn-outline-secondary me-2" 
+                        [disabled]="filterRequest.pageIndex === 0"
+                        (click)="onPageChange(filterRequest.pageIndex - 1)">
+                    <i class='bx bx-chevron-left'></i> Önceki
+                </button>
+                <button class="btn btn-outline-secondary" 
+                        (click)="onPageChange(filterRequest.pageIndex + 1)">
+                    Sonraki <i class='bx bx-chevron-right'></i>
+                </button>
             </div>
+
         </div>
     </div>
-    <div class="col-lg-6 col-xl-4 col-sm-6 col-md-6">
-        <div class="single-course-item position-relative">
-            <div class="image position-relative">
-                <a routerLink="/course-details" class="d-block">
-                    <img src="assets/images/courses/course5.jpg" alt="course-image">
-                </a>
-                <span class="price">$19</span>
-            </div>
-            <div class="content">
-                <div class="meta justify-content-between align-items-center d-flex">
-                    <a routerLink="/instructor-profile" class="user d-flex align-items-center">
-                        <img src="assets/images/users/user3.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
-                        Sydney Phelps
-                    </a>
-                    <div class="rating">
-                        <i class='bx bxs-star'></i>
-                        (5.0)
-                    </div>
-                </div>
-                <h3>
-                    <a routerLink="/course-details">
-                        Agile Crash Course Agile Project Management
-                    </a>
-                </h3>
-                <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
-                    <li>
-                        <i class="flaticon-open-book"></i>
-                        12 Lessons
-                    </li>
-                    <li>
-                        <i class="flaticon-young-man"></i>
-                        20 Students
-                    </li>
-                </ul>
-                <div class="btn-box mt-3">
-                    <a routerLink="/course-details" class="default-btn two">Edit</a>
-                    <a routerLink="/course-details" class="default-btn ms-3">Remove</a>
-                </div>
-            </div>
-            <div class="hover-box">
-                <h3>
-                    <a routerLink="/course-details">
-                        Agile Crash Course Agile Project Management
-                    </a>
-                </h3>
-                <span class="sub-title d-block">What you'll learn</span>
-                <ul class="features-list ps-0 list-unstyled mb-0">
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Get familiar with almosconcepts of business statistics
-                    </li>
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Master statistical tools which can be used for data analysis
-                    </li>
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Master the art of presenting data using different tools
-                    </li>
-                </ul>
-                <div class="btn-box d-flex align-items-center">
-                    <button type="button" class="default-btn">Add To Cart</button>
-                    <button type="button" class="fav-btn"><i class="flaticon-heart"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-6 col-xl-4 col-sm-6 col-md-6">
-        <div class="single-course-item position-relative">
-            <div class="image position-relative">
-                <a routerLink="/course-details" class="d-block">
-                    <img src="assets/images/courses/course6.jpg" alt="course-image">
-                </a>
-                <span class="price">$29</span>
-            </div>
-            <div class="content">
-                <div class="meta justify-content-between align-items-center d-flex">
-                    <a routerLink="/instructor-profile" class="user d-flex align-items-center">
-                        <img src="assets/images/users/user4.jpg" width="30" height="30" class="rounded-circle" alt="user-image">
-                        Sergio Osborn
-                    </a>
-                    <div class="rating">
-                        <i class='bx bxs-star'></i>
-                        (4.0)
-                    </div>
-                </div>
-                <h3>
-                    <a routerLink="/course-details">
-                        Deep Learning a-z Hands on Artificial Neural Networks
-                    </a>
-                </h3>
-                <ul class="info d-flex align-items-center justify-content-between ps-0 mb-0 list-unstyled">
-                    <li>
-                        <i class="flaticon-open-book"></i>
-                        09 Lessons
-                    </li>
-                    <li>
-                        <i class="flaticon-young-man"></i>
-                        65 Students
-                    </li>
-                </ul>
-                <div class="btn-box mt-3">
-                    <a routerLink="/course-details" class="default-btn two">Edit</a>
-                    <a routerLink="/course-details" class="default-btn ms-3">Remove</a>
-                </div>
-            </div>
-            <div class="hover-box">
-                <h3>
-                    <a routerLink="/course-details">
-                        Deep Learning a-z Hands on Artificial Neural Networks
-                    </a>
-                </h3>
-                <span class="sub-title d-block">What you'll learn</span>
-                <ul class="features-list ps-0 list-unstyled mb-0">
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Get familiar with almosconcepts of business statistics
-                    </li>
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Master statistical tools which can be used for data analysis
-                    </li>
-                    <li>
-                        <i class="flaticon-tick"></i>
-                        Master the art of presenting data using different tools
-                    </li>
-                </ul>
-                <div class="btn-box d-flex align-items-center">
-                    <button type="button" class="default-btn">Add To Cart</button>
-                    <button type="button" class="fav-btn"><i class="flaticon-heart"></i></button>
-                </div>
-            </div>
-        </div>
-    </div> -->
 </div>

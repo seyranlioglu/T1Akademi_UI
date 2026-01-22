@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { TrainingCard } from '../models/training-card.model'; 
+import { PagedList, SearchTrainingRequest, TrainingListItem } from '../models/training-list.model'; // Yolu düzeltirsin
 
 const API_TRAINING_URL = `${environment.apiUrl}/Training`;
 const API_TRAINING_CATEGORY_URL = `${environment.apiUrl}/TrainingCategory`;
@@ -127,5 +128,26 @@ export class TrainingApiService {
     return this.http.get<any>(`${API_TRAINING_URL}/GetNavbarRecentTrainings`, { params }).pipe(
         map(res => res.data || res.body || res)
     );
+  }
+
+  getAdvancedList(request: SearchTrainingRequest): Observable<any> {
+    let params = new HttpParams()
+        .set('pageIndex', request.pageIndex.toString())
+        .set('pageSize', request.pageSize.toString())
+        .set('onlyPrivate', request.onlyPrivate.toString());
+
+    if (request.searchText) params = params.set('searchText', request.searchText);
+    if (request.minRating) params = params.set('minRating', request.minRating.toString());
+
+    // Array parametreleri (backend [FromQuery] ile list bekliyorsa)
+    if (request.categoryIds) {
+        request.categoryIds.forEach(id => params = params.append('categoryIds', id.toString()));
+    }
+    if (request.levelIds) {
+        request.levelIds.forEach(id => params = params.append('levelIds', id.toString()));
+    }
+    // LanguageIds vb. eklenebilir
+
+    return this.http.get<any>(`${API_TRAINING_URL}/GetAdvancedList`, { params });
   }
 }
