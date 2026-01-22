@@ -3,25 +3,54 @@
     transition: all 0.3s ease;
 }
 
-// Sidebar Stilleri
+// Sidebar Stilleri (SAĞ TARAFTA)
 .filter-sidebar {
     position: fixed;
-    top: 80px; // Navbar yüksekliğine göre ayarla
-    left: -280px; // Başlangıçta gizli (Soldan dışarıda)
-    width: 280px;
-    height: calc(100vh - 80px);
-    overflow-y: auto;
+    top: 100px; // Navbar yüksekliğine göre ayarla
+    right: -300px; // Başlangıçta gizli (Sağdan dışarıda) - Genişlikten biraz fazla verdim
+    width: 300px;  // Genişliği biraz artırdım rahat sığsın diye
+    height: calc(100vh - 100px);
     z-index: 1040;
-    transition: left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     
+    // Açıkken sağa yapışsın
     &.open {
-        left: 0; // Açılınca içeri girer
-        box-shadow: 0 0 50px rgba(0,0,0,0.1) !important;
+        right: 0; 
     }
 
     // Scrollbar özelleştirme
     &::-webkit-scrollbar { width: 5px; }
     &::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+}
+
+// --- YAN TAB (KULAKÇIK) STİLİ ---
+.filter-tab {
+    position: absolute;
+    top: 80px; // Yukarıdan mesafe
+    left: -42px; // Sidebar'ın soluna taşır (Genişliği 42px olduğu için)
+    width: 42px;
+    height: 140px; // Tab yüksekliği
+    background-color: var(--primaryColor, #5624d0); // Tema rengi (Mor)
+    color: #fff;
+    cursor: pointer;
+    border-radius: 8px 0 0 8px; // Sadece sol köşeleri yuvarla
+    writing-mode: vertical-rl; // Yazıyı dikey çevir (Sağdan sola)
+    text-orientation: mixed;
+    transform: rotate(180deg); // Yazının yönünü aşağıdan yukarıya düzelt
+    font-weight: 600;
+    letter-spacing: 2px;
+    font-size: 14px;
+    box-shadow: -2px 2px 5px rgba(0,0,0,0.1); // Gölge solda olsun
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: darken(#5624d0, 10%);
+    }
+
+    span {
+        display: block;
+        padding: 10px 0;
+    }
 }
 
 // Kart Stilleri
@@ -54,14 +83,9 @@
     overflow: hidden;
 }
 
-// Küçük Ekranlar
-@media (min-width: 992px) {
-    // Büyük ekranda sidebar push edebilir veya overlay olabilir
-    // Şu an overlay mantığında (üstüne biniyor), content'i itmesini istersen margin-left oynanabilir.
-}
-
+// Seçili Rating Stili
 .bg-light-primary {
-    background-color: rgba(86, 36, 208, 0.1); // Temanın primary renginin açığı
+    background-color: rgba(86, 36, 208, 0.1); 
 }
 
 .cursor-pointer {

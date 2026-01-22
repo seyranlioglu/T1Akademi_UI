@@ -1,7 +1,6 @@
-<div class="container-fluid py-4 position-relative">
-
-    <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm border">
+<div class="container-fluid py-4 position-relative overflow-hidden"> <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm border">
         <div class="d-flex align-items-center gap-3">
+            
             <button class="btn btn-primary d-flex align-items-center gap-2" (click)="toggleFilter()">
                 <i class='bx bx-filter-alt'></i> 
                 <span class="d-none d-sm-inline">Filtreler</span>
@@ -21,12 +20,106 @@
 
     <div class="row g-0">
         
-        <div class="filter-sidebar bg-white border-end shadow-sm" [class.open]="isFilterOpen">
-            <div class="p-3">
+        <div class="col-12 transition-all">
+             <div *ngIf="isLoading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="text-muted mt-2">Yükleniyor...</p>
+            </div>
+
+            <div *ngIf="!isLoading && trainings.length === 0" class="text-center py-5 bg-light rounded border border-dashed">
+                <i class='bx bx-search-alt fs-1 text-muted mb-3'></i>
+                <h5>Sonuç Bulunamadı</h5>
+                <p class="text-muted">Arama kriterlerinize uygun eğitim bulunamadı.</p>
+                <button class="btn btn-sm btn-outline-danger mt-2" (click)="ngOnInit()">Filtreleri Temizle</button>
+            </div>
+
+            <div *ngFor="let item of trainings" class="card course-card border mb-3 shadow-sm hover-elevate">
+                <div class="row g-0">
+                    <div class="col-md-4 col-xl-3 position-relative">
+                        <a [routerLink]="['/course-details', item.id]" class="d-block h-100">
+                            <img [src]="item.headerImage || 'assets/images/courses/course1.jpg'" 
+                                 class="img-fluid rounded-start h-100 object-fit-cover w-100" alt="Course">
+                        </a>
+                        <div *ngIf="item.isPrivate" class="position-absolute top-0 start-0 m-2 badge bg-danger shadow-sm">
+                            <i class='bx bxs-lock-alt'></i> Kuruma Özel
+                        </div>
+                    </div>
+                    <div class="col-md-8 col-xl-9">
+                        <div class="card-body d-flex flex-column h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <span class="badge bg-light text-primary border mb-2">{{ item.categoryName }}</span>
+                                    <h5 class="card-title fw-bold text-dark mb-1">
+                                        <a [routerLink]="['/course-details', item.id]" class="text-decoration-none text-dark hover-text-primary">
+                                            {{ item.title }}
+                                        </a>
+                                    </h5>
+                                    <p class="card-text text-muted small clamp-2 mb-2">{{ item.description }}</p>
+                                </div>
+                                <div class="text-end ms-3 flex-shrink-0" *ngIf="item.currentAmount > 0">
+                                    <h5 class="fw-bold text-dark mb-0">{{ item.currentAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}</h5>
+                                    <small *ngIf="item.discountRate > 0" class="text-muted text-decoration-line-through d-block">
+                                        {{ item.amount | currency:'TRY':'symbol-narrow':'1.0-0' }}
+                                    </small>
+                                </div>
+                                <div class="text-end ms-3 flex-shrink-0" *ngIf="item.currentAmount === 0">
+                                    <span class="badge bg-success">ÜCRETSİZ</span>
+                                </div>
+                            </div>
+                            <div class="mt-auto d-flex flex-wrap align-items-center justify-content-between pt-3 border-top">
+                                <div class="d-flex align-items-center gap-2 mb-2 mb-lg-0">
+                                    <img [src]="item.instructorImage || 'assets/images/users/user-dummy.jpg'" 
+                                         class="rounded-circle border" width="30" height="30">
+                                    <small class="text-muted fw-bold">{{ item.instructorName }}</small>
+                                </div>
+                                <div class="d-flex gap-3 text-muted small align-items-center">
+                                    <span title="Süre"><i class='bx bx-time-five text-warning'></i> {{ item.totalMinutes }} dk</span>
+                                    <span title="Ders Sayısı"><i class='bx bx-book-open text-info'></i> {{ item.lessonCount }} ders</span>
+                                    <span title="Puan"><i class='bx bxs-star text-warning'></i> {{ item.rating | number:'1.1-1' }}</span>
+                                </div>
+                                <a [routerLink]="['/course-details', item.id]" class="btn btn-sm btn-outline-primary fw-bold rounded-pill px-3">
+                                    İncele
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-center mt-4" *ngIf="totalRecords > filterRequest.pageSize">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" [class.disabled]="filterRequest.pageIndex === 0">
+                            <a class="page-link" href="javascript:void(0)" (click)="onPageChange(filterRequest.pageIndex - 1)">
+                                <i class='bx bx-chevron-left'></i>
+                            </a>
+                        </li>
+                        <li class="page-item" *ngFor="let p of pageArray" [class.active]="p === filterRequest.pageIndex">
+                            <a class="page-link" href="javascript:void(0)" (click)="onPageChange(p)">{{ p + 1 }}</a>
+                        </li>
+                        <li class="page-item" [class.disabled]="filterRequest.pageIndex >= totalPages - 1">
+                            <a class="page-link" href="javascript:void(0)" (click)="onPageChange(filterRequest.pageIndex + 1)">
+                                <i class='bx bx-chevron-right'></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div class="filter-sidebar bg-white border-start shadow-lg" [class.open]="isFilterOpen">
+            
+            <div class="filter-tab d-flex align-items-center justify-content-center shadow-sm" 
+                 (click)="toggleFilter()" title="Filtreleri Aç/Kapa">
+                <i class='bx bx-filter-alt me-2 d-block d-md-none' style="transform: rotate(90deg);"></i>
+                <span>FİLTRELE</span>
+            </div>
+
+            <div class="p-3 h-100 overflow-auto">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold m-0">Filtrele</h6>
                     <button class="btn btn-sm btn-light rounded-circle" (click)="toggleFilter()">
-                        <i class='bx bx-x'></i>
+                        <i class='bx bx-x fs-5'></i>
                     </button>
                 </div>
 
@@ -43,33 +136,42 @@
                     </div>
                 </div>
 
-<div class="mb-4" *ngIf="allCategories.length > 0">
-    <h6 class="small fw-bold text-muted mb-2 text-uppercase ls-1">Kategoriler</h6>
-    
-    <div class="mb-2 position-relative">
-        <input type="text" class="form-control form-control-sm" placeholder="Kategori ara..."
-                [(ngModel)]="categorySearchText" (keyup)="filterCategoriesOnUI()">
-        <i class='bx bx-search position-absolute top-50 end-0 translate-middle-y me-2 text-muted'></i>
-    </div>
+                <div class="mb-4" *ngIf="allCategories.length > 0">
+                    <h6 class="small fw-bold text-muted mb-2 text-uppercase ls-1">Kategoriler</h6>
+                    
+                    <div class="mb-2 position-relative">
+                        <input type="text" class="form-control form-control-sm" placeholder="Kategori ara..."
+                               [(ngModel)]="categorySearchText" (keyup)="filterCategoriesOnUI()">
+                        <i class='bx bx-search position-absolute top-50 end-0 translate-middle-y me-2 text-muted'></i>
+                    </div>
 
-    <div class="filter-scroll-area custom-scrollbar" style="max-height: 300px; overflow-y: auto;">
-        <div *ngFor="let cat of filteredCategories" class="form-check mb-1 position-relative"
-                [style.padding-left.px]="(cat.level * 20) + 24"> 
-            
-            <div *ngIf="cat.level > 0" class="position-absolute border-start border-bottom"
-                    [style.left.px]="(cat.level * 20) + 5"
-                    style="top: -12px; bottom: 12px; width: 15px; border-color: #ddd !important;">
-            </div>
+                    <div class="filter-scroll-area custom-scrollbar" style="max-height: 300px; overflow-y: auto;">
+                        <div *ngFor="let cat of filteredCategories" class="position-relative">
+                            
+                            <div class="form-check mb-1" 
+                                 [style.margin-left.px]="cat.level * 20"
+                                 [class.mt-3]="cat.level === 0 && filteredCategories.indexOf(cat) !== 0"
+                                 [class.mt-1]="cat.level > 0">
+                                
+                                <div *ngIf="cat.level > 0" class="position-absolute"
+                                     style="left: -12px; top: 0; bottom: 0; width: 1px; background-color: #e0e0e0;">
+                                     <div style="position: absolute; top: 12px; left: 0; width: 10px; height: 1px; background-color: #e0e0e0;"></div>
+                                </div>
 
-            <input class="form-check-input" type="checkbox" [id]="'cat'+cat.id" [value]="cat.id"
-                    [checked]="isCategorySelected(cat.id)"
-                    (change)="onCategoryChange(cat, $event)"> <label class="form-check-label small" [for]="'cat'+cat.id" 
-                    [class.fw-bold]="cat.level === 0">
-                {{ cat.title }}
-            </label>
-        </div>
-    </div>
-</div>
+                                <input class="form-check-input" type="checkbox" [id]="'cat'+cat.id" [value]="cat.id"
+                                       [checked]="isCategorySelected(cat.id)"
+                                       (change)="onCategoryChange(cat, $event)">
+                                
+                                <label class="form-check-label small cursor-pointer" [for]="'cat'+cat.id" 
+                                       [style.font-weight]="cat.level === 0 ? '700' : '400'"
+                                       [class.text-dark]="cat.level === 0"
+                                       [class.text-muted]="cat.level > 0">
+                                    {{ cat.title }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="mb-4">
                     <h6 class="small fw-bold text-muted mb-2 text-uppercase ls-1">Puan</h6>
@@ -100,16 +202,18 @@
                     <h6 class="small fw-bold text-muted mb-2 text-uppercase ls-1">Seviye</h6>
                     <div *ngFor="let lvl of levels" class="form-check mb-1">
                         <input class="form-check-input" type="checkbox" [id]="'lvl'+lvl.id" [value]="lvl.id"
+                               [checked]="filterRequest.levelIds?.includes(lvl.id)"
                                (change)="onFilterChange($event, 'level')">
                         <label class="form-check-label small" [for]="'lvl'+lvl.id">{{ lvl.title }}</label>
                     </div>
                 </div>
-
+                
                 <div class="mb-4" *ngIf="instructors.length > 0">
                     <h6 class="small fw-bold text-muted mb-2 text-uppercase ls-1">Eğitmenler</h6>
                     <div class="filter-scroll-area custom-scrollbar" style="max-height: 200px; overflow-y: auto;">
                         <div *ngFor="let inst of instructors" class="form-check mb-1">
                             <input class="form-check-input" type="checkbox" [id]="'inst'+inst.id" [value]="inst.id"
+                                   [checked]="filterRequest.instructorIds?.includes(inst.id)"
                                    (change)="onFilterChange($event, 'instructor')">
                             <label class="form-check-label small" [for]="'inst'+inst.id">{{ inst.title }}</label>
                         </div>
@@ -119,102 +223,5 @@
             </div>
         </div>
 
-        <div class="col px-lg-4 transition-all">
-            <div *ngIf="isLoading" class="text-center py-5">
-                <div class="spinner-border text-primary" role="status"></div>
-                <p class="text-muted mt-2">Yükleniyor...</p>
-            </div>
-
-            <div *ngIf="!isLoading && trainings.length === 0" class="text-center py-5 bg-light rounded border border-dashed">
-                <i class='bx bx-search-alt fs-1 text-muted mb-3'></i>
-                <h5>Sonuç Bulunamadı</h5>
-                <p class="text-muted">Arama kriterlerinize uygun eğitim bulunamadı.</p>
-                <button class="btn btn-sm btn-outline-danger mt-2" (click)="ngOnInit()">Filtreleri Temizle</button>
-            </div>
-
-            <div *ngFor="let item of trainings" class="card course-card border mb-3 shadow-sm hover-elevate">
-                <div class="row g-0">
-                    <div class="col-md-4 col-xl-3 position-relative">
-                        <a [routerLink]="['/course-details', item.id]" class="d-block h-100">
-                            <img [src]="item.headerImage || 'assets/images/courses/course1.jpg'" 
-                                 class="img-fluid rounded-start h-100 object-fit-cover w-100" alt="Course">
-                        </a>
-                        
-                        <div *ngIf="item.isPrivate" class="position-absolute top-0 start-0 m-2 badge bg-danger shadow-sm">
-                            <i class='bx bxs-lock-alt'></i> Kuruma Özel
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-8 col-xl-9">
-                        <div class="card-body d-flex flex-column h-100">
-                            
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <span class="badge bg-light text-primary border mb-2">{{ item.categoryName }}</span>
-                                    <h5 class="card-title fw-bold text-dark mb-1">
-                                        <a [routerLink]="['/course-details', item.id]" class="text-decoration-none text-dark hover-text-primary">
-                                            {{ item.title }}
-                                        </a>
-                                    </h5>
-                                    <p class="card-text text-muted small clamp-2 mb-2">{{ item.description }}</p>
-                                </div>
-                                
-                                <div class="text-end ms-3 flex-shrink-0" *ngIf="item.currentAmount > 0">
-                                    <h5 class="fw-bold text-dark mb-0">{{ item.currentAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}</h5>
-                                    <small *ngIf="item.discountRate > 0" class="text-muted text-decoration-line-through d-block">
-                                        {{ item.amount | currency:'TRY':'symbol-narrow':'1.0-0' }}
-                                    </small>
-                                </div>
-                                <div class="text-end ms-3 flex-shrink-0" *ngIf="item.currentAmount === 0">
-                                    <span class="badge bg-success">ÜCRETSİZ</span>
-                                </div>
-                            </div>
-
-                            <div class="mt-auto d-flex flex-wrap align-items-center justify-content-between pt-3 border-top">
-                                
-                                <div class="d-flex align-items-center gap-2 mb-2 mb-lg-0">
-                                    <img [src]="item.instructorImage || 'assets/images/users/user-dummy.jpg'" 
-                                         class="rounded-circle border" width="30" height="30">
-                                    <small class="text-muted fw-bold">{{ item.instructorName }}</small>
-                                </div>
-
-                                <div class="d-flex gap-3 text-muted small align-items-center">
-                                    <span title="Süre"><i class='bx bx-time-five text-warning'></i> {{ item.totalMinutes }} dk</span>
-                                    <span title="Ders Sayısı"><i class='bx bx-book-open text-info'></i> {{ item.lessonCount }} ders</span>
-                                    <span title="Puan"><i class='bx bxs-star text-warning'></i> {{ item.rating | number:'1.1-1' }}</span>
-                                </div>
-
-                                <a [routerLink]="['/course-details', item.id]" class="btn btn-sm btn-outline-primary fw-bold rounded-pill px-3">
-                                    İncele
-                                </a>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="d-flex justify-content-center mt-4" *ngIf="totalRecords > filterRequest.pageSize">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination">
-                        <li class="page-item" [class.disabled]="filterRequest.pageIndex === 0">
-                            <a class="page-link" href="javascript:void(0)" (click)="onPageChange(filterRequest.pageIndex - 1)">
-                                <i class='bx bx-chevron-left'></i>
-                            </a>
-                        </li>
-                        
-                        <li class="page-item" *ngFor="let p of pageArray" [class.active]="p === filterRequest.pageIndex">
-                            <a class="page-link" href="javascript:void(0)" (click)="onPageChange(p)">{{ p + 1 }}</a>
-                        </li>
-
-                        <li class="page-item" [class.disabled]="filterRequest.pageIndex >= totalPages - 1">
-                            <a class="page-link" href="javascript:void(0)" (click)="onPageChange(filterRequest.pageIndex + 1)">
-                                <i class='bx bx-chevron-right'></i>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
     </div>
 </div>
