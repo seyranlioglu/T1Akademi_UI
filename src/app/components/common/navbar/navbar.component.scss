@@ -15,12 +15,13 @@
     }
 }
 
-// 2. ANA NAVBAR
+// 2. ANA NAVBAR LİNKLERİ
 .nav-link {
     font-weight: 400;
     font-size: 14px;
     color: #2d2f31 !important;
     transition: color 0.2s;
+    cursor: pointer;
     &:hover { color: #5624d0 !important; }
 }
 
@@ -32,8 +33,10 @@
     &:hover { color: #5624d0 !important; }
 }
 
-// ARAMA KUTUSU
+// 3. ARAMA KUTUSU VE DROPDOWN
 .search-box {
+    position: relative; // Dropdown bunun içine konumlanır
+    
     .input-group {
         border: 1px solid #989ca4;
         border-radius: 999px;
@@ -47,7 +50,28 @@
     }
 }
 
-// --- ÖĞRENİM İÇERİĞİM (MOR STİL) ---
+// Arama Sonuçları Listesi (Autocomplete)
+.search-results-dropdown {
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    z-index: 1050; // Diğer elementlerin üstünde olsun
+    
+    .list-group-item {
+        cursor: pointer;
+        transition: background-color 0.2s;
+        
+        &:hover {
+            background-color: #f8f9fa;
+        }
+        
+        // Kurs resmi
+        img {
+            object-fit: cover;
+        }
+    }
+}
+
+// 4. ÖĞRENİM İÇERİĞİM (MOR STİLLER)
 .learning-link {
     transition: all 0.2s;
     &.active-menu, &:hover {
@@ -57,7 +81,11 @@
 }
 
 .bg-purple {
-    background-color: #6a11cb; // Udemy tarzı mor
+    background-color: #6a11cb; 
+}
+
+.text-purple {
+    color: #6a11cb !important;
 }
 
 .btn-purple {
@@ -75,7 +103,7 @@
     background-color: #f8f9fa;
 }
 
-// --- DROPDOWN MENÜ STİLLERİ ---
+// 5. GENEL DROPDOWN AYARLARI
 .dropdown-menu {
     margin-top: 0;
     border-radius: 0;
@@ -83,6 +111,7 @@
     border: 1px solid #eee;
     padding: 5px 0;
 
+    // Sihirli Köprü (Mouse kopmasın diye)
     &::before {
         content: '';
         position: absolute;
@@ -96,6 +125,7 @@
         color: #555;
         font-size: 14px;
         border-bottom: 1px solid #f9f9f9;
+        cursor: pointer;
         
         &:hover {
             color: #5624d0;
@@ -105,14 +135,12 @@
         i { font-size: 18px; }
     }
 
-    // --- NESTED SUBMENU ---
+    // Nested Menu (Kategoriler)
     .dropdown-submenu {
         position: relative; 
-
         &:hover > .submenu {
             display: block;
         }
-
         .submenu {
             display: none; 
             position: absolute;
@@ -127,15 +155,21 @@
     }
 }
 
-// Profil Menüsü
+// Profil Menüsü Özel
 .profile-menu-wrapper {
     cursor: pointer;
     .dropdown-menu {
-        border-radius: 12px;
+        border-radius: 12px; // Profil menüsü biraz daha yuvarlak
         margin-top: 10px !important;
     }
 }
 
+// Animasyon
 .animate__animated {
     animation-duration: 0.3s;
+}
+
+// Mobil Toggle
+.navbar-toggler {
+    &:focus { box-shadow: none; outline: none; }
 }

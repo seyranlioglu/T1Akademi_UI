@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { CategoryService } from 'src/app/shared/services/category.service';
 import { SidebarService } from 'src/app/shared/services/sidebar.service';
 import { TrainingApiService } from 'src/app/shared/api/training-api.service';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, of, catchError } from 'rxjs';
 
 @Component({
   selector: 'app-navbar',
@@ -12,6 +13,7 @@ import { TrainingApiService } from 'src/app/shared/api/training-api.service';
 })
 export class NavbarComponent implements OnInit {
 
+  // --- KULLANICI DEĞİŞKENLERİ ---
   isLoggedIn = false;
   isInstructor = false;
   
@@ -20,30 +22,23 @@ export class NavbarComponent implements OnInit {
   userInitials = 'U';
   userRole = 'Öğrenci';
 
+  // --- MENÜ KONTROLLERİ ---
   showCatMenu = false;
   showMyCourses = false;
   isProfileMenuOpen = false;
   
+  // --- DATA LİSTELERİ ---
   categories: any[] = [];
-  
-  // ÖĞRENİM İÇERİĞİM İÇİN ÖRNEK VERİ (Senin yapına uygun)
-  recentCourses = [
-    {
-      title: 'SIFIRDAN YAZILIM TEMELLERİNİ ÖĞRENMEK',
-      image: 'assets/images/courses/course1.jpg',
-      progress: 25
-    },
-    {
-      title: 'Unit Test Yazma - Asp.Net Core MVC/API',
-      image: 'assets/images/courses/course2.jpg',
-      progress: 10
-    },
-    {
-      title: 'C# İle Algoritma Öğrenin!',
-      image: 'assets/images/courses/course3.jpg',
-      progress: 45
-    }
-  ];
+  recentCourses: any[] = []; // Öğrenim içeriğim (API'den dolar)
+
+  // --- ARAMA (AUTOCOMPLETE) DEĞİŞKENLERİ ---
+  searchResults: any[] = [];
+  showSearchResults = false;
+  private searchSubject = new Subject<string>();
+
+  // HTML tarafındaki arama kutusunu (container) seçiyoruz
+  // Dışarı tıklamayı algılamak için gerekli
+  @ViewChild('searchBoxContainer') searchBoxContainer!: ElementRef;
 
   constructor(
     private authService: AuthService,
@@ -54,45 +49,91 @@ export class NavbarComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    // 1. KULLANICI KONTROLÜ VE VERİSİ
     const userJson = localStorage.getItem('currentUser');
     if (userJson) {
         this.isLoggedIn = true;
         try {
             const user = JSON.parse(userJson);
             this.processUserData(user);
+            this.loadMyCourses(); 
         } catch (e) {
             console.error('User parse error', e);
         }
     }
+
+    // 2. KATEGORİLERİ ÇEK
     this.getCategoriesFromApi();
+
+    // 3. ARAMA DİNLEYİCİSİ (AUTOCOMPLETE MANTIĞI)
+    this.searchSubject.pipe(
+      debounceTime(300),        // Kullanıcı yazmayı bıraktıktan 300ms sonra çalış
+      distinctUntilChanged(),   // Aynı kelime tekrar gelirse çalışma
+      switchMap(term => {
+        if (term.length >= 2) {
+           // 3 harf ve üzeriyse API'ye git
+           return this.trainingService.searchTrainings(term).pipe(
+             catchError(error => {
+               console.error('Arama hatası:', error);
+               return of([]); // Hata olursa boş dizi dön
+             })
+           );
+        } else {
+          return of([]); // 3 harften azsa boş dön
+        }
+      })
+    ).subscribe((results: any) => {
+        // Backend'den gelen veri yapısını kontrol et
+        const data = results.data || results.body || results;
+        if(Array.isArray(data)){
+            this.searchResults = data;
+            this.showSearchResults = data.length > 0;
+        } else {
+             this.searchResults = [];
+             this.showSearchResults = false;
+        }
+    });
   }
 
+  // --- DIŞARI TIKLAMA (CLICK OUTSIDE) DİNLEYİCİSİ ---
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    // Eğer arama sonuçları açıksa VE tıklanan yer arama kutusunun içinde değilse kapat
+    if (this.showSearchResults && this.searchBoxContainer && !this.searchBoxContainer.nativeElement.contains(event.target)) {
+      this.showSearchResults = false;
+    }
+  }
+
+  // --- API: KULLANICI KURSLARI (Öğrenim İçeriğim Menüsü) ---
+  loadMyCourses() {
+    this.trainingService.getNavbarRecentTrainings(5).subscribe({
+        next: (data: any[]) => {
+            if (Array.isArray(data)) {
+                this.recentCourses = data;
+            }
+        },
+        error: (err) => {
+            console.error('Navbar kursları yüklenemedi', err);
+        }
+    });
+  }
+
+  // --- KULLANICI VERİSİNİ İŞLEME ---
   processUserData(user: any) {
-      // 1. İSİM (Soyad varsa ekle)
-      if (user.name && user.surname) {
-          this.userName = `${user.name} ${user.surname}`;
-      } else if (user.firstName && user.lastName) {
-          this.userName = `${user.firstName} ${user.lastName}`;
+      // 1. İSİM SOYİSİM (Logdaki veri yapısına göre)
+      if (user.name && user.surName) {
+          this.userName = `${user.name} ${user.surName}`;
       } else {
-          this.userName = user.name || user.email || 'Kullanıcı';
+          this.userName = user.name || 'Kullanıcı';
       }
-      
+
+      // 2. BAŞ HARFLER (Backend'den gelen hazır alan)
+      this.userInitials = user.userShortName || 'U';
+
+      // 3. E-POSTA
       this.userEmail = user.email || '';
 
-      // 2. BAŞ HARFLER (Şükrü Şeyranlıoğlu -> ŞŞ)
-      // Boşluklardan ayırıp ilk ve son parçanın baş harfini alıyoruz
-      if (this.userName) {
-          const parts = this.userName.trim().split(/\s+/); // Birden fazla boşluk varsa da çalışır
-          if (parts.length >= 2) {
-              // İlk ismin baş harfi + Son soyadın baş harfi
-              this.userInitials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-          } else {
-              // Tek kelimeyse ilk 2 harf (örn: Ahmet -> AH)
-              this.userInitials = this.userName.substring(0, 2).toUpperCase();
-          }
-      }
-
-      // 3. ROL BELİRLEME
+      // 4. ROL BELİRLEME
       if (user.roles && Array.isArray(user.roles)) {
           const rolesLower = user.roles.map((r: any) => r.toString().toLowerCase());
           if (rolesLower.includes('admin') || rolesLower.includes('superadmin')) {
@@ -107,6 +148,7 @@ export class NavbarComponent implements OnInit {
       }
   }
 
+  // --- KATEGORİLERİ ÇEKME ---
   getCategoriesFromApi() {
     this.categoryService.getCategories().subscribe({
       next: (response: any) => {
@@ -119,15 +161,35 @@ export class NavbarComponent implements OnInit {
     });
   }
 
-  onSearchKeyUp(event: any) {
-      if (event.key === 'Enter') {
-          const term = event.target.value;
-          if (term && term.length > 0) {
-              this.router.navigate(['/courses'], { queryParams: { search: term } });
-          }
+  // --- ARAMA METODLARI ---
+
+  // Input'a her basıldığında çalışır (HTML'den çağrılır -> Subject'i tetikler)
+  onSearchChange(term: string) {
+    this.searchSubject.next(term);
+    // 3 harften azsa listeyi temizle ve kapat
+    if(term.length < 3) {
+        this.showSearchResults = false;
+        this.searchResults = [];
+    }
+  }
+
+  // Enter'a basınca veya büyütece tıklayınca çalışır (Arama sayfasına gider)
+  search(term: string) {
+      this.showSearchResults = false; // Dropdown'ı kapat
+      if (term && term.trim().length > 0) {
+          this.router.navigate(['/courses'], { queryParams: { search: term.trim() } });
       }
   }
 
+  // Listeden bir sonuca tıklayınca arama geçmişini temizle
+  clearSearch(inputElement: HTMLInputElement){
+      inputElement.value = '';
+      this.showSearchResults = false;
+      this.searchResults = [];
+  }
+
+  // --- DİĞER MENÜ İŞLEMLERİ ---
+  
   toggleMobileMenu() {
     this.sidebarService.toggle();
   }

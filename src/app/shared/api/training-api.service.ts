@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http'; // EKLENDİ
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
- import { TrainingCard } from '../models/training-card.model'; 
+import { TrainingCard } from '../models/training-card.model'; 
 
 const API_TRAINING_URL = `${environment.apiUrl}/Training`;
 const API_TRAINING_CATEGORY_URL = `${environment.apiUrl}/TrainingCategory`;
@@ -19,17 +19,13 @@ export class TrainingApiService {
   getRecommendedTrainings(): Observable<TrainingCard> {
     return this.http.get<any>(`${API_TRAINING_URL}/get-recommended-trainings`);
   }
-  // --------------------------
 
   addTraining(payload: any): Observable<any> {
     return this.http.post<any>(`${API_TRAINING_URL}/AddTraining`, payload);
   }
 
   updateTraining(payload: any): Observable<any> {
-    return this.http.put<any>(
-      `${API_TRAINING_URL}/UpdateTraining`,
-      payload
-    );
+    return this.http.put<any>(`${API_TRAINING_URL}/UpdateTraining`, payload);
   }
 
   getTrainings(): Observable<any[]> {
@@ -120,9 +116,16 @@ export class TrainingApiService {
     return this.http.delete<any>(`${API_WHAT_YOU_WILL_LEARN_URL}/DeleteWhatYouWillLearn`, { body:  id  });
   }
 
-// --- BURASI EKSİKTİ, EKLENDİ ---
   searchTrainings(term: string): Observable<any> {
     const params = new HttpParams().set('query', term);
     return this.http.get<any>(`${API_TRAINING_URL}/Search`, { params });
+  }
+
+  // --- YENİ EKLENEN METOD (Navbar İçin) ---
+  getNavbarRecentTrainings(count: number = 5): Observable<any> {
+    const params = new HttpParams().set('count', count);
+    return this.http.get<any>(`${API_TRAINING_URL}/GetNavbarRecentTrainings`, { params }).pipe(
+        map(res => res.data || res.body || res)
+    );
   }
 }
