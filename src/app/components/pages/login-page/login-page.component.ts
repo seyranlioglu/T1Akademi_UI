@@ -13,18 +13,22 @@ import { interval, Subscription } from 'rxjs';
 export class LoginPageComponent implements OnInit, OnDestroy {
   
   loginForm!: FormGroup;
-  verifyForm!: FormGroup;
+  verifyForm!: FormGroup; // Login sonrası 2FA için
   
   isLoading$ = this.authService.isLoading$;
   showPassword = false;
 
+  // Login 2FA değişkenleri
   isVerificationStep = false; 
   pendingUserName = '';       
   
   remainingTime = 120; 
   timerSub: Subscription | null = null;
 
+  // Modallar
   isForgotPasswordModalOpen = false;
+  isAccountConfirmModalOpen = false;
+  unverifiedEmail = ''; // Hesabı doğrulanmamış kişinin maili
 
   constructor(
     private fb: FormBuilder,
@@ -48,71 +52,19 @@ export class LoginPageComponent implements OnInit, OnDestroy {
       code: [null, [Validators.required, Validators.minLength(4)]]
     });
 
-    // --- YENİ EKLENEN: Kayıtlı kullanıcıyı kontrol et ---
     this.checkRememberedUser();
   }
 
   get f() { return this.loginForm.controls; }
 
-  // --- YENİ EKLENEN: Hafızadaki kullanıcıyı yükle ---
   checkRememberedUser() {
     const savedUser = localStorage.getItem('rememberedUser');
     if (savedUser) {
-        this.loginForm.patchValue({
-            emailOrPhone: savedUser,
-            rememberMe: true
-        });
+        this.loginForm.patchValue({ emailOrPhone: savedUser, rememberMe: true });
     }
   }
 
-  openForgotPasswordModal() {
-    this.isForgotPasswordModalOpen = true;
-  }
-
-  closeForgotPasswordModal() {
-    this.isForgotPasswordModalOpen = false;
-  }
-
-  onPasswordResetSuccess() {
-    this.isForgotPasswordModalOpen = false;
-    this.toastr.success('Şifreniz başarıyla değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.');
-  }
-
-  onDynamicInput(event: any) {
-    const input = event.target;
-    const originalValue = input.value;
-    if (!originalValue) return;
-
-    const firstChar = originalValue.charAt(0);
-    const isDigit = /^\d$/.test(firstChar); 
-
-    if (isDigit) {
-        let numbers = originalValue.replace(/\D/g, '');
-        if (numbers.startsWith('0')) { 
-            if (numbers.length > 1 && numbers[1] !== '5') { numbers = '0'; } 
-        } 
-        else if (numbers.startsWith('5')) { numbers = '0' + numbers; } 
-        else { numbers = '05' + numbers; }
-
-        if (numbers.length > 11) { numbers = numbers.substring(0, 11); }
-
-        let formatted = "";
-        if (numbers.length > 0) formatted = numbers.substring(0, 4);
-        if (numbers.length > 4) formatted += " " + numbers.substring(4, 7);
-        if (numbers.length > 7) formatted += " " + numbers.substring(7, 9);
-        if (numbers.length > 9) formatted += " " + numbers.substring(9, 11);
-
-        input.value = formatted;
-        this.loginForm.get('emailOrPhone')?.setValue(formatted, { emitEvent: false });
-    }
-  }
-
-  numberOnly(event: any): boolean {
-    const charCode = (event.which) ? event.which : event.keyCode;
-    if (charCode > 31 && (charCode < 48 || charCode > 57)) return false;
-    return true;
-  }
-
+  // --- LOGIN İŞLEMİ ---
   onSubmit() {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -120,7 +72,7 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     }
 
     let inputVal = this.loginForm.get('emailOrPhone')?.value;
-    let submissionType = 1; 
+    let submissionType = 1; // 1: Sms, 0: Email
     
     if (inputVal.includes('@')) {
         submissionType = 0; 
@@ -140,12 +92,19 @@ export class LoginPageComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         this.authService.isLoadingSubject.next(false);
         
+        // 1. BAŞARILI GİRİŞ (Result: true)
         if (res.header.result) {
             this.toastr.success(res.header.msg || "Doğrulama kodu gönderildi.");
             this.pendingUserName = inputVal; 
             this.isVerificationStep = true;  
             this.startTimer();               
-        } else {
+        } 
+        // 2. DOĞRULANMAMIŞ HESAP (ResCode: 119)
+        else if (res.header.resCode == 119) {
+            this.unverifiedEmail = inputVal.includes('@') ? inputVal : '';
+            this.openAccountConfirmModal();
+        }
+        else {
             const cleanMsg = this.parseErrorMessage(res.header.msg);
             this.toastr.error(cleanMsg);
         }
@@ -158,27 +117,20 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     });
   }
 
-onVerifySubmit() {
+  // --- LOGIN 2FA VERIFY ---
+  onVerifySubmit() {
     if (this.verifyForm.invalid) return;
-
     const code = this.verifyForm.get('code')?.value;
     const rememberMeValue = this.loginForm.get('rememberMe')?.value || false;
     
     this.authService.isLoadingSubject.next(true);
-
-    // Verify metodu zaten saveUserData'yı çağırıyor, ekstra bir şey yapmaya gerek yok.
+    
     this.authService.verify(this.pendingUserName, code, rememberMeValue).subscribe({
       next: (res: any) => {
         this.authService.isLoadingSubject.next(false);
-        
         if (res.header.result) {
-          // Sadece "Beni Hatırla" için kullanıcı adını sakla (Token işine karışma)
-          if (rememberMeValue) {
-            localStorage.setItem('rememberedUser', this.loginForm.get('emailOrPhone')?.value);
-          } else {
-            localStorage.removeItem('rememberedUser');
-          }
-
+          if (rememberMeValue) localStorage.setItem('rememberedUser', this.loginForm.get('emailOrPhone')?.value);
+          else localStorage.removeItem('rememberedUser');
           this.toastr.success("Giriş Başarılı!");
           this.router.navigate(['/']);
         } else {
@@ -192,8 +144,56 @@ onVerifySubmit() {
     });
   }
 
-  resendCode() {
-      this.onSubmit();
+  // --- MODAL YÖNETİMİ ---
+  openAccountConfirmModal() {
+    this.isAccountConfirmModalOpen = true;
+  }
+
+  closeAccountConfirmModal() {
+    this.isAccountConfirmModalOpen = false;
+  }
+
+  onAccountConfirmComplete() {
+    this.isAccountConfirmModalOpen = false;
+    this.toastr.info("Hesabınız doğrulandı, lütfen tekrar giriş yapın.");
+    this.loginForm.reset();
+  }
+
+  // --- YARDIMCI FONKSİYONLAR ---
+  openForgotPasswordModal() { this.isForgotPasswordModalOpen = true; }
+  closeForgotPasswordModal() { this.isForgotPasswordModalOpen = false; }
+  onPasswordResetSuccess() {
+    this.isForgotPasswordModalOpen = false;
+    this.toastr.success('Şifreniz değiştirildi.');
+  }
+
+  resendCode() { this.onSubmit(); }
+
+  onDynamicInput(event: any) {
+    const input = event.target;
+    let val = input.value;
+    if (!val) return;
+    const isDigit = /^\d$/.test(val.charAt(0)); 
+    if (isDigit && !val.includes('@')) {
+        let numbers = val.replace(/\D/g, '');
+        if (numbers.startsWith('0')) { if (numbers.length > 1 && numbers[1] !== '5') { numbers = '0'; } } 
+        else if (numbers.startsWith('5')) { numbers = '0' + numbers; } 
+        else { numbers = '05' + numbers; }
+        if (numbers.length > 11) { numbers = numbers.substring(0, 11); }
+        let formatted = "";
+        if (numbers.length > 0) formatted = numbers.substring(0, 4);
+        if (numbers.length > 4) formatted += " " + numbers.substring(4, 7);
+        if (numbers.length > 7) formatted += " " + numbers.substring(7, 9);
+        if (numbers.length > 9) formatted += " " + numbers.substring(9, 11);
+        input.value = formatted;
+        this.loginForm.get('emailOrPhone')?.setValue(formatted, { emitEvent: false });
+    }
+  }
+
+  numberOnly(event: any): boolean {
+    const charCode = (event.which) ? event.which : event.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) return false;
+    return true;
   }
 
   private parseErrorMessage(msg: any): string {
@@ -211,13 +211,9 @@ onVerifySubmit() {
   startTimer() {
     this.remainingTime = 120; 
     if (this.timerSub) this.timerSub.unsubscribe();
-    
     this.timerSub = interval(1000).subscribe(() => {
-        if (this.remainingTime > 0) {
-            this.remainingTime--;
-        } else {
-            this.timerSub?.unsubscribe();
-        }
+        if (this.remainingTime > 0) this.remainingTime--; 
+        else this.timerSub?.unsubscribe();
     });
   }
 

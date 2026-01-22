@@ -1,0 +1,119 @@
+<div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        
+        <div class="modal-header bg-warning-dark text-white border-0 py-3">
+            <h5 class="modal-title fw-bold ms-2">
+                <i class='bx bx-shield-quarter me-2'></i>Hesap Doğrulama
+            </h5>
+            <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+        </div>
+
+        <div class="modal-body p-4 bg-white">
+            
+            <div class="stepper-wrapper mb-4" *ngIf="wizardStep !== 'COMPLETE'">
+                <div class="progress-line">
+                    <div class="progress-fill" 
+                         [style.width]="(wizardStep == 'EMAIL_SEND' || wizardStep == 'EMAIL_VERIFY') ? '33%' : (wizardStep == 'SMS_SEND' || wizardStep == 'SMS_VERIFY' ? '66%' : '100%')">
+                    </div>
+                </div>
+                
+                <div class="step-circle active">1</div>
+                
+                <div class="step-circle" 
+                     [class.active]="wizardStep !== 'EMAIL_SEND' && wizardStep !== 'EMAIL_VERIFY'"
+                     [class.inactive]="wizardStep === 'EMAIL_SEND' || wizardStep === 'EMAIL_VERIFY'">
+                     2
+                </div>
+                
+                <div class="step-circle inactive">
+                    <i class='bx bx-check'></i>
+                </div>
+            </div>
+
+            <form [formGroup]="wizardForm">
+                
+                <div *ngIf="wizardStep === 'EMAIL_SEND' || wizardStep === 'EMAIL_VERIFY'" class="fade-in">
+                    <div class="text-center mb-4">
+                        <div class="icon-box bg-light text-primary">
+                            <i class='bx bx-envelope'></i>
+                        </div>
+                        <h5>E-Posta Doğrulama</h5>
+                        <p class="text-muted small">Devam etmek için e-posta adresinizi doğrulayın.</p>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" formControlName="email">
+                        <label>E-Posta Adresi</label>
+                    </div>
+
+                    <div *ngIf="wizardStep === 'EMAIL_VERIFY'" class="mb-3 fade-in">
+                        <label class="form-label small fw-bold">Doğrulama Kodu</label>
+                        <input type="text" formControlName="code" class="form-control text-center code-input" maxlength="6">
+                        <div class="text-end mt-1" *ngIf="remainingTime > 0">
+                            <small class="text-muted"><i class='bx bx-time'></i> {{remainingTime}} sn</small>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button *ngIf="wizardStep === 'EMAIL_SEND'" type="button" class="btn btn-primary py-2" 
+                                (click)="sendEmailCode()" [disabled]="isLocalLoading">
+                            <span *ngIf="isLocalLoading" class="spinner-border spinner-border-sm me-2"></span> Kod Gönder
+                        </button>
+                        <button *ngIf="wizardStep === 'EMAIL_VERIFY'" type="button" class="btn btn-success py-2" 
+                                (click)="verifyEmail()" [disabled]="isLocalLoading">
+                            <span *ngIf="isLocalLoading" class="spinner-border spinner-border-sm me-2"></span> Doğrula
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="wizardStep === 'SMS_SEND' || wizardStep === 'SMS_VERIFY'" class="fade-in">
+                    <div class="text-center mb-4">
+                        <div class="icon-box bg-light text-info">
+                            <i class='bx bx-mobile-alt'></i>
+                        </div>
+                        <h5>Telefon Doğrulama</h5>
+                        <p class="text-muted small">Son adım olarak telefon numaranızı doğrulayın.</p>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" formControlName="phone" (input)="onPhoneInput($event)">
+                        <label>Telefon Numarası</label>
+                    </div>
+
+                    <div *ngIf="wizardStep === 'SMS_VERIFY'" class="mb-3 fade-in">
+                        <label class="form-label small fw-bold">SMS Kodu</label>
+                        <input type="text" formControlName="code" class="form-control text-center code-input" maxlength="6">
+                        <div class="text-end mt-1" *ngIf="remainingTime > 0">
+                            <small class="text-muted"><i class='bx bx-time'></i> {{remainingTime}} sn</small>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button *ngIf="wizardStep === 'SMS_SEND'" type="button" class="btn btn-primary py-2" 
+                                (click)="sendSmsCode()" [disabled]="isLocalLoading">
+                            <span *ngIf="isLocalLoading" class="spinner-border spinner-border-sm me-2"></span> Kod Gönder
+                        </button>
+                        <button *ngIf="wizardStep === 'SMS_VERIFY'" type="button" class="btn btn-success py-2" 
+                                (click)="verifySms()" [disabled]="isLocalLoading">
+                            <span *ngIf="isLocalLoading" class="spinner-border spinner-border-sm me-2"></span> Doğrula
+                        </button>
+                    </div>
+                </div>
+
+                <div *ngIf="wizardStep === 'COMPLETE'" class="fade-in text-center py-4">
+                    <div class="mb-4">
+                        <div class="icon-box bg-success text-white" style="width: 80px; height: 80px; font-size: 40px;">
+                            <i class='bx bx-check'></i>
+                        </div>
+                    </div>
+                    <h4 class="fw-bold text-success">Tebrikler!</h4>
+                    <p class="text-muted">Hesabınız başarıyla doğrulandı.</p>
+                    <div class="d-grid mt-5">
+                        <button type="button" class="btn btn-dark py-3" (click)="finish()">Giriş Ekranına Dön</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

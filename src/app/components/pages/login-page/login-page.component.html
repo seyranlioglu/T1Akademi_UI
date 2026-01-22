@@ -12,7 +12,6 @@
         </div>
 
         <div class="col-md-5 d-flex flex-column bg-light-mobile h-100">
-            
             <div class="flex-grow-1 d-flex align-items-center justify-content-center px-3 py-4">
                 <div class="login-wrapper w-100">
                     
@@ -30,7 +29,6 @@
                     </div>
 
                     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" *ngIf="!isVerificationStep">
-                        
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="emailInput" placeholder="name@example.com" 
                                    formControlName="emailOrPhone" (input)="onDynamicInput($event)"
@@ -53,7 +51,6 @@
                                 <input class="form-check-input" type="checkbox" id="rememberMe" formControlName="rememberMe" style="cursor: pointer;">
                                 <label class="form-check-label small text-muted" for="rememberMe" style="cursor: pointer;">Beni Hatırla</label>
                             </div>
-                            
                             <a href="javascript:void(0)" (click)="openForgotPasswordModal()" class="text-decoration-none small fw-bold text-warning-dark" style="position: relative; z-index: 10;">
                                 Şifremi Unuttum?
                             </a>
@@ -71,7 +68,6 @@
                     </form>
 
                     <form [formGroup]="verifyForm" (ngSubmit)="onVerifySubmit()" *ngIf="isVerificationStep" class="fade-in text-center">
-                        
                         <div class="mb-4 mt-3">
                             <input type="text" formControlName="code" 
                                    class="form-control form-control-lg text-center mx-auto shadow-sm" 
@@ -88,7 +84,6 @@
                             <span *ngIf="remainingTime > 0" class="text-muted small">
                                 <i class="bx bx-time"></i> Kalan Süre: <b>{{ remainingTime }}</b> sn
                             </span>
-                            
                             <span *ngIf="remainingTime === 0">
                                 <button type="button" class="btn btn-link text-warning-dark fw-bold text-decoration-none" (click)="resendCode()">
                                     Kodu Tekrar Gönder <i class='bx bx-refresh'></i>
@@ -105,31 +100,34 @@
 
                 </div>
             </div>
-
             <div class="py-3 text-center bg-light-mobile">
-                <small class="text-muted" style="font-size: 0.75rem;">
-                    &copy; 2026 T1 Akademi. Tüm hakları saklıdır.
-                </small>
+                <small class="text-muted" style="font-size: 0.75rem;">&copy; 2026 T1 Akademi. Tüm hakları saklıdır.</small>
             </div>
         </div>
     </div>
 </div>
 
 <div class="modal fade" [ngClass]="{'show d-block': isForgotPasswordModalOpen}" 
-     tabindex="-1" role="dialog" 
-     style="background: rgba(0,0,0,0.5);" 
-     *ngIf="isForgotPasswordModalOpen">
+     tabindex="-1" role="dialog" style="background: rgba(0,0,0,0.5); z-index: 9999;" *ngIf="isForgotPasswordModalOpen">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header border-0 pb-0 justify-content-end">
                 <button type="button" class="btn-close" (click)="closeForgotPasswordModal()"></button>
             </div>
             <div class="modal-body pt-0">
-                <app-forgot-password-page 
-                    (close)="closeForgotPasswordModal()" 
-                    (success)="onPasswordResetSuccess()">
-                </app-forgot-password-page>
+                <app-forgot-password-page (close)="closeForgotPasswordModal()" (success)="onPasswordResetSuccess()"></app-forgot-password-page>
             </div>
         </div>
     </div>
+</div>
+
+<div class="modal fade" [ngClass]="{'show d-block': isAccountConfirmModalOpen}" 
+     tabindex="-1" role="dialog" style="background: rgba(0,0,0,0.8); z-index: 99999;" *ngIf="isAccountConfirmModalOpen">
+    
+    <app-account-verification 
+        [startEmail]="unverifiedEmail"
+        (close)="closeAccountConfirmModal()"
+        (complete)="onAccountConfirmComplete()">
+    </app-account-verification>
+
 </div>

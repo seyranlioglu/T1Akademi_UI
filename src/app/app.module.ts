@@ -103,6 +103,7 @@ import { CarouselModule } from 'ngx-owl-carousel-o';
 import { CourseCardComponent } from './components/common/course-card/course-card.component';
 import { CompanyEmployeesComponent } from './components/dashboard/company-employees/company-employees.component';
 import { NgSelectModule } from '@ng-select/ng-select'; // <-- Import
+import { AccountVerificationComponent } from './components/pages/login-page/account-verification/account-verification.component';
 
 @NgModule({
     declarations: [
@@ -189,7 +190,8 @@ import { NgSelectModule } from '@ng-select/ng-select'; // <-- Import
         MainLayoutComponent,  
         PlayerLayoutComponent,
         CalendarViewComponent,
-        CourseCardComponent
+        CourseCardComponent,
+        AccountVerificationComponent
     ],
     imports: [
         BrowserModule,

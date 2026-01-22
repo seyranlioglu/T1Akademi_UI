@@ -1,130 +1,141 @@
-// Temel Font
+// Font ve Temel
 .navbar-area {
     font-family: 'Spartan', sans-serif;
 }
 
-// Hover Efekti (Gri Arka Plan)
-.hover-effect {
-    transition: background-color 0.2s;
-    &:hover { background-color: #f0f0f0; color: #ff1949 !important; }
+// 1. ÜST DUYURU BARI
+.top-info-bar {
+    background-color: #ffd000;
+    color: #2d2f31;
+    font-size: 13px;
+    font-weight: 700;
+    a {
+        color: #5624d0;
+        &:hover { text-decoration: underline !important; }
+    }
 }
 
-// Arama Kutusu Stilleri
+// 2. ANA NAVBAR
+.nav-link {
+    font-weight: 400;
+    font-size: 14px;
+    color: #2d2f31 !important;
+    transition: color 0.2s;
+    &:hover { color: #5624d0 !important; }
+}
+
+.category-link {
+    font-size: 14px;
+    font-weight: 700; 
+    cursor: pointer;
+    transition: color 0.2s;
+    &:hover { color: #5624d0 !important; }
+}
+
+// ARAMA KUTUSU
 .search-box {
     .input-group {
-        border-color: #e9ecef !important;
-        transition: all 0.3s ease;
-        
+        border: 1px solid #989ca4;
+        border-radius: 999px;
+        transition: all 0.2s;
+        background-color: #f7f9fa;
         &:focus-within {
             background-color: #fff !important;
-            border-color: #ff1949 !important;
-            box-shadow: 0 0 0 3px rgba(255, 25, 73, 0.1); // Hafif focus halkası
+            border-color: #1c1d1f !important;
+            button, input { background-color: #fff !important; }
         }
     }
+}
 
-    .search-results {
-        max-height: 400px;
-        overflow-y: auto;
+// --- ÖĞRENİM İÇERİĞİM (MOR STİL) ---
+.learning-link {
+    transition: all 0.2s;
+    &.active-menu, &:hover {
+        background-color: #f0ecfc; // Hafif mor arka plan
+        color: #5624d0 !important;
+    }
+}
+
+.bg-purple {
+    background-color: #6a11cb; // Udemy tarzı mor
+}
+
+.btn-purple {
+    background-color: #6a11cb;
+    border-color: #6a11cb;
+    transition: all 0.3s;
+    
+    &:hover {
+        background-color: #5624d0;
+        border-color: #5624d0;
+    }
+}
+
+.hover-bg:hover {
+    background-color: #f8f9fa;
+}
+
+// --- DROPDOWN MENÜ STİLLERİ ---
+.dropdown-menu {
+    margin-top: 0;
+    border-radius: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 1px solid #eee;
+    padding: 5px 0;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -15px; left: 0;
+        width: 100%; height: 15px;
+        background: transparent;
+    }
+
+    .dropdown-item {
+        padding: 8px 15px;
+        color: #555;
+        font-size: 14px;
+        border-bottom: 1px solid #f9f9f9;
         
-        &::-webkit-scrollbar { width: 5px; }
-        &::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+        &:hover {
+            color: #5624d0;
+            background-color: #f8f9fa;
+        }
+        
+        i { font-size: 18px; }
+    }
 
-        .list-group-item {
-            transition: background-color 0.2s;
-            &:hover { background-color: #f8f9fa; }
+    // --- NESTED SUBMENU ---
+    .dropdown-submenu {
+        position: relative; 
+
+        &:hover > .submenu {
+            display: block;
+        }
+
+        .submenu {
+            display: none; 
+            position: absolute;
+            left: 100%; 
+            top: -5px;  
+            min-width: 240px;
+            background: #fff;
+            box-shadow: 4px 4px 12px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
+            z-index: 10000;
         }
     }
 }
 
 // Profil Menüsü
 .profile-menu-wrapper {
+    cursor: pointer;
     .dropdown-menu {
+        border-radius: 12px;
         margin-top: 10px !important;
-        border-radius: 12px;
-        overflow: hidden;
-        
-        // Menü ile buton arasındaki boşluğu dolduran köprü (Hover kopmasın diye)
-        &::before {
-            content: '';
-            position: absolute;
-            top: -15px; left: 0; width: 100%; height: 15px; background: transparent;
-        }
-
-        .dropdown-item {
-            font-size: 14px;
-            color: #555;
-            transition: all 0.2s;
-            
-            &:hover { 
-                background-color: #fff5f7; 
-                color: #ff1949; 
-                i { color: #ff1949; }
-            }
-            
-            i { font-size: 18px; vertical-align: middle; transition: color 0.2s; color: #999; }
-        }
     }
 }
 
-// Mobil Buton Focus İptali
-.navbar-toggler:focus {
-    box-shadow: none;
-    outline: none;
-}
-
-// Küçük Ekranlar (Mobil) İçin Arama Kutusunu Göster
-@media (max-width: 767px) {
-    .search-box {
-        display: none !important; // Mobilde üst bar çok şişmesin diye gizledim, istersen açabiliriz.
-    }
-}
-
-.profile-menu-wrapper {
-    position: relative; // Dropdown buna göre konumlanacak
-    
-    // Dropdown Menü
-    .dropdown-menu {
-        margin-top: 0 !important; // Boşluğu sıfırla
-        top: 100%; // Tam altına yapışsın
-        right: 0;
-        border-radius: 12px;
-        overflow: visible; // Before elementi dışarı taşabilsin
-        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        border: none;
-        
-        // --- SİHİRLİ KÖPRÜ (Mouse kaçmasın diye) ---
-        &::before {
-            content: '';
-            position: absolute;
-            top: -20px; // Yukarı doğru 20px uzat
-            left: 0;
-            width: 100%;
-            height: 20px;
-            background: transparent; // Görünmez
-            z-index: 1;
-        }
-        // ------------------------------------------
-
-        .dropdown-item {
-            font-size: 14px;
-            color: #555;
-            padding: 10px 20px;
-            transition: all 0.2s;
-            display: flex; 
-            align-items: center;
-            
-            &:hover { 
-                background-color: #fff5f7; 
-                color: #ff1949; 
-                i { color: #ff1949; }
-            }
-            
-            i { 
-                font-size: 18px; 
-                margin-right: 10px; // İkon ile yazı arası
-                color: #999; 
-                transition: color 0.2s; 
-            }
-        }
-    }
+.animate__animated {
+    animation-duration: 0.3s;
 }
