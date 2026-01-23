@@ -17,8 +17,11 @@ const API_WHAT_YOU_WILL_LEARN_URL = `${environment.apiUrl}/WhatYouWillLearn`;
 export class TrainingApiService {
   constructor(private http: HttpClient) {}
 
-  getRecommendedTrainings(): Observable<TrainingCard> {
-    return this.http.get<any>(`${API_TRAINING_URL}/get-recommended-trainings`);
+getRecommendedTrainings(): Observable<TrainingCard[]> {
+    return this.http.get<any>(`${API_TRAINING_URL}/get-recommended-trainings`).pipe(
+        // Backend Response<List<T>> dönüyorsa data/body içindedir
+        map(res => res.data || res.body || res) 
+    );
   }
 
   addTraining(payload: any): Observable<any> {

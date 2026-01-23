@@ -50,7 +50,7 @@
                 </a>
                 <ul class="sub-menu" [class.show]="cat.expanded && !isCollapsed" *ngIf="cat.subCategories && cat.subCategories.length > 0">
                     <li *ngFor="let sub of cat.subCategories">
-                        <a [routerLink]="['/courses']" [queryParams]="{category: sub.id}" class="sub-link">{{ sub.title }}</a>
+                        <a [routerLink]="['/dashboard/active-courses']" [queryParams]="{categoryIds: sub.id}" class="sub-link">{{ sub.title }}</a>
                     </li>
                 </ul>
             </li>

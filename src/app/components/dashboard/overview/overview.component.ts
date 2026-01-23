@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { OwlOptions } from 'ngx-owl-carousel-o'; 
 import { DashboardApiService } from 'src/app/shared/api/dashboard-api.service';
-// TrainingCardDto ve diğer modelleri import ediyoruz ama çakışma olmasın diye dikkatli kullanacağız
-import { ContinueTrainingDto, DashboardStatsDto, TrainingCardDto, UserCertificateDto } from 'src/app/shared/models/dashboard.model';
+import { ContinueTrainingDto, DashboardStatsDto, UserCertificateDto } from 'src/app/shared/models/dashboard.model';
 
 @Component({
   selector: 'app-overview',
@@ -10,16 +9,12 @@ import { ContinueTrainingDto, DashboardStatsDto, TrainingCardDto, UserCertificat
   styleUrls: ['./overview.component.scss']
 })
 export class OverviewComponent implements OnInit {
+  
   viewMode: 'list' | 'calendar' = 'list';
   
-  assignedTrainings: TrainingCardDto[] = [];
-  
-  // --- DÜZELTME BURADA ---
-  // Tip uyuşmazlığı hatasını (TS2740) aşmak için burayı 'any[]' yaptık.
-  // Artık Backend'den gelen yeni DTO yapısını (headerImage, price vb.) sorunsuz kabul edecek.
+  // Resim mantığı için tipleri 'any' olarak kullanıyoruz
+  assignedTrainings: any[] = []; 
   recommendedTrainings: any[] = []; 
-  // -----------------------
-
   myCertificates: UserCertificateDto[] = []; 
   
   stats: DashboardStatsDto | null = null;
@@ -28,9 +23,9 @@ export class OverviewComponent implements OnInit {
   today = new Date();
   loading = true;
 
-  // Slider Ayarları
+  // Owl Carousel (Slider) Ayarları
   customOptions: OwlOptions = {
-    loop: false,
+    loop: false, 
     mouseDrag: true,
     touchDrag: true,
     pullDrag: true,
@@ -56,28 +51,81 @@ export class OverviewComponent implements OnInit {
   loadDashboardData(): void {
     this.loading = true;
     
-    // İstatistikler
+    // 1. İstatistikler
     this.dashboardService.getStats().subscribe(res => this.stats = res);
     
-    // Devam Edenler
-    this.dashboardService.getContinueLearning().subscribe(res => this.continueData = res);
+    // 2. Devam Eden Eğitim
+    this.dashboardService.getContinueLearning().subscribe(res => {
+        if (res) {
+            this.continueData = this.processSingleImage(res);
+        }
+    });
     
-    // Atanan Eğitimler
+    // 3. Atanan Eğitimler (Tablo)
     this.dashboardService.getAssignedTrainings().subscribe(res => {
-        this.assignedTrainings = res || [];
+        this.assignedTrainings = this.processImages(res || []);
     });
     
-    // Önerilen Eğitimler (Slider İçin)
+    // 4. Önerilen Eğitimler (Slider)
     this.dashboardService.getRecommendedTrainings().subscribe(res => {
-        // Gelen veriyi olduğu gibi alıyoruz
-        this.recommendedTrainings = res || [];
+        this.recommendedTrainings = this.processImages(res || []);
     });
     
-    // Sertifikalar
+    // 5. Sertifikalar
     this.dashboardService.getMyCertificates().subscribe(res => {
         this.myCertificates = res || [];
+        this.loading = false;
     });
+  }
 
-    this.loading = false;
+  // --- RESİM İŞLEME MANTIĞI (LİSTE) ---
+  processImages(list: any[]): any[] {
+    return list.map(item => {
+        const imageId = item.categoryId || item.parentCategoryId;
+        const fallbackPng = `assets/images/defaults/category${imageId}.png`;
+
+        // Eğer veride resim yoksa, direkt kategori PNG'sini ata
+        if (!item.headerImage && !item.imageUrl) {
+            item.headerImage = fallbackPng;
+            item.imageUrl = fallbackPng;
+        } else {
+             // headerImage var ama imageUrl yoksa eşitle
+             if(!item.imageUrl) item.imageUrl = item.headerImage;
+             if(!item.headerImage) item.headerImage = item.imageUrl;
+        }
+        return item;
+    });
+  }
+
+  // --- RESİM İŞLEME MANTIĞI (TEKİL) ---
+  processSingleImage(item: any): any {
+      if (!item) return null;
+      
+      const imageId = item.categoryId || item.parentCategoryId;
+      const fallbackPng = `assets/images/defaults/category${imageId}.png`;
+
+      if (!item.headerImage && !item.imageUrl) {
+          item.headerImage = fallbackPng;
+          item.imageUrl = fallbackPng;
+      }
+      return item;
+  }
+
+  // --- RESİM HATA YÖNETİMİ (KESİN KURAL) ---
+  // Hata durumunda SADECE category{id}.png yoluna git.
+  handleMissingImage(event: Event, item: any) {
+      const target = event.target as HTMLImageElement;
+      const imageId = item.categoryId || item.parentCategoryId;
+      
+      // Hedef yol:
+      const categoryPng = `assets/images/defaults/category${imageId}.png`;
+
+      // Eğer mevcut kaynak zaten bu PNG ise ve yine hata verdiyse DUR (Sonsuz döngü engelleme)
+      if (target.src.includes(`category${imageId}.png`)) {
+          return;
+      }
+
+      // Kırık linki kategori PNG'si ile değiştir
+      target.src = categoryPng;
   }
 }

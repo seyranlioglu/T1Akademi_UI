@@ -1,104 +1,105 @@
-// Geçiş Efektleri
-.transition-all {
-    transition: all 0.3s ease;
-}
-
-// Sidebar Stilleri (SAĞ TARAFTA)
-.filter-sidebar {
-    position: fixed;
-    top: 100px; // Navbar yüksekliğine göre ayarla
-    right: -300px; // Başlangıçta gizli (Sağdan dışarıda) - Genişlikten biraz fazla verdim
-    width: 300px;  // Genişliği biraz artırdım rahat sığsın diye
-    height: calc(100vh - 100px);
-    z-index: 1040;
-    transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    
-    // Açıkken sağa yapışsın
-    &.open {
-        right: 0; 
-    }
-
-    // Scrollbar özelleştirme
-    &::-webkit-scrollbar { width: 5px; }
-    &::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
-}
-
-// --- YAN TAB (KULAKÇIK) STİLİ ---
-.filter-tab {
-    position: absolute;
-    top: 80px; // Yukarıdan mesafe
-    left: -42px; // Sidebar'ın soluna taşır (Genişliği 42px olduğu için)
-    width: 42px;
-    height: 140px; // Tab yüksekliği
-    background-color: var(--primaryColor, #5624d0); // Tema rengi (Mor)
-    color: #fff;
-    cursor: pointer;
-    border-radius: 8px 0 0 8px; // Sadece sol köşeleri yuvarla
-    writing-mode: vertical-rl; // Yazıyı dikey çevir (Sağdan sola)
-    text-orientation: mixed;
-    transform: rotate(180deg); // Yazının yönünü aşağıdan yukarıya düzelt
-    font-weight: 600;
-    letter-spacing: 2px;
-    font-size: 14px;
-    box-shadow: -2px 2px 5px rgba(0,0,0,0.1); // Gölge solda olsun
-    transition: background-color 0.2s;
-
-    &:hover {
-        background-color: darken(#5624d0, 10%);
-    }
-
-    span {
-        display: block;
-        padding: 10px 0;
-    }
-}
-
-// Kart Stilleri
-.course-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-    border-radius: 12px;
-    overflow: hidden;
-    
-    img {
-        height: 100%;
-        min-height: 200px;
-    }
-
-    &.hover-elevate:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
-        border-color: #5624d0 !important; // Hover'da mor border
-        
-        .card-title a {
-            color: #5624d0 !important;
-        }
-    }
-}
-
-// Metin Kısaltma
-.clamp-2 {
+// --- GENEL YARDIMCILAR ---
+.transition-all { transition: all 0.3s ease; }
+.cursor-pointer { cursor: pointer; }
+.text-truncate-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    line-height: 1.3;
+}
+.object-fit-cover { object-fit: cover; }
+
+// --- SIDEBAR & TAB ---
+.filter-sidebar {
+    position: fixed;
+    top: 100px;
+    right: -300px;
+    width: 300px;
+    height: calc(100vh - 100px);
+    z-index: 1040;
+    transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    background-color: #fff;
+    &.open { right: 0; }
+    &::-webkit-scrollbar { width: 5px; }
+    &::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 }
 
-// Seçili Rating Stili
-.bg-light-primary {
-    background-color: rgba(86, 36, 208, 0.1); 
-}
-
-.cursor-pointer {
+.filter-tab {
+    position: absolute;
+    top: 80px;
+    left: -42px;
+    width: 42px;
+    height: 140px;
+    background-color: var(--primaryColor, #5624d0);
+    color: #fff;
     cursor: pointer;
+    border-radius: 8px 0 0 8px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-weight: 600;
+    letter-spacing: 2px;
+    font-size: 14px;
+    box-shadow: -2px 2px 5px rgba(0,0,0,0.1);
+    transition: background-color 0.2s;
+    &:hover { background-color: darken(#5624d0, 10%); }
+    span { display: block; padding: 10px 0; }
 }
 
-// Scrollbar İyileştirme
+// --- KART STİLLERİ ---
+.course-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #fff;
+    min-height: 140px; 
+    
+    img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+        @media (max-width: 768px) { max-height: 200px; }
+    }
+
+    &.hover-elevate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.06) !important;
+        border-color: var(--primaryColor, #5624d0) !important;
+        .card-title a { color: var(--primaryColor, #5624d0) !important; }
+    }
+}
+
+// --- BUTONLAR ---
+.btn-icon {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; border: 1px solid transparent;
+    &:hover { background-color: #f8f9fa; border-color: #e9ecef; }
+}
+.hover-danger:hover { color: #dc3545 !important; background-color: rgba(220, 53, 69, 0.1) !important; }
+.btn-xs { padding: 0.25rem 0.5rem; font-size: 0.75rem; line-height: 1.5; }
+
+// --- FİLTRE & MOBİL UYUM ---
+.bg-light-primary { background-color: rgba(86, 36, 208, 0.1); }
+
+.filter-header-row {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 1rem; flex-wrap: nowrap;
+    @media (max-width: 576px) { gap: 0.5rem; }
+}
+
+.search-box-wrapper {
+    width: 250px; position: relative; transition: all 0.3s ease;
+    @media (max-width: 768px) { width: 180px; }
+    @media (max-width: 576px) { width: 100%; min-width: 120px; }
+}
+
+.total-records-text {
+    @media (max-width: 576px) { display: none; }
+}
+
 .custom-scrollbar {
-    &::-webkit-scrollbar {
-        width: 4px;
-    }
-    &::-webkit-scrollbar-thumb {
-        background-color: #ddd;
-        border-radius: 4px;
-    }
+    &::-webkit-scrollbar { height: 4px; width: 4px; }
+    &::-webkit-scrollbar-thumb { background-color: #ddd; border-radius: 4px; }
 }

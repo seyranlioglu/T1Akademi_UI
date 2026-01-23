@@ -1,4 +1,6 @@
-.overview-container { background-color: transparent; }
+.overview-container { 
+    background-color: transparent; 
+}
 
 .stat-card {
     transition: transform 0.3s ease;
@@ -11,6 +13,7 @@
     }
 }
 
+// Renk Sınıfları
 .bg-primary-light { background-color: rgba(255, 25, 73, 0.1); }
 .bg-success-light { background-color: rgba(25, 135, 84, 0.1); }
 .bg-warning-light { background-color: rgba(255, 193, 7, 0.1); }
@@ -20,29 +23,35 @@
 // Animasyon
 .animate__animated { --animate-duration: 0.5s; }
 
-// --- YENİ EKLENEN: Owl Carousel Ok Stilleri ---
+// Owl Carousel Ok Stilleri
 ::ng-deep .owl-carousel {
     .owl-nav {
         position: absolute;
-        top: -50px; // Başlığın yanına taşıma veya kartın ortasına alma tercihi
+        top: -60px; 
         right: 0;
         
         .owl-prev, .owl-next {
-            background-color: #f8f9fa !important;
+            background-color: #fff !important;
             color: #1c1d1f !important;
             border: 1px solid #d1d7dc !important;
             border-radius: 50% !important;
-            width: 32px;
-            height: 32px;
-            line-height: 32px !important;
+            width: 36px;
+            height: 36px;
+            line-height: 36px !important;
             margin: 0 4px;
-            font-size: 18px !important;
+            font-size: 20px !important;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 
             &:hover {
                 background-color: #1c1d1f !important;
                 color: #fff !important;
                 border-color: #1c1d1f !important;
+            }
+            
+            &.disabled {
+                opacity: 0.5;
+                cursor: default;
             }
         }
     }

@@ -51,6 +51,8 @@ export class NavbarComponent implements OnInit {
   ngOnInit(): void {
     // 1. KULLANICI KONTROLÜ VE VERİSİ
     const userJson = localStorage.getItem('currentUser');
+
+    console.log('Navbar kullanıcı verisi:', userJson);
     if (userJson) {
         this.isLoggedIn = true;
         try {
@@ -121,6 +123,7 @@ export class NavbarComponent implements OnInit {
   // --- KULLANICI VERİSİNİ İŞLEME ---
   processUserData(user: any) {
       // 1. İSİM SOYİSİM (Logdaki veri yapısına göre)
+      console.log(user);
       if (user.name && user.surName) {
           this.userName = `${user.name} ${user.surName}`;
       } else {

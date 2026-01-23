@@ -129,6 +129,13 @@ export class LoginPageComponent implements OnInit, OnDestroy {
       next: (res: any) => {
         this.authService.isLoadingSubject.next(false);
         if (res.header.result) {
+          if (res.body) {
+              // 1. LocalStorage'a kaydet
+              localStorage.setItem('currentUser', JSON.stringify(res.body));
+              
+              // 2. AuthService'i güncelle (Uygulamanın geri kalanı haberdar olsun)
+              this.authService.currentUserSubject.next(res.body);
+          }
           if (rememberMeValue) localStorage.setItem('rememberedUser', this.loginForm.get('emailOrPhone')?.value);
           else localStorage.removeItem('rememberedUser');
           this.toastr.success("Giriş Başarılı!");

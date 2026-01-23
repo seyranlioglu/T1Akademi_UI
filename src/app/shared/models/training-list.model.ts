@@ -36,6 +36,8 @@ export interface TrainingListItem {
     createdDate: Date;
     isPrivate: boolean;
     isActive: boolean;
+    categoryId?: number;
+    parentCategoryId?: number;
 }
 
 export interface SearchTrainingRequest {

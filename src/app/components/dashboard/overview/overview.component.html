@@ -89,7 +89,9 @@
                                     <tr *ngFor="let item of assignedTrainings">
                                         <td class="ps-4">
                                             <div class="d-flex align-items-center">
-                                                <img [src]="item.imageUrl || 'assets/images/courses/course1.jpg'" class="rounded me-3" width="40" height="40" style="object-fit: cover;">
+                                                <img [src]="item.imageUrl || item.headerImage" 
+                                                     (error)="handleMissingImage($event, item)"
+                                                     class="rounded me-3" width="40" height="40" style="object-fit: cover;">
                                                 <span class="fw-bold small">{{item.title}}</span>
                                             </div>
                                         </td>
@@ -100,7 +102,7 @@
                                             <span *ngIf="item.accessStatus === 'Expired'" class="badge bg-danger-light text-danger">Süresi Doldu</span>
                                         </td>
                                         <td class="text-end pe-4">
-                                            <button *ngIf="item.accessStatus !== 'Expired'" class="btn btn-outline-dark btn-sm" [routerLink]="['/course', item.id]">Detay</button>
+                                            <button *ngIf="item.accessStatus !== 'Expired'" class="btn btn-outline-dark btn-sm" [routerLink]="['/course-details', item.id]">Detay</button>
                                             <button *ngIf="item.accessStatus === 'Expired'" class="btn btn-danger btn-sm shadow-sm">
                                                 <i class='bx bx-time-five me-1'></i> Süre Uzat
                                             </button>
@@ -166,9 +168,9 @@
             <div class="card border-0 shadow-sm bg-white">
                 <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
                     <h5 class="fw-bold m-0"><i class='bx bx-star text-primary me-2'></i>Senin İçin Önerilenler</h5>
-                    <a routerLink="/courses-grid" class="text-primary small text-decoration-none">Tümünü Gör</a>
+                    <a routerLink="/dashboard/active-courses" class="text-primary small text-decoration-none">Tümünü Gör</a>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body p-4 position-relative">
                     
                     <div *ngIf="recommendedTrainings.length > 0; else noData">
                         <owl-carousel-o [options]="customOptions">
@@ -190,4 +192,5 @@
             </div>
         </div>
     </div>
-    </div>
+    
+</div>

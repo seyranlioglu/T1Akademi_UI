@@ -1,6 +1,9 @@
 <div class="course-card" [routerLink]="['/course-details', training.id]">
     <div class="card-image">
-        <img [src]="training.headerImage || 'assets/images/courses/course1.jpg'" [alt]="training.title">
+        <img [src]="training.headerImage || training.imageUrl || getFallbackImage()" 
+             (error)="handleMissingImage($event)"
+             [alt]="training.title">
+        
         <span *ngIf="training.discountRate > 0" class="badge-discount">
             %{{ training.discountRate }} İndirim
         </span>
@@ -8,8 +11,8 @@
 
     <div class="card-content">
         <div class="meta-tags">
-            <span class="category">{{ training.categoryTitle }}</span>
-            <span class="level dot-separator">{{ training.trainingLevelTitle }}</span>
+            <span class="category">{{ training.categoryTitle || training.categoryName }}</span>
+            <span class="level dot-separator">{{ training.trainingLevelTitle || training.levelName }}</span>
         </div>
 
         <h3 class="title" [title]="training.title">
@@ -17,7 +20,7 @@
         </h3>
 
         <div class="instructor">
-            <span class="name">{{ training.instructorTitle }}</span>
+            <span class="name">{{ training.instructorTitle || training.instructorName }}</span>
         </div>
 
         <div class="rating-box">
