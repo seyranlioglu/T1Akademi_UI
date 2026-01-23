@@ -1,132 +1,171 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
 .course-card {
     display: flex;
     flex-direction: column;
     background: #fff;
-    border: 1px solid #d1d7dc; /* Udemy gri border */
-    border-radius: 0; /* Udemy kartları genelde köşeli veya çok az radiusludur */
-    overflow: hidden;
-    cursor: pointer;
-    transition: box-shadow 0.2s ease;
-    height: 100%; /* Slider içinde eşit boyda durması için */
-    min-height: 320px;
+    // Kartın kendisine iç boşluk veriyoruz (Resim kenara yapışmayacak)
+    padding: 12px; 
+    border-radius: 16px; // Kart köşeleri daha yumuşak
+    border: 1px solid #f0f0f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    height: 100%;
+    text-decoration: none;
+    position: relative;
+    gap: 12px; // Resim ile içerik arasındaki boşluk
 
     &:hover {
-        box-shadow: 0 2px 8px 2px rgba(20, 23, 28, .15);
-        
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        border-color: transparent;
+
         .card-image img {
-            opacity: 0.9;
-            transform: scale(1.05);
+            transform: scale(1.08); // Hover'da hafif zoom
+        }
+        
+        .title {
+            color: var(--primaryColor, #5624d0);
         }
     }
 
+    // --- RESİM ALANI (ARTIK BAĞIMSIZ BİR KUTU) ---
     .card-image {
         position: relative;
-        height: 150px;
-        overflow: hidden;
-        
+        width: 100%;
+        // Sinema oranı (En garanti oran)
+        aspect-ratio: 16 / 9; 
+        border-radius: 10px; // Resmin kendi köşeleri yuvarlatıldı
+        overflow: hidden; // Resim taşmasın
+        background-color: #f8f9fa;
+        flex-shrink: 0; // Resim asla ezilmesin
+
         img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
+            object-fit: cover; // Kutuyu doldur
+            object-position: center;
+            display: block;
+            transition: transform 0.5s ease;
         }
 
+        // İndirim Rozeti (Konumu güncellendi)
         .badge-discount {
             position: absolute;
-            bottom: 8px;
-            right: 8px;
-            background-color: #ec5252;
+            top: 8px;
+            left: 8px;
+            background-color: rgba(220, 53, 69, 0.95); // Hafif transparan
+            backdrop-filter: blur(4px);
             color: #fff;
-            padding: 2px 6px;
-            font-size: 12px;
+            font-size: 0.65rem;
             font-weight: 700;
-            border-radius: 2px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            z-index: 2;
         }
     }
 
+    // --- İÇERİK ALANI ---
     .card-content {
-        padding: 12px;
+        // Padding'i kaldırdık çünkü kartın genel padding'i var
+        padding: 0; 
         display: flex;
         flex-direction: column;
         flex-grow: 1;
 
+        .meta-tags {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.7rem;
+
+            .category {
+                color: var(--primaryColor, #5624d0);
+                font-weight: 700;
+                font-size: 0.65rem;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .level { color: #999; font-weight: 500; }
+        }
+
         .title {
-            font-size: 15px;
+            font-size: 0.95rem;
             font-weight: 700;
-            color: #1c1d1f;
-            margin: 8px 0;
+            color: #2d2f31;
+            margin-bottom: 6px;
             line-height: 1.4;
-            
-            /* 2 satırdan sonrasını ... ile kes (Line Clamp) */
+            // 2 satır sınırı
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-        }
-
-        .meta-tags {
-            font-size: 11px;
-            color: #6a6f73;
-            margin-bottom: 4px;
-            
-            .category { font-weight: 600; color: #5624d0; } /* Udemy moru */
-            .dot-separator::before { content: "•"; margin: 0 4px; }
+            height: 2.8em; 
         }
 
         .instructor {
-            font-size: 12px;
-            color: #6a6f73;
-            margin-bottom: 8px;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-
-        .rating-box {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-bottom: auto; // Aradaki boşluğu doldur
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
-
-            .rating-number {
-                font-weight: 700;
-                color: #b4690e;
-                font-size: 14px;
-                margin-right: 4px;
-            }
-
-            .stars {
-                i { color: #e59819; font-size: 12px; margin-right: 1px; }
-                i.bx-star { color: #d1d7dc; } /* Boş yıldız rengi */
-            }
-
-            .review-count {
-                font-size: 12px;
-                color: #6a6f73;
-                margin-left: 4px;
-            }
+            gap: 4px;
+            
+            i { font-size: 0.9rem; }
         }
 
-        .price-box {
-            margin-top: auto; /* En alta yapıştır */
+        // Alt Bar: Puan ve Fiyat
+        .footer-box {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed #eee; // İnce kesikli çizgi
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
 
-            .current-price {
-                font-size: 18px;
-                font-weight: 800;
-                color: #1c1d1f;
+            .rating-box {
+                display: flex;
+                align-items: center;
+                
+                .rating-number {
+                    font-weight: 700;
+                    color: #b4690e;
+                    font-size: 0.8rem;
+                    margin-right: 3px;
+                }
+                .stars i { 
+                    color: #e59819; 
+                    font-size: 0.8rem; 
+                }
             }
 
-            .original-price {
-                font-size: 14px;
-                color: #6a6f73;
-                text-decoration: line-through;
-            }
+            .price-box {
+                text-align: right;
+                line-height: 1;
 
-            .free-badge {
-                font-weight: 700;
-                color: #198754;
+                .current-price {
+                    display: block;
+                    font-size: 1rem;
+                    font-weight: 800;
+                    color: #212529;
+                }
+                
+                .original-price {
+                    font-size: 0.75rem;
+                    color: #adb5bd;
+                    text-decoration: line-through;
+                }
+
+                .free-badge {
+                    font-size: 0.9rem;
+                    font-weight: 700;
+                    color: #198754;
+                }
             }
         }
     }

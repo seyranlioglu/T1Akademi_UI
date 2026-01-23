@@ -23,7 +23,7 @@ export class OverviewComponent implements OnInit {
   today = new Date();
   loading = true;
 
-  // Owl Carousel (Slider) Ayarları
+// Owl Carousel (Slider) Ayarları
   customOptions: OwlOptions = {
     loop: false, 
     mouseDrag: true,
@@ -33,12 +33,14 @@ export class OverviewComponent implements OnInit {
     navSpeed: 700,
     navText: ['<i class="bx bx-chevron-left"></i>', '<i class="bx bx-chevron-right"></i>'],
     nav: true,
-    margin: 15,
+    margin: 20, // Kartlar birbirine yapışmasın diye boşluğu biraz artırdım (15 -> 20)
     responsive: {
-      0: { items: 1 },
-      576: { items: 2 },
-      768: { items: 3 },
-      1200: { items: 4 }
+      0: { items: 1 },       // Mobilde 1 tane (Tam genişlik)
+      480: { items: 2 },     // Küçük telefonda 2 tane
+      768: { items: 3 },     // Tablette 3 tane
+      992: { items: 4 },     // Küçük laptopta 4 tane
+      1200: { items: 5 },    // Büyük ekranda 5 TANE (Kartlar daralır)
+      1400: { items: 6 }     // Çok büyük ekranda 6 TANE (Daha da daralır)
     }
   };
 
@@ -81,7 +83,7 @@ export class OverviewComponent implements OnInit {
   // --- RESİM İŞLEME MANTIĞI (LİSTE) ---
   processImages(list: any[]): any[] {
     return list.map(item => {
-        const imageId = item.categoryId || item.parentCategoryId;
+        const imageId =item.parentCategoryId || item.categoryId;
         const fallbackPng = `assets/images/defaults/category${imageId}.png`;
 
         // Eğer veride resim yoksa, direkt kategori PNG'sini ata
