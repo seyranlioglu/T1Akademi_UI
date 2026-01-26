@@ -12,7 +12,7 @@ import { CartService } from 'src/app/shared/services/cart.service';
 export class CourseDetailsPageComponent implements OnInit {
 
     trainingId: number = 0;
-    training: any = null; 
+    training: any = null;
     isLoading = true;
     currentTab = 'tab1';
 
@@ -36,34 +36,27 @@ export class CourseDetailsPageComponent implements OnInit {
             if (params['id']) {
                 this.trainingId = +params['id'];
                 this.loadTrainingDetail();
-            } else {
-                this.router.navigate(['/']);
             }
         });
     }
 
     loadTrainingDetail() {
         this.isLoading = true;
-        
-        // TEK ÇAĞRI: Sadece eğitim detayı. Başka hiçbir servis yok.
         this.trainingService.getTrainingPublicDetail(this.trainingId).subscribe({
             next: (res: any) => {
                 this.training = res.data || res.body || res;
                 this.isLoading = false;
 
-                // Video URL güvenliği
                 if (this.training?.previewVideoPath) {
                     this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.training.previewVideoPath);
                 }
             },
             error: (err) => {
-                console.error("Eğitim detayı alınamadı", err);
+                console.error("Eğitim detayı çekilemedi", err);
                 this.isLoading = false;
             }
         });
     }
-
-    // --- UI İŞLEMLERİ ---
 
     switchTab(event: MouseEvent, tab: string) {
         event.preventDefault();
@@ -96,8 +89,8 @@ export class CourseDetailsPageComponent implements OnInit {
         if (!this.training) return;
         this.cartService.addToCart(this.training.id, 1).subscribe({
             next: (res) => {
-                // Buraya bildirim eklenebilir
-                console.log("Sepete eklendi");
+                // Buraya Toast mesajı ekleyebilirsin
+                console.log("Sepete eklendi!"); 
             },
             error: (err) => console.error(err)
         });

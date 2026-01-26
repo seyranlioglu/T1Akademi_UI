@@ -10,11 +10,10 @@ import { AuthGuard } from './shared/guards/auth.guard';
 import { IdValidatorGuard } from './shared/guards/id-validator.guard';
 import { InstructorGuard } from './shared/guards/instructor.guard';
 
-// Components
+// Components (Auth & Common)
 import { NotFoundComponent } from './components/common/not-found/not-found.component';
 import { LoginPageComponent } from './components/pages/login-page/login-page.component';
 import { RegisterPageComponent } from './components/pages/register-page/register-page.component';
-import { ForgotPasswordPageComponent } from './components/pages/forgot-password-page/forgot-password-page.component';
 import { ResetPasswordPageComponent } from './components/pages/reset-password-page/reset-password-page.component';
 import { VerifyComponent } from './components/pages/verify/verify.component';
 
@@ -30,19 +29,17 @@ import { ReviewsComponent } from './components/dashboard/reviews/reviews.compone
 import { CompletedCoursesComponent } from './components/dashboard/completed-courses/completed-courses.component';
 import { CartComponent } from './components/dashboard/cart/cart.component';
 import { CourseDetailsPageComponent } from './components/pages/course-details-page/course-details-page.component';
-import { CourseComponent } from './components/pages/course/course.component';
+import { CourseComponent } from './components/pages/course/course.component'; // Player Component
 import { OverviewComponent } from './components/dashboard/overview/overview.component';
-import { CompanyEmployeesComponent } from './components/dashboard/company-employees/company-employees.component'; // EKLENDİ
+import { CompanyEmployeesComponent } from './components/dashboard/company-employees/company-employees.component';
 
-// Instructor
-import { InstructorComponent } from './components/pages/instructor/instructor.component';
+// Instructor Components
 import { CoursesComponent } from './components/pages/instructor/courses/courses.component';
 import { CourseManageComponent } from './components/pages/instructor/course-manage/course-manage.component';
 import { CurriculumComponent } from './components/pages/instructor/course-manage/curriculum/curriculum.component';
 import { WhatYouWillLearnComponent } from './components/pages/instructor/course-manage/what-you-will-learn/what-you-will-learn.component';
 import { CourseLandingComponent } from './components/pages/instructor/course-manage/course-landing/course-landing.component';
 import { CoursePricingComponent } from './components/pages/instructor/course-manage/course-pricing/course-pricing.component';
-
 
 const routes: Routes = [
 
@@ -68,7 +65,7 @@ const routes: Routes = [
         ]
     },
 
-    // 3. EĞİTİM YÖNETİMİ (BAĞIMSIZ - ÖZEL MENÜSÜ VAR)
+    // 3. EĞİTİM YÖNETİMİ (EĞİTMEN PANELİ - BAĞIMSIZ)
     {
         path: 'instructor/course-manage/:id',
         component: CourseManageComponent,
@@ -82,7 +79,7 @@ const routes: Routes = [
         ]
     },
 
-    // 4. ANA PLATFORM (NAVBAR VE SİDEBAR VAR)
+    // 4. ANA PLATFORM (NAVBAR VE SIDEBAR VAR)
     {
         path: '',
         component: MainLayoutComponent,
@@ -106,18 +103,12 @@ const routes: Routes = [
                     { path: 'reviews', component: ReviewsComponent },
                     { path: 'completed-courses', component: CompletedCoursesComponent },
                     { path: 'cart', component: CartComponent },
+                    { path: 'course-details/:id', component: CourseDetailsPageComponent, canActivate: [IdValidatorGuard] },
                 ]
             },
 
-            // Kurs Listeleme ve Detay
-            { path: 'courses', component: CourseDetailsPageComponent }, 
-            { path: 'course/:id', component: CourseDetailsPageComponent, canActivate: [IdValidatorGuard] },
-
             // --- KURUMSAL PANEL ---
-            { 
-                path: 'company/employees', 
-                component: CompanyEmployeesComponent // ARTIK DOĞRU KOMPONENT
-            }, 
+            { path: 'company/employees', component: CompanyEmployeesComponent }, 
             { path: 'company/assign', component: ActiveCoursesComponent },    // Geçici
             { path: 'company/reports', component: ActiveCoursesComponent },   // Geçici
             { path: 'company/requests', component: ActiveCoursesComponent },  // Geçici
