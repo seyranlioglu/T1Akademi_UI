@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { TrainingCard } from 'src/app/shared/models/training-card.model';
+import { TrainingCard } from 'src/app/shared/models/dashboard.model'; 
 
 @Component({
   selector: 'app-course-card',
@@ -7,39 +7,54 @@ import { TrainingCard } from 'src/app/shared/models/training-card.model';
   styleUrls: ['./course-card.component.scss']
 })
 export class CourseCardComponent implements OnInit {
-  // Input olarak gelen veride categoryId veya parentCategoryId olduğunu varsayıyoruz.
-  // Model dosyasında bu alanlar yoksa any olarak işaretleyebilirsin: @Input() training!: any;
-  @Input() training!: any; 
+  
+  @Input() training!: TrainingCard | any; 
 
   constructor() { }
 
   ngOnInit(): void {
   }
 
-  // --- RESİM HATA YÖNETİMİ ---
-  // Resim yüklenemezse (404) devreye girer
-  handleMissingImage(event: Event) {
-    const imgElement = event.target as HTMLImageElement;
-    const fallback = this.getFallbackImage();
+  // --- RESİM MANTIĞI (GÜNCELLENMİŞ HALİ) ---
+  getCardImage(): string {
+      // 1. Backend'den gelen resim kontrolü
+      // "none" değilse ve boş değilse kullan
+      if (this.training.headerImage && 
+          this.training.headerImage.toLowerCase() !== 'none' && 
+          this.training.headerImage.trim() !== '' &&
+          !this.training.headerImage.includes('default.jpg')) {
+          return this.training.headerImage;
+      }
 
-    // Sonsuz döngü koruması: Zaten fallback resmini deniyorsa dur.
-    if (imgElement.src.includes(fallback)) {
-        return;
-    }
+      // imageUrl varsa ve "none" değilse kullan (Yedek alan)
+      if (this.training.imageUrl && 
+          this.training.imageUrl.toLowerCase() !== 'none' && 
+          this.training.imageUrl.trim() !== '' &&
+          !this.training.imageUrl.includes('default.jpg')) {
+          return this.training.imageUrl;
+      }
 
-    imgElement.src = fallback;
+      // 2. Kategori Resmi Mantığı (Parent Öncelikli)
+      const id = (this.training.parentCategoryId && this.training.parentCategoryId > 0)
+                 ? this.training.parentCategoryId
+                 : this.training.categoryId;
+
+      // ID varsa category{id}.png döndür
+      if (id && id > 0) {
+          return `assets/images/defaults/category${id}.png`;
+      }
+
+      // 3. Hiçbiri yoksa Default
+      return 'assets/images/defaults/default.jpg';
   }
 
-  // --- KATEGORİ BAZLI YEDEK RESİM ---
-  getFallbackImage(): string {
-    // Verideki kategori ID'sine bak
-    const id = this.training.categoryId || this.training.parentCategoryId;
+  handleMissingImage(event: Event) {
+    const imgElement = event.target as HTMLImageElement;
     
-    // ID varsa kategori png'sini döndür, yoksa genel default
-    if (id) {
-        return `assets/images/defaults/category${id}.png`;
-    }
+    // Sonsuz döngü koruması
+    if (imgElement.src.includes('default.jpg')) return;
     
-    return  `assets/images/defaults/category${id}.png`; // Hiçbiri yoksa son çare
+    // Kategori resmi de yoksa default.jpg
+    imgElement.src = 'assets/images/defaults/default.jpg';
   }
 }

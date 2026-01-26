@@ -1,12 +1,99 @@
-<div class="overview-area pb-75">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-6 col-md-12" *ngFor="let content of overviewBox;">
-                <div class="overview-item" style="background-image: url({{content.bgImage}});">
-                    <span class="sub-title">{{content.subTitle}}</span>
-                    <h3>{{content.title}}</h3>
-                    <a routerLink="{{content.buttonLink}}" class="default-btn">{{content.buttonText}}</a>
+<div class="main-banner-area mb-4" *ngIf="continueData">
+    <div class="container-fluid">
+        <div class="row align-items-center bg-white p-4 rounded shadow-sm border mx-0">
+            <div class="col-lg-6 mb-3 mb-lg-0">
+                <span class="badge bg-light text-primary mb-2">Son İzlenen</span>
+                <h2 class="fw-bold mb-3">{{ continueData.title }}</h2>
+                <p class="text-muted mb-4">
+                    Kaldığınız Yer: <strong>{{ continueData.lastLessonName }}</strong>
+                </p>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <a [routerLink]="['/course-details', continueData.trainingId]" class="btn btn-primary px-4">
+                        <i class='bx bx-play-circle me-1'></i> Eğitime Devam Et
+                    </a>
+                    <div class="d-flex flex-column flex-grow-1" style="max-width: 200px;">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>İlerleme</span>
+                            <span class="fw-bold">%{{ continueData.progress }}</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 [style.width.%]="continueData.progress"></div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <img [src]="continueData.imageUrl" class="img-fluid rounded shadow-sm" 
+                     style="max-height: 250px; object-fit: cover;" alt="Hero Image">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="overview-area mb-4" *ngIf="stats">
+    <div class="container-fluid">
+        <div class="row g-3">
+            <div class="col-lg-4 col-md-6">
+                <div class="stats-card bg-primary text-white p-4 rounded shadow-sm h-100 d-flex align-items-center justify-content-between">
+                    <div>
+                        <h3 class="fw-bold mb-0">{{ stats.inProgressTrainingsCount }}</h3>
+                        <span class="opacity-75">Devam Eden Eğitimler</span>
+                    </div>
+                    <i class='bx bx-play-circle fs-1 opacity-50'></i>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="stats-card bg-success text-white p-4 rounded shadow-sm h-100 d-flex align-items-center justify-content-between">
+                    <div>
+                        <h3 class="fw-bold mb-0">{{ stats.completedTrainingsCount }}</h3>
+                        <span class="opacity-75">Tamamlanan Eğitimler</span>
+                    </div>
+                    <i class='bx bx-check-circle fs-1 opacity-50'></i>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="stats-card bg-warning text-dark p-4 rounded shadow-sm h-100 d-flex align-items-center justify-content-between">
+                    <div>
+                        <h3 class="fw-bold mb-0">{{ stats.totalCertificates }}</h3>
+                        <span class="opacity-75">Kazanılan Sertifikalar</span>
+                    </div>
+                    <i class='bx bx-medal fs-1 opacity-50'></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="courses-area bg-light py-5 mb-4" *ngIf="recommendedTrainings.length > 0">
+    <div class="container-fluid">
+        <div class="section-title mb-4 d-flex align-items-center justify-content-between">
+            <div>
+                <span class="sub-title text-primary fw-bold text-uppercase small">Sizin İçin Seçtik</span>
+                <h2 class="fw-bold mb-0">Önerilen Eğitimler</h2>
+            </div>
+            <a routerLink="/active-courses" class="btn btn-outline-primary btn-sm">Tümünü Gör</a>
+        </div>
+
+        <owl-carousel-o [options]="customOptions">
+            <ng-template carouselSlide *ngFor="let training of recommendedTrainings">
+                <app-course-card [training]="training"></app-course-card>
+            </ng-template>
+        </owl-carousel-o>
+    </div>
+</div>
+
+<div class="my-courses-area mb-5" *ngIf="assignedTrainings.length > 0">
+    <div class="container-fluid">
+        <div class="section-title mb-4">
+            <span class="sub-title text-danger fw-bold text-uppercase small">Öncelikli</span>
+            <h2 class="fw-bold mb-0">Atanan Eğitimlerim</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" *ngFor="let training of assignedTrainings">
+                <app-course-card [training]="training"></app-course-card>
             </div>
         </div>
     </div>

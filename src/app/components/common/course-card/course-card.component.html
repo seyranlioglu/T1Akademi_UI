@@ -1,47 +1,68 @@
-<div class="course-card" [routerLink]="['/course-details', training.id]">
-    <div class="card-image">
-        <img [src]="training.headerImage || training.imageUrl || getFallbackImage()" 
+<div class="course-card h-100" [routerLink]="['/course-details', training.id]">
+    
+    <div class="card-image position-relative">
+        <img [src]="getCardImage()" 
              (error)="handleMissingImage($event)"
-             [alt]="training.title">
+             [alt]="training.title" 
+             class="w-100 h-100 object-fit-cover">
         
-        <span *ngIf="training.discountRate > 0" class="badge-discount">
+        <span *ngIf="training.discountRate > 0" class="badge bg-danger position-absolute top-0 end-0 m-2">
             %{{ training.discountRate }} İndirim
         </span>
+
+        <div class="position-absolute top-0 start-0 m-2 d-flex flex-column gap-1">
+            <span *ngIf="training.isBestseller" class="badge bg-warning text-dark shadow-sm">
+                <i class='bx bxs-badge-check'></i> Çok Satan
+            </span>
+            <span *ngIf="training.isNew" class="badge bg-success shadow-sm">
+                <i class='bx bxs-star'></i> Yeni
+            </span>
+        </div>
     </div>
 
-    <div class="card-content">
-        <div class="meta-tags">
-            <span class="category">{{ training.categoryTitle || training.categoryName }}</span>
-            <span class="level dot-separator">{{ training.trainingLevelTitle || training.levelName }}</span>
-        </div>
-
-        <h3 class="title" [title]="training.title">
-            {{ training.title }}
-        </h3>
-
-        <div class="instructor">
-            <span class="name">{{ training.instructorTitle || training.instructorName }}</span>
-        </div>
-
-        <div class="rating-box">
-            <span class="rating-number">{{ training.rating | number:'1.1-1' }}</span>
-            <div class="stars">
-                <i class="bx bxs-star" *ngFor="let s of [1,2,3,4,5]" 
-                   [ngClass]="{'checked': s <= training.rating, 'bx-star': s > training.rating}"></i>
+    <div class="card-content p-3 d-flex flex-column justify-content-between flex-grow-1">
+        
+        <div>
+            <div class="meta-tags d-flex align-items-center gap-2 mb-2 text-muted small">
+                <span class="category fw-bold text-primary">{{ training.categoryTitle || training.categoryName }}</span>
+                <span class="dot-separator">•</span>
+                <span class="level">{{ training.trainingLevelTitle || training.levelName }}</span>
             </div>
-            <span class="review-count">({{ training.reviewCount }})</span>
+
+            <h3 class="title fw-bold text-dark mb-1 text-truncate-2" [title]="training.title">
+                {{ training.title }}
+            </h3>
+
+            <div class="instructor text-muted small mb-2">
+                <i class='bx bx-user me-1'></i>
+                <span class="name">{{ training.instructorTitle || training.instructorName }}</span>
+            </div>
         </div>
 
-        <div class="price-box">
-            <ng-container *ngIf="training.currentAmount > 0; else freeCourse">
-                <span class="current-price">{{ training.currentAmount | currency:'TRY':'symbol-narrow':'1.2-2' }}</span>
-                <span *ngIf="training.discountRate > 0" class="original-price">
-                    {{ training.amount | currency:'TRY':'symbol-narrow':'1.2-2' }}
-                </span>
-            </ng-container>
-            <ng-template #freeCourse>
-                <span class="free-badge">Ücretsiz</span>
-            </ng-template>
+        <div class="mt-auto pt-2 border-top">
+            
+            <div class="rating-box d-flex align-items-center gap-1 mb-2">
+                <span class="fw-bold text-warning">{{ training.rating | number:'1.1-1' }}</span>
+                <div class="stars d-flex text-warning small">
+                    <i class="bx bxs-star" *ngFor="let s of [1,2,3,4,5]" 
+                       [ngClass]="{'text-muted bx-star': s > (training.rating || 0)}"></i>
+                </div>
+                <span class="text-muted small">({{ training.reviewCount }})</span>
+            </div>
+
+            <div class="price-box d-flex align-items-center gap-2">
+                <ng-container *ngIf="training.currentAmount > 0; else freeCourse">
+                    <span class="current-price fw-bold text-primary fs-5">
+                        {{ training.currentAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}
+                    </span>
+                    <span *ngIf="training.discountRate > 0" class="original-price text-muted text-decoration-line-through small">
+                        {{ training.amount | currency:'TRY':'symbol-narrow':'1.0-0' }}
+                    </span>
+                </ng-container>
+                <ng-template #freeCourse>
+                    <span class="badge bg-success">ÜCRETSİZ</span>
+                </ng-template>
+            </div>
         </div>
     </div>
 </div>

@@ -1,172 +1,220 @@
-.course-card {
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    border-radius: 12px; // Kart köşeleri yuvarlatıldı
-    overflow: hidden; // Resim köşelerden taşmasın
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+// Geçiş Efektleri
+.transition-all {
     transition: all 0.3s ease;
-    height: 100%; // Slider içinde yükseklik eşitlensin
-    border: 1px solid transparent;
+}
+
+// Sidebar Stilleri
+.filter-sidebar {
+    position: fixed;
+    top: 100px; 
+    right: -300px; 
+    width: 300px;
+    height: calc(100vh - 100px);
+    z-index: 1040;
+    transition: right 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    background-color: #fff;
+    
+    &.open {
+        right: 0; 
+        box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+    }
+
+    &::-webkit-scrollbar { width: 5px; }
+    &::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
+}
+
+.filter-tab {
+    position: absolute;
+    top: 80px;
+    left: -42px;
+    width: 42px;
+    height: 140px;
+    background-color: var(--primaryColor, #5624d0);
+    color: #fff;
     cursor: pointer;
-    text-decoration: none; // RouterLink alt çizgisi olmasın
+    border-radius: 8px 0 0 8px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-weight: 600;
+    letter-spacing: 2px;
+    font-size: 14px;
+    box-shadow: -2px 2px 5px rgba(0,0,0,0.1);
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     &:hover {
-        transform: translateY(-4px); // Hafif yukarı kalkma efekti
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        border-color: var(--primaryColor, #5624d0); // Hover'da border rengi
+        background-color: darken(#5624d0, 10%);
+    }
+}
 
-        .title {
-            color: var(--primaryColor, #5624d0);
+// ==========================================================================
+// 1. GRID GÖRÜNÜMÜ ("ÖNERİLENLER" TARZI KART)
+// ==========================================================================
+.course-recommend-card {
+    background: #fff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 16px; 
+    position: relative; 
+    overflow: hidden; 
+    border: 1px solid #eee;
+
+    .card-img-top {
+        border-bottom: 1px solid #f8f9fa;
+        img {
+            border-radius: 16px 16px 0 0;
         }
     }
 
-    // --- RESİM ALANI (DÜZELTİLEN KISIM) ---
-    .card-image {
-        position: relative;
-        width: 100%;
-        height: 180px; // SABİT YÜKSEKLİK (Tasarımına göre değiştirilebilir: 160px - 200px arası iyidir)
-        background-color: #f0f2f5; // Resim yüklenirken gri fon
+    // Hover Durumu
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
 
-        img {
+        .grid-hover-overlay {
+            top: 0; // Aşağı kaydır
+            opacity: 1;
+        }
+    }
+
+    // KAYAN PENCERE (Overlay)
+    .grid-hover-overlay {
+        position: absolute;
+        top: -100%; // Başlangıçta gizli
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.98); 
+        z-index: 10;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 0;
+        border-radius: 16px;
+    }
+}
+
+// ==========================================================================
+// 2. LIST GÖRÜNÜMÜ (TOLEDO TARZI - ORTA OVERLAY & FIXED LAYOUT)
+// ==========================================================================
+.course-list-row {
+    background: #fff;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    overflow: hidden; 
+    border: 1px solid #eee;
+    min-height: 200px; 
+
+    &:hover {
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        border-color: var(--primaryColor, #5624d0) !important;
+        transform: translateY(-2px);
+
+        // Hover olunca orta kolonun içindeki overlay aşağı kaysın
+        .list-middle-col .list-hover-overlay {
+            top: 0; 
+            opacity: 1;
+        }
+    }
+
+    // --- SOL RESİM ALANI (Sabit Genişlik) ---
+    .list-img-wrapper {
+        width: 260px;       
+        min-height: 200px;  
+        position: relative; 
+        flex-shrink: 0;     
+        
+        a { display: block; width: 100%; height: 100%; }
+        img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+
+        @media (max-width: 768px) {
+            width: 100%; height: 180px; min-height: auto;
+            img { position: relative; } 
+        }
+    }
+
+    // --- ORTA KOLON (İçerik + Overlay) ---
+    .list-middle-col {
+        min-width: 0; // Flexbox taşma önleyici (Sıkışmayı çözer)
+        
+        @media (min-width: 768px) {
+            border-right: 1px solid #eee; // Sağ çizgi
+        }
+
+        // Kayan Overlay
+        .list-hover-overlay {
+            position: absolute;
+            top: -100%; // Yukarıda gizli
+            left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover; // KRİTİK SATIR: En boy oranını koruyarak doldur
-            object-position: center; // Resmi merkeze odakla
-            display: block; // Alt boşlukları önle
-        }
-
-        // İndirim Rozeti
-        .badge-discount {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: #dc3545; // Bootstrap danger rengi
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            background-color: rgba(255, 255, 255, 0.98); // Opak beyaz
+            z-index: 10;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); // Grid ile aynı animasyon
+            opacity: 0;
         }
     }
-    // ------------------------------------
 
-    // KART İÇERİĞİ
-    .card-content {
-        padding: 16px;
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1; // İçeriğin alanı doldurmasını sağlar
-
-        // Meta Etiketler (Kategori / Seviye)
-        .meta-tags {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            font-size: 0.75rem;
-            color: #6c757d;
-
-            .category {
-                font-weight: 600;
-                color: var(--primaryColor, #5624d0);
-                background-color: rgba(86, 36, 208, 0.1); // Primary rengin açığı
-                padding: 2px 8px;
-                border-radius: 12px;
-            }
-
-            .dot-separator::before {
-                content: "•";
-                margin-right: 8px;
-                color: #adb5bd;
-            }
+    // --- SAĞ AKSİYON KOLONU (Sabit Genişlik) ---
+    .list-action-col {
+        background-color: #fcfcfc; 
+        
+        @media (min-width: 768px) {
+            width: 190px; // Butonlar rahat sığsın
+            flex-shrink: 0;
         }
 
-        // Başlık
-        .title {
-            font-size: 1rem;
-            font-weight: 700;
-            line-height: 1.4;
-            color: #212529;
-            margin-bottom: 8px;
-            // Başlığı 2 satırla sınırla ve üç nokta koy
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            height: 2.8em; // 2 satır yüksekliği sabitleme
-        }
-
-        // Eğitmen
-        .instructor {
-            font-size: 0.85rem;
-            color: #6c757d;
-            margin-bottom: 12px;
-            display: flex;
+        @media (max-width: 768px) {
+            width: 100%;
+            flex-direction: row; 
+            justify-content: space-between;
             align-items: center;
-            gap: 5px;
-            
-            &::before {
-                content: '\eb99'; // Boxicons user icon kodu (opsiyonel)
-                font-family: 'boxicons';
-            }
-        }
-
-        // Puanlama
-        .rating-box {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            margin-top: auto; // Fiyatın hemen üstüne it
-
-            .rating-number {
-                font-weight: 700;
-                color: #ffc107; // Warning sarısı
-                margin-right: 4px;
-            }
-
-            .stars {
-                color: #ffc107;
-                margin-right: 8px;
-                font-size: 0.9rem;
-                
-                i { margin-right: 1px; }
-                i.bx-star { color: #e4e5e9; } // Boş yıldız rengi
-            }
-
-            .review-count {
-                font-size: 0.8rem;
-                color: #adb5bd;
-            }
-        }
-
-        // Fiyat Alanı
-        .price-box {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding-top: 12px;
-            border-top: 1px solid #e9ecef;
-
-            .current-price {
-                font-size: 1.1rem;
-                font-weight: 800;
-                color: #212529;
-            }
-
-            .original-price {
-                font-size: 0.9rem;
-                color: #adb5bd;
-                text-decoration: line-through;
-            }
-
-            .free-badge {
-                font-size: 1rem;
-                font-weight: 700;
-                color: #198754; // Success yeşili
-            }
+            border-top: 1px solid #eee;
         }
     }
+}
+
+// --- TOAST ---
+.toast-notification {
+    position: fixed;
+    top: 100px; 
+    right: 20px;
+    background-color: #28a745; 
+    color: #fff;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 100000;
+    font-weight: 600;
+    font-size: 14px;
+    transform: translateX(120%); 
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    &.show { transform: translateX(0); }
+    &.error { background-color: #dc3545; }
+    i { font-size: 1.5rem; }
+}
+
+// --- YARDIMCI ---
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.cursor-pointer { cursor: pointer; }
+.hover-text-primary:hover { color: var(--primaryColor, #5624d0) !important; }
+.bg-light-primary { background-color: rgba(86, 36, 208, 0.05); }
+.custom-scrollbar {
+    &::-webkit-scrollbar { width: 4px; }
+    &::-webkit-scrollbar-thumb { background-color: #ddd; border-radius: 4px; }
 }

@@ -1,20 +1,20 @@
 :host {
     display: block;
-    height: 100%;
+    height: 100%; // Slider içinde kartın tam boy kaplaması için
 }
 
 .course-card {
     display: flex;
     flex-direction: column;
     background: #fff;
-    // Kartın kendisine iç boşluk veriyoruz (Resim kenara yapışmayacak)
+    // Kartın kendisine iç boşluk veriyoruz (Resim kenara yapışmayacak, çerçeveli duracak)
     padding: 12px; 
     border-radius: 16px; // Kart köşeleri daha yumuşak
     border: 1px solid #f0f0f0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     height: 100%;
-    text-decoration: none;
+    text-decoration: none; // Link alt çizgisini kaldır
     position: relative;
     gap: 12px; // Resim ile içerik arasındaki boşluk
 
@@ -32,32 +32,32 @@
         }
     }
 
-    // --- RESİM ALANI (ARTIK BAĞIMSIZ BİR KUTU) ---
+    // --- RESİM ALANI (BAĞIMSIZ KUTU) ---
     .card-image {
         position: relative;
         width: 100%;
-        // Sinema oranı (En garanti oran)
+        // Sinema oranı (16:9) - Resim her zaman bu oranda kalır
         aspect-ratio: 16 / 9; 
         border-radius: 10px; // Resmin kendi köşeleri yuvarlatıldı
-        overflow: hidden; // Resim taşmasın
+        overflow: hidden; // Zoom efekti taşmasın
         background-color: #f8f9fa;
         flex-shrink: 0; // Resim asla ezilmesin
 
         img {
             width: 100%;
             height: 100%;
-            object-fit: cover; // Kutuyu doldur
+            object-fit: cover; // Resmi kutuya yayar (keserek doldurur)
             object-position: center;
             display: block;
             transition: transform 0.5s ease;
         }
 
-        // İndirim Rozeti (Konumu güncellendi)
+        // İndirim Rozeti
         .badge-discount {
             position: absolute;
             top: 8px;
             left: 8px;
-            background-color: rgba(220, 53, 69, 0.95); // Hafif transparan
+            background-color: rgba(220, 53, 69, 0.95); // Hafif transparan kırmızı
             backdrop-filter: blur(4px);
             color: #fff;
             font-size: 0.65rem;
@@ -70,8 +70,7 @@
 
     // --- İÇERİK ALANI ---
     .card-content {
-        // Padding'i kaldırdık çünkü kartın genel padding'i var
-        padding: 0; 
+        padding: 0; // Kartın kendi padding'i olduğu için burayı sıfırladık
         display: flex;
         flex-direction: column;
         flex-grow: 1;
@@ -111,7 +110,7 @@
         .instructor {
             font-size: 0.75rem;
             color: #6c757d;
-            margin-bottom: auto; // Aradaki boşluğu doldur
+            margin-bottom: auto; // Altındaki elemanları (fiyat/puan) en alta itmek için
             display: flex;
             align-items: center;
             gap: 4px;
@@ -119,7 +118,7 @@
             i { font-size: 0.9rem; }
         }
 
-        // Alt Bar: Puan ve Fiyat
+        // Alt Bar: Puan ve Fiyat (Footer Box)
         .footer-box {
             margin-top: 12px;
             padding-top: 10px;
@@ -138,9 +137,12 @@
                     font-size: 0.8rem;
                     margin-right: 3px;
                 }
-                .stars i { 
-                    color: #e59819; 
-                    font-size: 0.8rem; 
+                .stars {
+                    display: flex; 
+                    i { 
+                        color: #e59819; 
+                        font-size: 0.8rem; 
+                    }
                 }
             }
 

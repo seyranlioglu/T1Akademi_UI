@@ -4,7 +4,7 @@
         <div class="container-fluid">
              <small class="fw-bold text-dark">
                 Yazılım dünyasına hızlı bir giriş yapın! 
-                <a routerLink="/courses" class="text-primary text-decoration-none">Yeni kursları incele.</a>
+                <a routerLink="/active-courses" class="text-primary text-decoration-none">Yeni kursları incele.</a>
              </small>
         </div>
     </div>
@@ -32,7 +32,7 @@
                         <li *ngIf="categories.length === 0" class="p-3 text-muted small">Yükleniyor...</li>
                         <li *ngFor="let cat of categories" class="dropdown-submenu position-relative">
                             <a class="dropdown-item d-flex justify-content-between align-items-center py-2" 
-                               [routerLink]="['/courses']" [queryParams]="{category: cat.id}">
+                               [routerLink]="['/dashboard/active-courses']" [queryParams]="{categoryIds: cat.id}">
                                 <span>{{ cat.title }}</span>
                                 <i *ngIf="cat.subCategories && cat.subCategories.length > 0" class='bx bx-chevron-right text-muted'></i>
                             </a>
@@ -47,7 +47,7 @@
                     </ul>
                 </div>
 
-<div class="search-box flex-grow-1 mx-2 mx-lg-4 position-relative" style="max-width: 700px;" #searchBoxContainer>
+                <div class="search-box flex-grow-1 mx-2 mx-lg-4 position-relative" style="max-width: 700px;" #searchBoxContainer>
                     <div class="input-group rounded-pill border position-relative overflow-hidden bg-white">
                         
                         <button class="btn btn-link text-muted border-0 ps-3 bg-transparent" type="button" 
@@ -147,7 +147,62 @@
                     </div>
 
                     <a routerLink="/dashboard/wishlist" class="text-dark d-none d-sm-block" title="İstek Listesi"><i class='bx bx-heart fs-4'></i></a>
-                    <a routerLink="/dashboard/cart" class="text-dark position-relative" title="Sepet"><i class='bx bx-cart fs-3'></i></a>
+                    
+                    <div class="dropdown position-relative d-none d-sm-block me-3" 
+                         (mouseenter)="showCartDropdown=true" 
+                         (mouseleave)="showCartDropdown=false">
+                        
+                        <a routerLink="/dashboard/cart" class="text-dark position-relative d-flex align-items-center" 
+                           title="Sepet" id="cartIcon">
+                            <i class='bx bx-cart fs-3'></i>
+                            <span *ngIf="cartData.totalItemCount > 0" 
+                                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                  style="font-size: 10px; border: 2px solid #fff;">
+                                {{ cartData.totalItemCount }}
+                            </span>
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0 mt-0 animate__animated animate__fadeIn"
+                             [class.show]="showCartDropdown"
+                             style="width: 320px; position: absolute; right: 0; z-index: 1060;">
+                            
+                            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+                                <h6 class="m-0 fw-bold">Sepetim ({{ cartData.totalItemCount }})</h6>
+                                <span class="text-primary fw-bold">{{ cartData.totalAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}</span>
+                            </div>
+
+                            <div class="cart-list-wrapper custom-scrollbar" style="max-height: 300px; overflow-y: auto;">
+                                
+                                <div *ngIf="cartData.items.length === 0" class="p-4 text-center text-muted small">
+                                    <i class='bx bx-cart-alt fs-1 mb-2 text-muted opacity-50'></i>
+                                    <p class="mb-0">Sepetiniz boş.</p>
+                                </div>
+
+                                <div *ngFor="let item of cartData.items" class="cart-item p-2 border-bottom d-flex align-items-center hover-bg">
+                                    <img [src]="item.trainingImage !== 'none' ? item.trainingImage : 'assets/images/defaults/default.jpg'" 
+                                         class="rounded me-2 border" style="width: 50px; height: 50px; object-fit: cover;">
+                                    
+                                    <div class="flex-grow-1 overflow-hidden" style="line-height: 1.2;">
+                                        <a [routerLink]="['/course-details', item.trainingId]" class="text-dark fw-bold text-decoration-none text-truncate d-block" style="font-size: 13px;">
+                                            {{ item.trainingTitle }}
+                                        </a>
+                                        <small class="text-muted" style="font-size: 11px;">{{ item.categoryName }}</small>
+                                        <div class="d-flex align-items-center mt-1">
+                                            <span class="text-primary fw-bold small">{{ item.currentAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}</span>
+                                        </div>
+                                    </div>
+
+                                    <button class="btn btn-sm text-danger ms-2" (click)="removeItemFromCart(item.id, $event)" title="Kaldır">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-white" *ngIf="cartData.items.length > 0">
+                                <a routerLink="/dashboard/cart" class="btn btn-primary w-100 fw-bold btn-sm">Sepete Git</a>
+                            </div>
+                        </div>
+                    </div>
                     
                     <div class="dropdown position-relative profile-menu-wrapper" (mouseenter)="isProfileMenuOpen=true" (mouseleave)="isProfileMenuOpen=false">
                         <a href="javascript:void(0)" class="d-flex align-items-center text-decoration-none" (click)="toggleProfileMenu()">

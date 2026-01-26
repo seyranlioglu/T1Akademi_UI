@@ -38,6 +38,14 @@ export interface TrainingListItem {
     isActive: boolean;
     categoryId?: number;
     parentCategoryId?: number;
+    priceTierId: number;
+
+    // --- EKLENEN YENİ ALANLAR (UI ve Logic İçin) ---
+    whatYouWillLearn?: string[]; // Hoverda çıkacak liste
+    isBestseller?: boolean;      // Rozet
+    isNew?: boolean;             // Rozet
+    isFavorite?: boolean;        // Kalp durumu
+    isAssigned?: boolean;        // Satın alındı mı?
 }
 
 export interface SearchTrainingRequest {
@@ -48,10 +56,11 @@ export interface SearchTrainingRequest {
     categoryIds?: number[];
     levelIds?: number[];
     languageIds?: number[];
-    instructorIds?: number[]; // Bunu da ekleyelim (Opsiyonel backend desteklerse)
+    instructorIds?: number[]; 
     minRating?: number;
     
     onlyPrivate: boolean;
+    sortBy?: string;
 }
 
 export interface PagedList<T> {
@@ -62,4 +71,11 @@ export interface PagedList<T> {
     totalPages: number;
     hasPreviousPage: boolean;
     hasNextPage: boolean;
+}
+
+// Yorum Ekleme Modeli (Yeni)
+export interface AddReviewDto {
+    trainingId: number;
+    rating: number;
+    comment: string;
 }

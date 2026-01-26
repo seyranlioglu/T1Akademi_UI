@@ -39,7 +39,6 @@ export class SidebarComponent implements OnInit {
     this.menuService.getMyMenu().subscribe({
       next: (menuData) => {
         this.userMenuItems = menuData;
-        console.log("Menü Başarıyla Yüklendi:", this.userMenuItems);
       },
       error: (err) => {
         console.error("Menü yüklenirken hata oluştu:", err);

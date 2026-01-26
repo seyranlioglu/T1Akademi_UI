@@ -1,40 +1,75 @@
-export interface DashboardStatsDto {
+export interface DashboardStats {
     completedTrainingsCount: number;
     inProgressTrainingsCount: number;
     totalCertificates: number;
 }
 
-export interface ContinueTrainingDto {
+export interface ContinueTraining {
     trainingId: number;
     title: string;
-    imageUrl: string;
+    imageUrl: string; // Backend'den gelen HeaderImage buraya map edilebilir veya helper metodla yönetilir
     progress: number;
     lastLessonName: string;
+    categoryId: number; // YENİ: Routing için gerekli
 }
 
-export interface TrainingCardDto {
+// Backend'deki TrainingCardDto ve TrainingViewCardDto ile uyumlu hale getirildi
+export interface TrainingCard {
     id: number;
     title: string;
-    description: string;
-    imageUrl: string;
+    description?: string;
+    
+    // Backend "HeaderImage" gönderiyor. Eğer mapping yapmazsak bu isimle karşılamalıyız.
+    // Ama senin kodunda imageUrl yaygınsa, serviste maplemek gerekir. 
+    // Şimdilik standart olması için headerImage ekliyorum.
+    headerImage: string; 
+    
+    // Alternatif (Eski kodlar bozulmasın diye tutabilirsin ama backend'den veri gelmez)
+    imageUrl?: string; 
+
+    // Kategori & Eğitmen
+    categoryId: number;
+    parentCategoryId: number;
+    categoryTitle: string;
     instructorName: string;
+    instructorPicturePath?: string;
+
+    // Meta Veriler
+    rating?: number;
+    reviewCount: number;
+    totalDurationMinutes: number;
+    lessonCount: number;
+    trainingLevelTitle?: string;
+
+    // Fiyat
+    amount?: number;
+    currentAmount?: number;
+    discountRate?: number;
+
+    // Durumlar & Rozetler
     isAssigned: boolean;
-    rating: number;
-    // Takvim ve Durum Alanları
+    isFavorite: boolean;
+    isBestseller: boolean;
+    isNew: boolean;
+    
+    // Takvim ve Durum
     accessStatus?: string; // 'Active', 'NotStarted', 'Expired'
     startDate?: Date;
     dueDate?: Date;
     assignDate?: Date;
     isCompleted?: boolean;
+    progress: number;
+    createdDate: string;
+
+    // Hover Popover
+    whatYouWillLearn: string[];
 }
 
-// Backend'deki UserCertificateDto ile birebir uyumlu
 export interface UserCertificateDto {
-    certificateId: string;      // Guid
-    templateTitle: string;      // Gold, Silver vb.
+    certificateId: string;
+    templateTitle: string;
     trainingName: string;
-    
-    certificateDate?: Date;     
+    certificateDate?: Date;
     constructorName: string;
     startDate?: Date;
     endDate?: Date;

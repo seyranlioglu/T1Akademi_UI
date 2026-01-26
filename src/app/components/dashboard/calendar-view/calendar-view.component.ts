@@ -3,7 +3,7 @@ import { CalendarOptions, EventInput } from '@fullcalendar/core'; // EventInput 
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import trLocale from '@fullcalendar/core/locales/tr';
-import { TrainingCardDto } from 'src/app/shared/models/dashboard.model';
+import { TrainingCard } from 'src/app/shared/models/dashboard.model';
 
 @Component({
   selector: 'app-calendar-view',
@@ -26,7 +26,7 @@ import { TrainingCardDto } from 'src/app/shared/models/dashboard.model';
   `]
 })
 export class CalendarViewComponent implements OnInit {
-  @Input() trainings: TrainingCardDto[] = [];
+  @Input() trainings: TrainingCard[] = [];
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
