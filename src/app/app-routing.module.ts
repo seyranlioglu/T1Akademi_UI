@@ -28,7 +28,7 @@ import { OrdersListComponent } from './components/dashboard/orders-list/orders-l
 import { ReviewsComponent } from './components/dashboard/reviews/reviews.component';
 import { CompletedCoursesComponent } from './components/dashboard/completed-courses/completed-courses.component';
 import { CartComponent } from './components/dashboard/cart/cart.component';
-import { CourseDetailsPageComponent } from './components/pages/course-details-page/course-details-page.component';
+import { CourseDetailsPageComponent } from './components/dashboard/course-details-page/course-details-page.component';
 import { CourseComponent } from './components/pages/course/course.component'; // Player Component
 import { OverviewComponent } from './components/dashboard/overview/overview.component';
 import { CompanyEmployeesComponent } from './components/dashboard/company-employees/company-employees.component';

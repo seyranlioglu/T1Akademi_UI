@@ -1,34 +1,23 @@
-<div *ngIf="isLoading" class="text-center py-5" style="min-height: 50vh; display: flex; align-items: center; justify-content: center;">
+<div *ngIf="isLoading" class="text-center py-5">
     <div class="spinner-border text-primary" role="status"></div>
 </div>
 
 <div *ngIf="!isLoading && training">
-
-    <div class="page-banner-area ptb-100" 
-         [style.background-image]="'url(' + (training.headerImage || 'assets/images/shapes/page-banner-bg.jpg') + ')'">
+    <div class="page-banner-area ptb-100" [style.background-image]="'url(' + (training.headerImage || 'assets/images/shapes/page-banner-bg.jpg') + ')'">
         <div class="container">
             <div class="page-banner-content">
                 <div class="list d-sm-flex align-items-center">
-                    <div class="list-item d-block position-relative">
+                    <div class="list-item d-block">
                         <div class="d-flex align-items-center">
-                            <img [src]="training.instructorImage" class="rounded-circle border" width="30" height="30" style="object-fit: cover;" alt="user">
-                            <span class="ms-2 fw-bold">{{ training.instructorName }}</span>
+                            <img [src]="training.instructorImage" class="rounded-circle border" width="30" height="30" style="object-fit: cover;">
+                            <span class="ms-2 fw-bold text-white">{{ training.instructorName }}</span>
                         </div>
                     </div>
-                    <div class="list-item d-inline-block position-relative">
-                        <i class='bx bx-globe text-warning me-1'></i> {{ training.language }}
-                    </div>
-                    <div class="list-item d-inline-block position-relative">
-                        <i class='bx bxs-star text-warning'></i> {{ training.rating | number:'1.1-1' }} ({{ training.reviewCount }} Değerlendirme)
-                    </div>
+                    <div class="list-item text-white"><i class='bx bx-globe text-warning me-1'></i> {{ training.language }}</div>
+                    <div class="list-item text-white"><i class='bx bxs-star text-warning'></i> {{ training.rating | number:'1.1-1' }} ({{ training.reviewCount }})</div>
                 </div>
                 <h1 class="text-white mb-3">{{ training.title }}</h1>
                 <p class="text-white opacity-75 mb-3 d-none d-md-block">{{ training.description | slice:0:150 }}...</p>
-                
-                <ul class="ps-0 mb-0 list-unstyled">
-                    <li class="d-inline-block position-relative"><a routerLink="/">Anasayfa</a></li>
-                    <li class="d-inline-block position-relative">Eğitim Detayı</li>
-                </ul>
             </div>
         </div>
     </div>
@@ -36,230 +25,118 @@
     <div class="course-details-area ptb-100">
         <div class="container">
             <div class="row">
-                
                 <div class="col-lg-8 col-md-12">
                     <div class="course-details-desc">
-                        
                         <ul class="nav nav-tabs d-block">
-                            <li class="nav-item d-inline-block" [class.active]="currentTab === 'tab1'">
-                                <button type="button" class="nav-link position-relative shadow-none border-0 mb-0 rounded-0" (click)="switchTab($event, 'tab1')">
-                                    Genel Bakış
-                                </button>
-                            </li>
-                            <li class="nav-item d-inline-block" [class.active]="currentTab === 'tab2'">
-                                <button type="button" class="nav-link position-relative shadow-none border-0 mb-0 rounded-0" (click)="switchTab($event, 'tab2')">
-                                    Müfredat
-                                </button>
-                            </li>
-                            <li class="nav-item d-inline-block" [class.active]="currentTab === 'tab3'">
-                                <button type="button" class="nav-link position-relative shadow-none border-0 mb-0 rounded-0" (click)="switchTab($event, 'tab3')">
-                                    Eğitmen
-                                </button>
-                            </li>
-                            <li class="nav-item d-inline-block" [class.active]="currentTab === 'tab4'">
-                                <button type="button" class="nav-link position-relative shadow-none border-0 mb-0 rounded-0" (click)="switchTab($event, 'tab4')">
-                                    Yorumlar
-                                </button>
-                            </li>
+                            <li class="nav-item d-inline-block" [class.active]="currentTab === 'tab1'"><button class="nav-link" (click)="switchTab($event, 'tab1')">Genel Bakış</button></li>
+                            <li class="nav-item d-inline-block" [class.active]="currentTab === 'tab2'"><button class="nav-link" (click)="switchTab($event, 'tab2')">Müfredat</button></li>
+                            <li class="nav-item d-inline-block" [class.active]="currentTab === 'tab3'"><button class="nav-link" (click)="switchTab($event, 'tab3')">Eğitmen</button></li>
+                            <li class="nav-item d-inline-block" [class.active]="currentTab === 'tab4'"><button class="nav-link" (click)="switchTab($event, 'tab4')">Yorumlar</button></li>
                         </ul>
 
                         <div class="tab-content">
-                            
                             <div class="tab-pane fade show active" *ngIf="currentTab === 'tab1'">
                                 <div class="overview-details-content">
                                     <h4>Açıklama</h4>
                                     <div [innerHTML]="training.description" class="text-muted" style="line-height: 1.8;"></div>
-                                    
                                     <div *ngIf="training.whatYouWillLearn?.length > 0" class="mt-4">
                                         <h4>Neler Öğreneceksiniz?</h4>
                                         <ul class="features-list ps-0 list-unstyled d-flex flex-wrap">
-                                            <li *ngFor="let item of training.whatYouWillLearn">
-                                                <span>
-                                                    <i class="flaticon-tick"></i>
-                                                    {{ item }}
-                                                </span>
-                                            </li>
+                                            <li *ngFor="let item of training.whatYouWillLearn"><span><i class="flaticon-tick"></i> {{ item }}</span></li>
                                         </ul>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="tab-pane fade show active" *ngIf="currentTab === 'tab2'">
                                 <div class="course-details-content mb-0">
                                     <h4>Ders İçeriği</h4>
-                                    
                                     <div class="accordion">
                                         <div class="accordion-section" *ngFor="let section of training.sections; let i = index">
                                             <div class="accordion-header" (click)="toggleSection(i)" [class.open]="isSectionOpen(i)">
                                                 {{ section.title }}
-                                                <span class="text-muted small fw-normal">{{ section.contents?.length || 0 }} ders</span>
+                                                <span class="text-muted small">{{ section.contents?.length || 0 }} ders</span>
                                             </div>
                                             <div class="accordion-content" [class.open]="isSectionOpen(i)" [style.display]="isSectionOpen(i) ? 'block' : 'none'">
                                                 <ul class="ps-0 mb-0 list-unstyled">
                                                     <li *ngFor="let content of section.contents" class="d-sm-flex align-items-center justify-content-between">
                                                         <div class="d-flex align-items-center gap-2">
                                                             <i class='bx' [ngClass]="content.isPreview ? 'bx-play-circle text-primary fs-5' : 'bx-lock-alt text-muted fs-5'"></i>
-                                                            <span [class.text-primary]="content.isPreview" [class.fw-bold]="content.isPreview">
-                                                                {{ content.title }}
-                                                            </span>
+                                                            <span [class.text-primary]="content.isPreview">{{ content.title }}</span>
                                                         </div>
-                                                        <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
-                                                            <span *ngIf="content.isPreview" class="badge bg-success-light text-success border border-success border-opacity-25 small">Önizleme</span>
-                                                            <span class="text-muted small">{{ content.durationMinutes }} dk</span>
-                                                        </div>
+                                                        <span class="text-muted small">{{ content.durationMinutes }} dk</span>
                                                     </li>
                                                 </ul>
                                             </div>
                                         </div>
-                                        <div *ngIf="!training.sections || training.sections.length === 0" class="alert alert-light border">
-                                            Bu eğitimin müfredatı henüz eklenmemiş.
-                                        </div>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="tab-pane fade show active" *ngIf="currentTab === 'tab3'">
-                                <div class="course-details-instructor mb-0">
-                                    <h4>Eğitmen</h4>
-                                    <div class="user d-md-flex align-items-center">
-                                        <img [src]="training.instructorImage" class="rounded-circle border" width="80" height="80" style="object-fit: cover;" alt="user">
-                                        <div class="ms-md-4 mt-3 mt-md-0">
-                                            <h6 class="mb-1">{{ training.instructorName }}</h6>
-                                            <span class="designation d-block text-muted">{{ training.instructorTitle }}</span>
-                                            <ul class="mb-0 ps-0 list-unstyled mt-2 small text-muted d-flex gap-3 flex-wrap">
-                                                <li><i class="bx bxs-star text-warning"></i> {{ training.instructorRating | number:'1.1-1' }} Puan</li>
-                                                <li><i class="bx bxs-group text-primary"></i> {{ training.instructorTotalStudents }} Öğrenci</li>
-                                                <li><i class="bx bxs-book-open text-info"></i> {{ training.instructorTotalCourses }} Kurs</li>
-                                            </ul>
+                                <div class="course-details-instructor">
+                                    <div class="user d-flex align-items-center">
+                                        <img [src]="training.instructorImage" class="rounded-circle border" width="80" height="80">
+                                        <div class="ms-3">
+                                            <h6>{{ training.instructorName }}</h6>
+                                            <span class="text-muted">{{ training.instructorTitle }}</span>
                                         </div>
                                     </div>
-                                    <p class="mt-3 text-muted">{{ training.instructorBio }}</p>
+                                    <p class="mt-3">{{ training.instructorBio }}</p>
                                 </div>
                             </div>
-
                             <div class="tab-pane fade show active" *ngIf="currentTab === 'tab4'">
                                 <div class="course-details-feedback">
-                                    <h4>Öğrenci Değerlendirmeleri</h4>
-                                    
-                                    <div class="row align-items-center mb-4" *ngIf="training.reviewCount > 0">
-                                        <div class="col-lg-4 col-md-4 text-center border-end">
-                                            <h1 class="fw-bold text-dark">{{ training.rating | number:'1.1-1' }}</h1>
-                                            <div class="rating text-warning">
-                                                <i class="bx bxs-star" *ngFor="let s of [1,2,3,4,5]" [class.bx-star]="s > training.rating"></i>
-                                            </div>
-                                            <span class="d-block text-muted small mt-1">Kurs Puanı</span>
-                                        </div>
-                                        <div class="col-lg-8 col-md-8">
-                                            <p class="text-muted small mb-0">Toplam {{ training.reviewCount }} değerlendirme yapıldı.</p>
+                                    <h4>Yorumlar ({{ training.reviewCount }})</h4>
+                                    <div *ngFor="let review of training.topReviews" class="feedback-item d-flex gap-3 mb-3 border-bottom pb-3">
+                                        <img [src]="review.userImage" class="rounded-circle" width="50" height="50">
+                                        <div>
+                                            <h6 class="mb-1">{{ review.userName }}</h6>
+                                            <div class="text-warning x-small"><i class="bx bxs-star" *ngFor="let s of [1,2,3,4,5]" [class.bx-star]="s > review.rating"></i></div>
+                                            <p class="mt-1 text-muted">{{ review.comment }}</p>
                                         </div>
                                     </div>
-
-                                    <div class="feedback-list">
-                                        <div class="feedback-item" *ngFor="let review of training.topReviews">
-                                            <div class="user d-flex align-items-center">
-                                                <img [src]="review.userImage" class="rounded-circle border" width="55" height="55" style="object-fit: cover;">
-                                                <div class="ms-3">
-                                                    <h6 class="mb-1">{{ review.userName }} <span class="small text-muted fw-normal ms-2">{{ review.date | date }}</span></h6>
-                                                    <div class="rating text-warning x-small">
-                                                        <i class="bx bxs-star" *ngFor="let s of [1,2,3,4,5]" [ngClass]="{'text-muted': s > review.rating}"></i>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <p class="mt-3 text-muted">{{ review.comment }}</p>
-                                        </div>
-                                        
-                                        <div *ngIf="training.topReviews?.length === 0" class="text-center p-4 bg-light rounded">
-                                            <i class='bx bx-message-square-dots fs-3 text-muted mb-2'></i>
-                                            <p class="mb-0 text-muted">Bu kurs için henüz yorum yapılmamış.</p>
-                                        </div>
-                                    </div>
+                                    <div *ngIf="training.topReviews?.length === 0" class="text-center text-muted p-3">Henüz yorum yok.</div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-4 col-md-12">
                     <div class="course-details-info sticky-top" style="top: 100px; z-index: 90;">
-                        
-                        <div class="image position-relative mb-0 rounded-top overflow-hidden">
-                            <img [src]="training.headerImage" class="img-fluid w-100" style="height: 200px; object-fit: cover;" alt="course-image">
-                            
+                        <div class="image position-relative rounded-top overflow-hidden">
+                            <img [src]="training.headerImage" class="img-fluid w-100" style="height: 200px; object-fit: cover;">
                             <div class="overlay-dark position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-25" *ngIf="training.previewVideoPath"></div>
-                            <button *ngIf="training.previewVideoPath" type="button" class="video-btn p-0 border-0 d-inline-block rounded-circle position-absolute top-50 start-50 translate-middle ripple-effect" (click)="openPopup()">
-                                <i class='bx bx-play text-white ps-1' style="font-size: 40px; line-height: 55px;"></i>
+                            <button *ngIf="training.previewVideoPath" class="video-btn p-0 border-0 rounded-circle position-absolute top-50 start-50 translate-middle" (click)="openPopup()">
+                                <i class='bx bx-play text-white ps-1 fs-1'></i>
                             </button>
                         </div>
-
-                        <div class="content p-4 border border-top-0 rounded-bottom bg-white shadow-sm">
-                            
-                            <div class="price-box mb-4 text-center border-bottom pb-3">
-                                <h3 class="fw-bold text-primary mb-1 display-6">{{ training.currentAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}</h3>
-                                <div *ngIf="training.discountRate > 0" class="d-flex align-items-center justify-content-center gap-2">
-                                    <span class="text-muted text-decoration-line-through fs-6">{{ training.amount | currency:'TRY':'symbol-narrow':'1.0-0' }}</span>
-                                    <span class="badge bg-danger rounded-pill px-3">%{{ training.discountRate }} İndirim</span>
-                                </div>
+                        <div class="content p-4 bg-white shadow-sm border border-top-0 rounded-bottom">
+                            <div class="text-center mb-3">
+                                <h3 class="text-primary mb-0">{{ training.currentAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}</h3>
+                                <span *ngIf="training.discountRate > 0" class="text-muted text-decoration-line-through">{{ training.amount | currency:'TRY':'symbol-narrow':'1.0-0' }}</span>
                             </div>
-
-                            <div class="btn-box d-grid gap-2 mb-4">
-                                <button class="btn btn-primary btn-lg fw-bold shadow-sm" (click)="addToCart()">
-                                    <i class='bx bx-cart-alt me-1'></i> Sepete Ekle
-                                </button>
-                                <button class="btn btn-outline-secondary btn-lg fw-bold" (click)="buyNow()">
-                                    Hemen Al
-                                </button>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" (click)="addToCart()">Sepete Ekle</button>
+                                <button class="btn btn-outline-secondary" (click)="buyNow()">Hemen Al</button>
                             </div>
-
-                            <h6 class="fw-bold text-dark mb-3">Bu Kurs şunları içerir:</h6>
-                            <ul class="info ps-0 mb-0 list-unstyled small text-muted">
-                                <li class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
-                                    <span><i class='bx bx-time-five me-2 text-primary'></i>Toplam Süre:</span>
-                                    <span class="fw-bold text-dark">50 Saat</span> 
-                                </li>
-                                <li class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
-                                    <span><i class='bx bx-layer me-2 text-primary'></i>Seviye:</span>
-                                    <span class="fw-bold text-dark">{{ training.levelName }}</span>
-                                </li>
-                                <li class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
-                                    <span><i class='bx bx-globe me-2 text-primary'></i>Dil:</span>
-                                    <span class="fw-bold text-dark">{{ training.language }}</span>
-                                </li>
-                                <li class="d-flex justify-content-between mb-2 pb-2 border-bottom border-light">
-                                    <span><i class='bx bx-file me-2 text-primary'></i>Ders Sayısı:</span>
-                                    <span class="fw-bold text-dark">{{ training.sections?.length || 0 }} Bölüm</span>
-                                </li>
-                                <li class="d-flex justify-content-between mb-2">
-                                    <span><i class='bx bx-certification me-2 text-primary'></i>Sertifika:</span>
-                                    <span class="fw-bold text-dark">Tamamlama Sertifikası</span>
-                                </li>
+                            <ul class="list-unstyled mt-3 small text-muted">
+                                <li class="d-flex justify-content-between mb-2"><span>Süre:</span> <span class="fw-bold text-dark">50 Saat</span></li>
+                                <li class="d-flex justify-content-between mb-2"><span>Seviye:</span> <span class="fw-bold text-dark">{{ training.levelName }}</span></li>
+                                <li class="d-flex justify-content-between mb-2"><span>Dil:</span> <span class="fw-bold text-dark">{{ training.language }}</span></li>
                             </ul>
-
-                            <div class="text-center mt-4 pt-3 border-top">
-                                <span class="d-block fw-medium small text-muted mb-2">Paylaş:</span>
-                                <ul class="social-links ps-0 mb-0 list-unstyled d-flex justify-content-center gap-2">
-                                    <li><a href="#" class="d-flex align-items-center justify-content-center rounded-circle border text-muted hover-primary" style="width:35px; height:35px;"><i class="bx bxl-facebook"></i></a></li>
-                                    <li><a href="#" class="d-flex align-items-center justify-content-center rounded-circle border text-muted hover-primary" style="width:35px; height:35px;"><i class="bx bxl-twitter"></i></a></li>
-                                    <li><a href="#" class="d-flex align-items-center justify-content-center rounded-circle border text-muted hover-primary" style="width:35px; height:35px;"><i class="bx bxl-linkedin"></i></a></li>
-                                </ul>
-                            </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 
     <div class="video-popup-overlay" *ngIf="isOpen" (click)="closePopup()">
         <div class="popup-inner shadow-lg" (click)="$event.stopPropagation()">
-            <div class="d-flex justify-content-end mb-2">
-                <button (click)="closePopup()" type="button" class="btn btn-sm btn-light rounded-circle"><i class='bx bx-x fs-4'></i></button>
-            </div>
-            <div class="ratio ratio-16x9 rounded overflow-hidden bg-black">
-                <iframe [src]="safeVideoUrl" title="Course Preview" allowfullscreen></iframe>
+            <button (click)="closePopup()" class="btn btn-sm btn-light rounded-circle float-end mb-2"><i class='bx bx-x fs-4'></i></button>
+            <div class="ratio ratio-16x9 bg-black rounded">
+                <iframe [src]="safeVideoUrl" allowfullscreen></iframe>
             </div>
         </div>
     </div>
-
 </div>

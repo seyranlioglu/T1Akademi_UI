@@ -12,15 +12,11 @@ import { CartService } from 'src/app/shared/services/cart.service';
 export class CourseDetailsPageComponent implements OnInit {
 
     trainingId: number = 0;
-    training: any = null;
+    training: any = null; // HTML'de "training" kullanılacak
     isLoading = true;
     currentTab = 'tab1';
-
-    // Video Popup
     isOpen = false;
     safeVideoUrl: SafeResourceUrl | null = null;
-
-    // Accordion State
     openSectionIndex: number = 0; 
 
     constructor(
@@ -36,6 +32,8 @@ export class CourseDetailsPageComponent implements OnInit {
             if (params['id']) {
                 this.trainingId = +params['id'];
                 this.loadTrainingDetail();
+            } else {
+                this.router.navigate(['/']);
             }
         });
     }
@@ -52,7 +50,7 @@ export class CourseDetailsPageComponent implements OnInit {
                 }
             },
             error: (err) => {
-                console.error("Eğitim detayı çekilemedi", err);
+                console.error("Hata:", err);
                 this.isLoading = false;
             }
         });
@@ -76,9 +74,7 @@ export class CourseDetailsPageComponent implements OnInit {
     }
 
     openPopup(): void {
-        if (this.safeVideoUrl) {
-            this.isOpen = true;
-        }
+        if (this.safeVideoUrl) this.isOpen = true;
     }
 
     closePopup(): void {
@@ -88,10 +84,7 @@ export class CourseDetailsPageComponent implements OnInit {
     addToCart() {
         if (!this.training) return;
         this.cartService.addToCart(this.training.id, 1).subscribe({
-            next: (res) => {
-                // Buraya Toast mesajı ekleyebilirsin
-                console.log("Sepete eklendi!"); 
-            },
+            next: (res) => console.log("Sepete eklendi"),
             error: (err) => console.error(err)
         });
     }
@@ -99,9 +92,7 @@ export class CourseDetailsPageComponent implements OnInit {
     buyNow() {
         if (!this.training) return;
         this.cartService.addToCart(this.training.id, 1).subscribe({
-            next: (res) => {
-                this.router.navigate(['/dashboard/cart']);
-            }
+            next: (res) => this.router.navigate(['/dashboard/cart'])
         });
     }
 }

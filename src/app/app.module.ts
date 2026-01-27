@@ -55,7 +55,7 @@ import { BlogDetailsPageComponent } from './components/pages/blog-details-page/b
 import { BlogWidgetComponent } from './components/common/blog-widget/blog-widget.component';
 import { CoursesGridPageComponent } from './components/pages/courses-grid-page/courses-grid-page.component';
 import { CoursesListPageComponent } from './components/pages/courses-list-page/courses-list-page.component';
-import { CourseDetailsPageComponent } from './components/pages/course-details-page/course-details-page.component';
+import { CourseDetailsPageComponent } from './components/dashboard/course-details-page/course-details-page.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { EnrolledCoursesComponent } from './components/dashboard/enrolled-courses/enrolled-courses.component';
 import { WishlistComponent } from './components/dashboard/wishlist/wishlist.component';
