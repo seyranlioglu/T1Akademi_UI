@@ -104,6 +104,13 @@ import { CourseCardComponent } from './components/common/course-card/course-card
 import { CompanyEmployeesComponent } from './components/dashboard/company-employees/company-employees.component';
 import { NgSelectModule } from '@ng-select/ng-select'; // <-- Import
 import { AccountVerificationComponent } from './components/pages/login-page/account-verification/account-verification.component';
+import { LibraryComponent } from './components/pages/instructor/library/library.component';
+import { UploadWidgetComponent } from './components/common/upload-widget/upload-widget.component';
+import { UploadModalComponent } from './components/common/modals/upload-modal/upload-modal.component';
+import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
+import { SafeUrlPipe } from './shared/pipes/safe-url.pipe';
+import { ContentPreviewModalComponent } from './components/common/modals/content-preview-modal/content-preview-modal.component';
+import { DialogModule } from 'primeng/dialog';
 
 @NgModule({
     declarations: [
@@ -191,7 +198,13 @@ import { AccountVerificationComponent } from './components/pages/login-page/acco
         PlayerLayoutComponent,
         CalendarViewComponent,
         CourseCardComponent,
-        AccountVerificationComponent
+        AccountVerificationComponent,
+        LibraryComponent,
+        UploadWidgetComponent,
+        UploadModalComponent,
+        SafeUrlPipe,
+        ContentPreviewModalComponent
+        
     ],
     imports: [
         BrowserModule,
@@ -211,7 +224,9 @@ import { AccountVerificationComponent } from './components/pages/login-page/acco
         EffectsModule.forRoot([CourseEffects]),
         FullCalendarModule,
         CarouselModule,
-        NgSelectModule
+        NgSelectModule,
+        DynamicDialogModule,
+        DialogModule
     ],
     providers: [
         {

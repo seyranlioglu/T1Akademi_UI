@@ -1,0 +1,58 @@
+<div class="upload-modal-content">
+    
+    <form [formGroup]="uploadForm" (ngSubmit)="startUpload()">
+        
+        <div class="mb-4">
+            <label class="form-label fw-bold">Dosya</label>
+            
+            <div class="drop-zone" 
+                 [class.drag-over]="isDragOver"
+                 [class.file-selected]="selectedFile"
+                 (click)="fileInput.click()" 
+                 (dragover)="onDragOver($event)" 
+                 (dragleave)="onDragLeave($event)" 
+                 (drop)="onDrop($event)">
+
+                <ng-container *ngIf="!selectedFile">
+                    <i class='bx bx-cloud-upload'></i>
+                    <p>Dosyayı buraya sürükleyin</p>
+                    <span class="small-text">veya seçmek için tıklayın</span>
+                </ng-container>
+
+                <ng-container *ngIf="selectedFile">
+                    <div class="selected-file-info">
+                        <i class='bx bx-file-blank mb-2'></i>
+                        <span class="file-name text-truncate" style="max-width: 300px;">
+                            {{selectedFile.name}}
+                        </span>
+                        <span class="badge bg-secondary mb-2">{{formatBytes(selectedFile.size)}}</span>
+                        <br>
+                        <span class="change-file-btn">Değiştir</span>
+                    </div>
+                </ng-container>
+
+                <input type="file" #fileInput 
+                       (change)="onFileSelected($event)" 
+                       style="display: none;" 
+                       accept=".mp4,.pdf,.png,.jpg,.jpeg">
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">İçerik Başlığı</label>
+            <input type="text" class="form-control" formControlName="title" placeholder="Örn: Giriş Dersi">
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-bold">Açıklama (Opsiyonel)</label>
+            <textarea class="form-control" rows="3" formControlName="description" placeholder="İçerik hakkında kısa notlar..."></textarea>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" class="btn btn-outline-secondary" (click)="ref.close()">İptal</button>
+            <button type="submit" class="btn btn-primary" [disabled]="uploadForm.invalid || !selectedFile">
+                <i class='bx bx-upload me-2'></i> Yüklemeyi Başlat
+            </button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,12 @@
+.upload-widget-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    z-index: 9999; // En üstte dursun
+    
+    .card {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+}

@@ -1,26 +1,76 @@
-<div class="courses-wrapper">
-    <h3 class="page-title">Eğitimler</h3>
-
-    <div class="toolbar mb-4">
-        <form class="search-box">
-            <input class="form-control shadow-none" type="text" placeholder="Eğitimlerinizi arayın" [(ngModel)]="searchTerm"
-                (ngModelChange)="searchCourses()"  [ngModelOptions]="{standalone: true}">
-            <!-- <button type="submit">
-                <i class="flaticon-search"></i>
-            </button> -->
-        </form>
-
-        <button type="text" class="default-btn" (click)="openNewCoursePopup()">Yeni Eğitim</button>
-    </div>
-
-
-    <div *ngFor="let course of shownCourses;" class="course-card" (click)="redirectToCourseManage(course)"
-        (mouseenter)="isHovered = true" (mouseleave)="isHovered = false">
-        <div class="card-image"><img [src]="course.img || 'https://angular.hibootstrap.com/toledo/assets/images/courses/course8.jpg'" alt="">
-        </div>
-        <div class="card-body">
-            <div class="card-title">{{course.title}}</div>
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm overflow-hidden" style="background: linear-gradient(to right, #fff, #f0f2f5);">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <h4 class="fw-bold mb-2">Eğitim Oluşturmaya Başlayın</h4>
+                    <p class="text-muted mb-4" style="max-width: 600px;">
+                        Bilginizi paylaşmaya hazır mısınız? Eğitim oluşturma sihirbazımız ile dakikalar içinde müfredatınızı planlayın, kütüphanenizden içerik ekleyin ve yayınlayın.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a routerLink="/instructor/course-manage/new" class="btn btn-primary btn-lg">
+                            <i class='bx bx-plus-circle'></i> Yeni Eğitim Oluştur
+                        </a>
+                        <button class="btn btn-outline-dark">Eğitmen El Kitabı</button>
+                    </div>
+                </div>
+                <div class="d-none d-md-block opacity-75">
+                   <i class='bx bx-bulb' style="font-size: 8rem; color: #e9ecef;"></i>
+                </div>
+            </div>
         </div>
     </div>
+</div>
 
+<div class="row g-4 mb-5">
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm p-3">
+            <div class="d-flex align-items-start gap-3">
+                <i class='bx bx-video-recording bx-md text-primary'></i>
+                <div>
+                    <h6 class="fw-bold">Video Testi Yapın</h6>
+                    <p class="small text-muted mb-0">Mikrofon ve kamera ayarlarınızı kontrol etmek için ücretsiz test videomuzu kullanın.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm p-3">
+            <div class="d-flex align-items-start gap-3">
+                <i class='bx bx-group bx-md text-success'></i>
+                <div>
+                    <h6 class="fw-bold">Topluluğa Katılın</h6>
+                    <p class="small text-muted mb-0">Diğer eğitmenlerle tanışın, soru sorun ve tecrübelerinizi paylaşın.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm p-3">
+            <div class="d-flex align-items-start gap-3">
+                <i class='bx bx-trending-up bx-md text-info'></i>
+                <div>
+                    <h6 class="fw-bold">Trendleri Keşfedin</h6>
+                    <p class="small text-muted mb-0">Hangi konular popüler? Öğrenciler en çok neyi aratıyor? Analizlere göz atın.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="courses-list-area">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold">Eğitimlerim</h5>
+        
+        <div class="search-box">
+             <input type="text" class="form-control form-control-sm" placeholder="Eğitimlerinizde ara...">
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+             <div class="text-center py-5 text-muted" *ngIf="false"> Henüz bir eğitiminiz yok.
+             </div>
+        </div>
+    </div>
 </div>

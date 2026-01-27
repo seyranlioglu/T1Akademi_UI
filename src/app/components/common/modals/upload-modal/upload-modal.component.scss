@@ -1,0 +1,114 @@
+.upload-modal-content {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1rem;
+
+    .form-label {
+        color: #344767;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    input.form-control, textarea.form-control {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 10px 15px;
+        background-color: #f8f9fa;
+        
+        &:focus {
+            background-color: #fff;
+            border-color: #ff1949;
+            box-shadow: 0 0 0 3px rgba(255, 25, 73, 0.1);
+        }
+    }
+}
+
+// --- DRAG & DROP ZONE (YENİ) ---
+.drop-zone {
+    width: 100%;
+    height: 180px;
+    border: 2px dashed #cbd5e1; // Varsayılan gri kesikli çizgi
+    border-radius: 12px;
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+
+    // İkon ve Yazı Stilleri
+    i {
+        font-size: 3rem;
+        color: #94a3b8;
+        margin-bottom: 10px;
+        transition: color 0.3s ease;
+    }
+
+    p {
+        color: #64748b;
+        font-weight: 500;
+        margin: 0;
+    }
+
+    .small-text {
+        font-size: 0.8rem;
+        color: #94a3b8;
+    }
+
+    // Hover ve Sürükleme Efekti
+    &:hover, &.drag-over {
+        border-color: #ff1949; // T1 Kırmızısı
+        background-color: rgba(255, 25, 73, 0.03);
+
+        i { color: #ff1949; }
+        p { color: #333; }
+    }
+
+    // Dosya Seçildikten Sonraki Görünüm (Dolu Hali)
+    &.file-selected {
+        border-style: solid;
+        border-color: #4caf50; // Yeşil çerçeve
+        background-color: rgba(76, 175, 80, 0.05);
+
+        i { color: #4caf50; }
+    }
+}
+
+.selected-file-info {
+    text-align: center;
+    
+    .file-name {
+        font-weight: 600;
+        color: #333;
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .change-file-btn {
+        font-size: 0.85rem;
+        color: #ff1949;
+        text-decoration: underline;
+    }
+}
+
+// Footer Butonları
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+    padding: 10px 24px;
+    
+    &.btn-primary {
+        background: linear-gradient(135deg, #ff1949 0%, #d60e3b 100%);
+        border: none;
+        box-shadow: 0 4px 6px rgba(255, 25, 73, 0.3);
+        
+        &:disabled {
+            background: #e0e0e0;
+            box-shadow: none;
+            color: #999;
+        }
+    }
+}

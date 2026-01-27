@@ -1,0 +1,51 @@
+<div class="row">
+    <div class="col-md-8 bg-black d-flex align-items-center justify-content-center" style="min-height: 400px; background-color: #000;">
+        
+        <video *ngIf="isVideo" [src]="fullPath" controls class="w-100" style="max-height: 500px;" autoplay></video>
+
+        <object *ngIf="isPdf" [data]="fullPath | safeUrl" type="application/pdf" width="100%" height="500px">
+            <p>Tarayıcınız PDF göstermeyi desteklemiyor. <a [href]="fullPath" target="_blank">İndirmek için tıklayın.</a></p>
+        </object>
+
+    </div>
+
+    <div class="col-md-4 p-4 d-flex flex-column">
+        <h5 class="mb-4">İçerik Detayları</h5>
+
+        <form [formGroup]="editForm" (ngSubmit)="saveChanges()">
+            
+            <div class="mb-3">
+                <label class="form-label text-muted">İçerik Başlığı</label>
+                <input type="text" class="form-control" formControlName="title" placeholder="Başlık giriniz...">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label text-muted">Açıklama</label>
+                <textarea class="form-control" formControlName="description" rows="5" placeholder="İçerik hakkında notlar..."></textarea>
+                <small class="text-muted d-block text-end mt-1">{{ editForm.get('description')?.value?.length || 0 }} karakter</small>
+            </div>
+
+            <div class="p-3 bg-light rounded mb-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <small class="text-muted">Dosya Adı:</small>
+                    <small class="fw-semibold text-truncate" style="max-width: 150px;" [title]="data.fileName">{{ data.fileName }}</small>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <small class="text-muted">Boyut:</small>
+                    <small class="fw-semibold">{{ data.documentFileSize }} MB</small>
+                </div>
+                <div class="d-flex justify-content-between" *ngIf="data.videoDuration">
+                    <small class="text-muted">Süre:</small>
+                    <small class="fw-semibold">{{ data.videoDuration }}</small>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-auto">
+                <button type="submit" class="btn btn-primary" [disabled]="loading">
+                    <i class='bx bx-save me-1'></i> 
+                    {{ loading ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
