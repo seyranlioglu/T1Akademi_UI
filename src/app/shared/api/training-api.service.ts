@@ -231,4 +231,9 @@ export class TrainingApiService {
         map(res => res.data || res.body || res)
     );
   }
+
+  getInstructorTrainingList(): Observable<any> {
+    // Backend Controller Endpoint: [HttpGet("GetMyTrainings")]
+    return this.http.get<any>(`${API_TRAINING_URL}/GetInstructorTrainings`);
+  }
 }

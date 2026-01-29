@@ -1,20 +1,22 @@
 <div class="row mb-5">
     <div class="col-12">
         <div class="card border-0 shadow-sm overflow-hidden" style="background: linear-gradient(to right, #fff, #f0f2f5);">
-            <div class="card-body p-4 d-flex align-items-center justify-content-between">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
                 <div>
                     <h4 class="fw-bold mb-2">Eğitim Oluşturmaya Başlayın</h4>
                     <p class="text-muted mb-4" style="max-width: 600px;">
-                        Bilginizi paylaşmaya hazır mısınız? Eğitim oluşturma sihirbazımız ile dakikalar içinde müfredatınızı planlayın, kütüphanenizden içerik ekleyin ve yayınlayın.
+                        Bilginizi paylaşmaya hazır mısınız? Eğitim oluşturma sihirbazımız ile dakikalar içinde müfredatınızı planlayın.
                     </p>
                     <div class="d-flex gap-3">
-                        <a routerLink="/instructor/course-manage/new" class="btn btn-primary btn-lg">
+                        <a (click)="openNewCoursePopup()" class="btn btn-primary btn-lg text-white pointer">
                             <i class='bx bx-plus-circle'></i> Yeni Eğitim Oluştur
                         </a>
-                        <button class="btn btn-outline-dark">Eğitmen El Kitabı</button>
+                        <button class="btn btn-outline-dark btn-lg">
+                            <i class='bx bx-book-open'></i> Eğitmen El Kitabı
+                        </button>
                     </div>
                 </div>
-                <div class="d-none d-md-block opacity-75">
+                <div class="d-none d-lg-block opacity-75">
                    <i class='bx bx-bulb' style="font-size: 8rem; color: #e9ecef;"></i>
                 </div>
             </div>
@@ -24,33 +26,39 @@
 
 <div class="row g-4 mb-5">
     <div class="col-md-6 col-lg-4">
-        <div class="card h-100 border-0 shadow-sm p-3">
+        <div class="card h-100 border-0 shadow-sm p-3 hover-effect">
             <div class="d-flex align-items-start gap-3">
-                <i class='bx bx-video-recording bx-md text-primary'></i>
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                    <i class='bx bx-video-recording bx-md text-primary'></i>
+                </div>
                 <div>
-                    <h6 class="fw-bold">Video Testi Yapın</h6>
+                    <h6 class="fw-bold mb-1">Video Testi Yapın</h6>
                     <p class="small text-muted mb-0">Mikrofon ve kamera ayarlarınızı kontrol etmek için ücretsiz test videomuzu kullanın.</p>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-lg-4">
-        <div class="card h-100 border-0 shadow-sm p-3">
+        <div class="card h-100 border-0 shadow-sm p-3 hover-effect">
             <div class="d-flex align-items-start gap-3">
-                <i class='bx bx-group bx-md text-success'></i>
+                <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                    <i class='bx bx-group bx-md text-success'></i>
+                </div>
                 <div>
-                    <h6 class="fw-bold">Topluluğa Katılın</h6>
+                    <h6 class="fw-bold mb-1">Topluluğa Katılın</h6>
                     <p class="small text-muted mb-0">Diğer eğitmenlerle tanışın, soru sorun ve tecrübelerinizi paylaşın.</p>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-6 col-lg-4">
-        <div class="card h-100 border-0 shadow-sm p-3">
+        <div class="card h-100 border-0 shadow-sm p-3 hover-effect">
             <div class="d-flex align-items-start gap-3">
-                <i class='bx bx-trending-up bx-md text-info'></i>
+                <div class="bg-info bg-opacity-10 p-3 rounded-circle">
+                    <i class='bx bx-trending-up bx-md text-info'></i>
+                </div>
                 <div>
-                    <h6 class="fw-bold">Trendleri Keşfedin</h6>
+                    <h6 class="fw-bold mb-1">Trendleri Keşfedin</h6>
                     <p class="small text-muted mb-0">Hangi konular popüler? Öğrenciler en çok neyi aratıyor? Analizlere göz atın.</p>
                 </div>
             </div>
@@ -59,18 +67,85 @@
 </div>
 
 <div class="courses-list-area">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-bold">Eğitimlerim</h5>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0">
+            Eğitimlerim <span class="text-muted small ms-2" *ngIf="shownCourses">({{shownCourses.length}})</span>
+        </h5>
         
         <div class="search-box">
-             <input type="text" class="form-control form-control-sm" placeholder="Eğitimlerinizde ara...">
+             <input type="text" 
+                    [(ngModel)]="searchTerm" 
+                    (keyup)="searchCourses()"
+                    class="form-control form-control-sm" 
+                    placeholder="Eğitimlerinizde ara...">
         </div>
     </div>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
-             <div class="text-center py-5 text-muted" *ngIf="false"> Henüz bir eğitiminiz yok.
-             </div>
+    <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Yükleniyor...</span>
         </div>
     </div>
+
+    <div *ngIf="!loading && (!shownCourses || shownCourses.length === 0)" class="card border-0 shadow-sm">
+        <div class="card-body text-center py-5">
+             <img src="assets/images/error.gif" style="width: 80px; opacity: 0.5;" class="mb-3">
+             <h6 class="text-muted">Görüntülenecek eğitim bulunamadı.</h6>
+        </div>
+    </div>
+
+    <div *ngIf="!loading && shownCourses && shownCourses.length > 0" class="row g-4">
+        
+        <div class="col-xl-3 col-lg-4 col-md-6" *ngFor="let item of shownCourses">
+            
+            <div class="card h-100 border-0 shadow-sm course-card-custom" (click)="redirectToCourseManage(item)">
+                
+                <div class="card-img-wrapper position-relative" style="height: 160px; overflow: hidden; background-color: #f8f9fa;">
+                    
+                    <img [src]="getCourseImage(item.image)" 
+                         class="card-img-top" 
+                         alt="{{item.title}}"
+                         style="width: 100%; height: 100%; object-fit: contain;">
+                    
+                    <span class="badge position-absolute top-0 end-0 m-2 shadow-sm" 
+                          [ngClass]="item.isActive ? 'bg-success' : 'bg-secondary'">
+                        {{ item.statusName || (item.isActive ? 'Yayında' : 'Taslak') }}
+                    </span>
+                </div>
+
+                <div class="card-body d-flex flex-column p-3">
+                    <small class="text-muted mb-1 text-truncate">{{ item.categoryName || 'Genel' }}</small>
+                    
+                    <h6 class="card-title fw-bold text-truncate mb-3" [title]="item.title">
+                        {{ item.title }}
+                    </h6>
+
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-muted" style="font-size: 12px;">Hazırlanma</span>
+                            <span class="fw-bold" style="font-size: 12px;">%{{ item.completionRate || 0 }}</span>
+                        </div>
+                        <div class="progress" style="height: 4px;">
+                            <div class="progress-bar" role="progressbar" 
+                                 [style.width.%]="item.completionRate || 0"
+                                 [ngClass]="getProgressColor(item.completionRate || 0)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center pt-0 pb-3 px-3">
+                    <small class="text-muted" style="font-size: 11px;">
+                        <i class='bx bx-calendar me-1'></i>{{ item.createdDate | date:'dd.MM.yyyy' }}
+                    </small>
+                    <button class="btn btn-light btn-sm rounded-circle shadow-sm" title="Düzenle">
+                        <i class='bx bx-edit text-primary'></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 </div>

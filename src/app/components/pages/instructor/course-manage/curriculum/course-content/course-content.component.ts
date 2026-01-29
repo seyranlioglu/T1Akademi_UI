@@ -14,7 +14,6 @@ import { CourseState } from 'src/app/shared/store/course.reducer';
 export class CourseContentComponent {
     private unsubscribe: Subscription[] = [];
     @Input() data: any;
-    isUploaderVisible = false;
     isTitleEditorVisible = false;
     isExamLibraryVisible = false;
     isContentDetailsVisible = false;
@@ -37,11 +36,6 @@ export class CourseContentComponent {
         this.isContentDetailsVisible = !this.isContentDetailsVisible;
     }
 
-    toggleUploader(): void {
-        this.hideAll('uploader');
-        this.isUploaderVisible = !this.isUploaderVisible;
-    }
-
     toggleTitleEditor(): void {
         this.hideAll('titleEditor');
         this.isTitleEditorVisible = !this.isTitleEditorVisible;
@@ -53,7 +47,6 @@ export class CourseContentComponent {
     }
 
     hideAll(exception?: string): void {
-        if (exception !== 'uploader') this.isUploaderVisible = false;
         if (exception !== 'titleEditor') this.isTitleEditorVisible = false;
         if (exception !== 'examLibrary') this.isExamLibraryVisible = false;
         if (exception !== 'contentDetails')

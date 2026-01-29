@@ -1,23 +1,28 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { TrainingApiService } from 'src/app/shared/api/training-api.service';
 import { UserApiService } from 'src/app/shared/api/user-api.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NewCourseFormComponent } from './new-course-form/new-course-form.component';
-import { Subscription } from 'rxjs';
+import { GetTrainingListDto } from 'src/app/shared/models/GetTrainingListDto'; 
 
 @Component({
     selector: 'app-courses',
     templateUrl: './courses.component.html',
     styleUrls: ['./courses.component.scss'],
 })
-export class CoursesComponent {
+export class CoursesComponent implements OnInit, OnDestroy {
+    
     private unsubscribe: Subscription[] = [];
     isHovered = false;
     formModalRef!: NgbModalRef;
-    courseList: any = [];
-    shownCourses: any = [];
+    
+    courseList: GetTrainingListDto[] = [];
+    shownCourses: GetTrainingListDto[] = [];
     searchTerm: string = '';
+    loading: boolean = false;
+
     constructor(
         public router: Router,
         public trainingApiService: TrainingApiService,
@@ -26,40 +31,69 @@ export class CoursesComponent {
     ) { }
 
     ngOnInit(): void {
-        const apiSubs = this.trainingApiService.getTrainings().subscribe((response: any) => {
-            console.log(response);
-            if (response.body) {
-                this.courseList = response.body;
-                this.shownCourses = this.courseList;
+        this.loadCourses();
+    }
+
+    loadCourses() {
+        this.loading = true;
+        const apiSubs = this.trainingApiService.getInstructorTrainingList().subscribe({
+            next: (response: any) => {
+                const data = response.body || response.data || [];
+                this.courseList = data;
+                this.shownCourses = data;
+                this.loading = false;
+            },
+            error: (err) => {
+                console.error('Eğitim listesi yüklenirken hata oluştu:', err);
+                this.loading = false;
             }
         });
         this.unsubscribe.push(apiSubs);
     }
 
     searchCourses(): void {
-        this.shownCourses = this.courseList.filter((course: any) =>
-            course.title.toLowerCase().includes(this.searchTerm.toLowerCase())
+        if (!this.searchTerm) {
+            this.shownCourses = this.courseList;
+            return;
+        }
+        const term = this.searchTerm.toLowerCase();
+        this.shownCourses = this.courseList.filter((course) =>
+            course.title && course.title.toLowerCase().includes(term)
         );
     }
 
     openNewCoursePopup(): void {
         this.formModalRef = this.modalService.open(NewCourseFormComponent, {
             size: 'lg',
+            centered: true,
+            backdrop: 'static'
         });
-        this.formModalRef.result
-            .then((result) => {
-                this.modalService.dismissAll();
-                if (result.success) {
-                    // this.toastr.success(result.message);
-                } else {
-                    // this.toastr.error(result.message);
-                }
-            })
-            .catch(() => { });
+
+        this.formModalRef.result.then((result) => {
+            if (result && result.success) {
+                this.loadCourses();
+            }
+        }).catch(() => { });
     }
 
     redirectToCourseManage(course: any): void {
-        this.router.navigate(['/instructor/course-manage', course.id]);
+        if (course && course.id) {
+            this.router.navigate(['/instructor/course-manage', course.id]);
+        }
+    }
+    
+    // ✅ DÜZELTİLDİ: src/ kaldırıldı
+    getCourseImage(path: string): string {
+        if (!path || path === 'none' || path === 'null') {
+            return 'assets/images/courses/TrainingDraft.png'; 
+        }
+        return path;
+    }
+
+    getProgressColor(rate: number): string {
+        if (rate < 30) return 'bg-danger';
+        if (rate < 80) return 'bg-warning';
+        return 'bg-success';
     }
 
     ngOnDestroy(): void {

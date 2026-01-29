@@ -75,7 +75,6 @@ import { VerifyComponent } from './components/pages/verify/verify.component';
 import { JwtInterceptor } from './shared/interceptors/jwt.interceptor';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NewCourseFormComponent } from './components/pages/instructor/courses/new-course-form/new-course-form.component';
-import { ContentUploaderComponent } from './components/pages/instructor/course-manage/curriculum/content-uploader/content-uploader.component';
 import { CourseContentComponent } from './components/pages/instructor/course-manage/curriculum/course-content/course-content.component';
 import { DynamicDialogComponent } from './shared/components/dynamic-dialog.component';
 import { CourseSectionComponent } from './components/pages/instructor/course-manage/curriculum/course-section/course-section.component';
@@ -181,7 +180,6 @@ import { DialogModule } from 'primeng/dialog';
         InstructorComponent,
         VerifyComponent,
         NewCourseFormComponent,
-        ContentUploaderComponent,
         CourseContentComponent,
         DynamicDialogComponent,
         CourseSectionComponent,

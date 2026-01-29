@@ -99,3 +99,97 @@
         }
     }
 }
+
+.pointer {
+    cursor: pointer;
+}
+
+.hover-effect {
+    transition: transform 0.2s;
+    &:hover {
+        transform: translateY(-3px);
+    }
+}
+
+// Arama Kutusu Stili (Seninkini biraz modernize ettim)
+.search-box {
+    position: relative;
+    width: 300px;
+
+    .form-control {
+        padding-right: 40px;
+        border-radius: 20px; // Daha yuvarlak
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        
+        &:focus {
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(var(--primaryColor-rgb), 0.1); // Primary renginin RGB'si varsa
+        }
+    }
+
+    button {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: none;
+        color: #6c757d;
+        
+        &:hover {
+            color: var(--primaryColor);
+        }
+    }
+}
+
+// Yeni Course Card Stili
+.course-card-custom {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    overflow: hidden;
+    background: #fff;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+
+        .card-img-top {
+            transform: scale(1.05);
+        }
+    }
+
+    .card-img-wrapper {
+        overflow: hidden;
+        height: 160px; // Resim yüksekliği sabit
+    }
+
+    .card-img-top {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .card-title {
+        line-height: 1.4;
+        height: 2.8em; // 2 satır yüksekliği
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+}
+
+// Mobil Uyumluluk
+@media (max-width: 768px) {
+    .search-box {
+        width: 100%; // Mobilde tam genişlik
+        margin-top: 10px;
+    }
+    ß
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+}
