@@ -72,6 +72,28 @@ import { LibraryComponent } from './components/pages/instructor/library/library.
 
 const routes: Routes = [
 
+        // 1. AUTH - TAMAMEN BAĞIMSIZ (Navbar/Sidebar YOK)
+    {
+        path: 'auth',
+        children: [
+            { path: 'login', component: LoginPageComponent },
+            { path: 'register', component: RegisterPageComponent },
+            { path: 'forgot-password', component: ForgotPasswordPageComponent },
+            { path: 'reset-password', component: ResetPasswordPageComponent },
+            { path: 'account-verification', component: AccountVerificationComponent },
+            { path: 'verify', component: VerifyComponent },
+        ]
+    },
+
+    // 2. PLAYER (BAĞIMSIZ - NAVBAR/SIDEBAR YOK)
+    {
+        path: 'course/:id/watch',
+        component: PlayerLayoutComponent,
+        canActivate: [AuthGuard, IdValidatorGuard],
+        children: [
+            { path: '', component: CourseComponent }
+        ]
+    },
     // =================================================================
     // 1. ANA PLATFORM (Öğrenci Arayüzü - Navbar & Footer Var)
     // =================================================================
@@ -80,10 +102,7 @@ const routes: Routes = [
         component: MainLayoutComponent, // Bu layout içinde Navbar ve Footer var
         children: [
             // Public Sayfalar
-            { path: '', component: HomeDemoTwoComponent },
-            { path: 'home-style-one', component: HomeDemoOneComponent },
-            { path: 'home-style-two', component: HomeDemoTwoComponent },
-            { path: 'home-style-three', component: HomeDemoThreeComponent },
+            { path: '', component: OverviewComponent },
             { path: 'about', component: AboutPageComponent },
             { path: 'instructors', component: InstructorsPageComponent },
             { path: 'instructor-profile', component: InstructorProfilePageComponent },
@@ -103,13 +122,7 @@ const routes: Routes = [
             { path: 'privacy-policy', component: PrivacyPolicyPageComponent },
             { path: 'terms-conditions', component: TermsConditionsPageComponent },
             
-            // Auth Sayfaları (İstersen bunları da dışarı alabilirsin ama genelde navbar olması iyidir)
-            { path: 'login', component: LoginPageComponent },
-            { path: 'register', component: RegisterPageComponent },
-            { path: 'forgot-password', component: ForgotPasswordPageComponent },
-            { path: 'reset-password', component: ResetPasswordPageComponent },
-            { path: 'account-verification', component: AccountVerificationComponent },
-            { path: 'verify', component: VerifyComponent },
+
 
             // Öğrenci Paneli (Dashboard) - AuthGuard Korumalı
             {

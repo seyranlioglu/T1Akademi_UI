@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import { GlobalUploadService } from 'src/app/shared/services/global-upload.service';
+import { ContentLibraryApiService } from 'src/app/shared/api/content-library-api.service';
 
 @Component({
   selector: 'app-upload-modal',
@@ -9,38 +10,58 @@ import { GlobalUploadService } from 'src/app/shared/services/global-upload.servi
   styleUrls: ['./upload-modal.component.scss']
 })
 export class UploadModalComponent {
+  
+  // Tab Yönetimi: 'file' veya 'youtube'
+  activeTab: 'file' | 'youtube' = 'file';
+
+  // Dosya Yükleme Formu
   uploadForm: FormGroup;
   selectedFile: File | null = null;
-  isDragOver = false; // Sürükleme durumu için
+  isDragOver = false;
+
+  // YouTube Formu
+  youtubeForm: FormGroup;
+  youtubeLoading = false;
 
   constructor(
     private fb: FormBuilder,
     public ref: DynamicDialogRef,
-    private uploadService: GlobalUploadService
+    private uploadService: GlobalUploadService,
+    private contentService: ContentLibraryApiService
   ) {
+    // 1. Dosya Formu
     this.uploadForm = this.fb.group({
       title: ['', Validators.required],
       description: ['']
     });
+
+    // 2. YouTube Formu
+    this.youtubeForm = this.fb.group({
+      title: ['', Validators.required],
+      url: ['', [Validators.required, Validators.pattern(/^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/)]],
+      description: ['']
+    });
   }
 
-  // --- DRAG & DROP EVENTS ---
+  // --- TAB DEĞİŞİMİ ---
+  switchTab(tab: 'file' | 'youtube') {
+    this.activeTab = tab;
+  }
 
-  // Dosya alanın üzerine gelince
+  // --- DOSYA YÜKLEME METOTLARI ---
+  
   onDragOver(event: DragEvent) {
     event.preventDefault();
     event.stopPropagation();
     this.isDragOver = true;
   }
 
-  // Dosya alandan çıkınca
   onDragLeave(event: DragEvent) {
     event.preventDefault();
     event.stopPropagation();
     this.isDragOver = false;
   }
 
-  // Dosya bırakılınca
   onDrop(event: DragEvent) {
     event.preventDefault();
     event.stopPropagation();
@@ -52,7 +73,6 @@ export class UploadModalComponent {
     }
   }
 
-  // Input'tan seçilince (Tıklayarak)
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -60,16 +80,13 @@ export class UploadModalComponent {
     }
   }
 
-  // Ortak Dosya İşleme Metodu
   handleFile(file: File) {
     this.selectedFile = file;
-    // Eğer başlık boşsa, dosya adını otomatik yaz
     if (!this.uploadForm.get('title')?.value) {
       this.uploadForm.patchValue({ title: file.name });
     }
   }
 
-  // Yüklemeyi Başlat
   startUpload() {
     if (this.uploadForm.valid && this.selectedFile) {
       this.uploadService.startUpload(this.selectedFile, this.uploadForm.value);
@@ -77,7 +94,6 @@ export class UploadModalComponent {
     }
   }
 
-  // Helper: Dosya boyutunu okunabilir yap
   formatBytes(bytes: number, decimals = 2) {
     if (!+bytes) return '0 Bytes';
     const k = 1024;
@@ -85,5 +101,36 @@ export class UploadModalComponent {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
+
+  // --- YOUTUBE KAYIT METOTLARI ---
+
+saveYoutube() {
+    if (this.youtubeForm.invalid) return;
+
+    this.youtubeLoading = true;
+    const formVal = this.youtubeForm.value;
+
+    // ARTIK ID YOK, DESCRIPTION VAR
+    this.contentService.addYoutubeContent(
+        formVal.title, 
+        formVal.url, 
+        formVal.description
+    ).subscribe({
+        next: (res) => {
+            if(res.header.result) {
+                this.ref.close(true);
+            } else {
+                // Backend'den gelen hata mesajını göster (Toast veya Alert)
+                alert(res.header.message);
+            }
+            this.youtubeLoading = false;
+        },
+        error: (err) => {
+            console.error(err);
+            alert("YouTube videosu eklenirken bir hata oluştu.");
+            this.youtubeLoading = false;
+        }
+    });
   }
 }

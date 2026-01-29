@@ -1,35 +1,82 @@
-// Video veya PDF alanının arka planı
-.preview-container {
+// Sol Sütun (Siyah Alan)
+.preview-col {
     background-color: #000;
-    min-height: 400px;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px 0 0 6px; // Sol tarafı yuvarla
+    min-height: 500px; 
+    overflow: hidden; 
+    position: relative;
+    border-radius: 6px 0 0 6px;
 
+    // A. RETRY DROP ZONE (YENİ)
+    .retry-drop-zone {
+        border-style: dashed !important;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.05);
+        min-width: 300px;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #fff !important;
+        }
+    }
+    
+    // Fade-in animasyonu
+    .fade-in {
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    // B. Video Stili
     video {
-        max-height: 500px;
         width: 100%;
+        height: 100%;
+        max-height: 600px;
+        object-fit: contain; 
         outline: none;
     }
-}
 
-// Sağ taraftaki form alanı
-.details-container {
-    padding: 2rem;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-// Responsive Ayarlar
-@media (max-width: 768px) {
-    .preview-container {
-        border-radius: 6px 6px 0 0;
-        min-height: 250px;
+    // C. YouTube Stili
+    .youtube-iframe {
+        width: 100%;
+        height: 100%;
+        min-height: 500px;
     }
-    .details-container {
-        padding: 1rem;
+
+    // D. PDF Stili
+    .pdf-viewer {
+        width: 100%;
+        height: 100%;      
+        min-height: 600px; 
+        border: none;
+        background-color: #fff; 
+    }
+
+    // E. Resim Stili
+    .img-preview {
+        max-width: 100%;
+        max-height: 600px;
+        width: auto;
+        height: auto;
+        object-fit: contain; 
+    }
+}
+
+// Sağ Sütun (Form)
+.form-col {
+    border-radius: 0 6px 6px 0;
+}
+
+// Mobilde düzgün görünsün
+@media (max-width: 768px) {
+    .preview-col {
+        min-height: 250px;
+        border-radius: 6px 6px 0 0;
+    }
+    .form-col {
+        border-radius: 0 0 6px 6px;
     }
 }

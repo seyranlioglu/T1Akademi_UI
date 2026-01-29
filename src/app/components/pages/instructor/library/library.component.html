@@ -30,9 +30,16 @@
                             <i class='bx bx-link-alt'></i> {{ item.trainingUsed.length }}
                         </div>
 
-                        <ng-container *ngIf="item.thumbnail; else noImage">
-                            <img [src]="getThumbnailUrl(item.thumbnail)" class="w-100 h-100" style="object-fit: cover;" onerror="this.src='assets/images/placeholder.jpg'">
-                        </ng-container>
+                        <div class="file-thumbnail-wrapper">
+                            <img 
+                                [src]="getIconOrThumbnail(item)" 
+                                (error)="img.src='assets/images/file-types/error-fallback.png'" 
+                                #img
+                                alt="{{item.fileName}}"
+                                class="file-img">
+                            
+                            <span class="badge" *ngIf="item.fileName?.toLowerCase()?.endsWith('.pdf')">PDF</span>
+                        </div>
                         <ng-template #noImage>
                             <div class="d-flex align-items-center justify-content-center h-100">
                                 <i class='bx bxs-file-pdf fs-1 text-danger' *ngIf="item.fileName?.endsWith('.pdf')"></i>

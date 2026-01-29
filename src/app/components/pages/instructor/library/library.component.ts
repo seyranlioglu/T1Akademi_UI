@@ -1,8 +1,7 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { DialogService } from 'primeng/dynamicdialog';
-import { environment } from 'src/environments/environment';
+// environment importuna artık gerek yok, sildik.
 
-// Import yolları
 import { ContentLibraryApiService } from 'src/app/shared/api/content-library-api.service';
 import { UploadModalComponent } from 'src/app/components/common/modals/upload-modal/upload-modal.component';
 import { ContentPreviewModalComponent } from 'src/app/components/common/modals/content-preview-modal/content-preview-modal.component';
@@ -16,14 +15,13 @@ import { ContentPreviewModalComponent } from 'src/app/components/common/modals/c
 export class LibraryComponent implements OnInit {
   
   files: any[] = [];
-  imageBaseUrl = environment.apiUrl.replace('/api', ''); 
+  // imageBaseUrl sildik, artık ihtiyacımız yok.
   
-  activeMenuId: number | null = null; // Dropdown kontrolü için
+  activeMenuId: number | null = null; 
 
-  // --- YENİ EKLENEN: Kullanım Detayı Dialog Değişkenleri ---
+  // Dialog Değişkenleri
   displayUsageDialog: boolean = false;
   selectedUsageItem: any = null;
-  // --------------------------------------------------------
 
   constructor(
     private dialogService: DialogService,
@@ -34,7 +32,7 @@ export class LibraryComponent implements OnInit {
     this.getFiles();
   }
 
-  // Menü Aç/Kapa
+  // Menü İşlemleri
   toggleMenu(event: Event, id: number) {
     event.stopPropagation(); 
     if (this.activeMenuId === id) {
@@ -44,7 +42,6 @@ export class LibraryComponent implements OnInit {
     }
   }
 
-  // Dışarı Tıklayınca Menüyü Kapat
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     this.activeMenuId = null;
@@ -63,41 +60,69 @@ export class LibraryComponent implements OnInit {
     });
   }
 
-  getThumbnailUrl(path: string): string {
-    if (!path) return 'assets/images/placeholder.jpg';
-    const cleanPath = path.replace(/\\/g, '/');
-    return `${this.imageBaseUrl}/${cleanPath}`; 
+getIconOrThumbnail(item: any): string {
+    // 1. ÖNCE YOUTUBE KONTROLÜ (Uzantıdan bağımsız)
+    // Eğer dosya yolu bir web linki ise ve youtube içeriyorsa
+    if (item.filePath && (item.filePath.includes('youtube.com') || item.filePath.includes('youtu.be'))) {
+        // Thumbnail varsa onu göster, yoksa varsayılan youtube ikonu göster
+        return item.thumbnail ? item.thumbnail : 'assets/images/file-types/youtube.png';
+    }
+
+    // 2. Dosya uzantısını al
+    const extension = item.fileName ? item.fileName.split('.').pop().toLowerCase() : '';
+
+    // A. PDF
+    if (extension === 'pdf') {
+        return 'assets/images/file-types/pdf.png'; 
+    }
+
+    // B. Resim
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(extension)) {
+        return item.filePath ? item.filePath : 'assets/images/file-types/image-error.png';
+    }
+
+    // C. Video (MinIO'daki fiziksel dosyalar)
+    if (['mp4', 'avi', 'mov', 'mkv', 'webm'].includes(extension)) {
+        return item.thumbnail ? item.thumbnail : 'assets/images/file-types/video.png';
+    }
+
+    // D. Hiçbiri değilse
+    return 'assets/images/file-types/file.png';
   }
 
   openUploadModal() {
     const ref = this.dialogService.open(UploadModalComponent, {
-      header: 'Yeni İçerik Yükle', width: '500px', contentStyle: { overflow: 'visible' },
-      appendTo: 'body', baseZIndex: 10000, modal: true, dismissableMask: false
+      header: 'Yeni İçerik Yükle', 
+      width: '500px', 
+      contentStyle: { overflow: 'visible' },
+      appendTo: 'body', 
+      baseZIndex: 10000, 
+      modal: true, 
+      dismissableMask: false
+      // NOT: UploadModalComponent içinde input accept=".pdf, .mp4, .jpg, .png" eklemelisin!
     });
     ref.onClose.subscribe((success: boolean) => { if (success) this.getFiles(); });
   }
 
   openPreview(item: any) {
     const ref = this.dialogService.open(ContentPreviewModalComponent, {
-      header: item.fileName, width: '80%', height: 'auto', baseZIndex: 10000,
-      modal: true, dismissableMask: true, data: item 
+      header: item.fileName, 
+      width: '80%', 
+      height: 'auto', 
+      baseZIndex: 10000,
+      modal: true, 
+      dismissableMask: true, 
+      data: item 
     });
     ref.onClose.subscribe((updated: boolean) => { if (updated) this.getFiles(); });
   }
 
-  // --- GÜNCELLENEN METOD: Alert yerine Dialog açıyor ---
-showUsage(item: any) {
-    // Menüyü her türlü kapat (tıklama sonrası açık kalmasın)
+  showUsage(item: any) {
     this.activeMenuId = null;
-
-    // Eğer eğitimlerde kullanılıyorsa Dialog'u aç
     if (item.trainingUsed && item.trainingUsed.length > 0) {
       this.selectedUsageItem = item;    
       this.displayUsageDialog = true;   
-    } 
-    // Kullanılmıyorsa Bilgi Ver
-    else {
-      // Şimdilik alert ile gösteriyoruz, ilerde Toast mesajına çevirebiliriz
+    } else {
       alert('Bu içerik şu an herhangi bir eğitimde kullanılmamaktadır.');
     }
   }
@@ -112,7 +137,6 @@ showUsage(item: any) {
         if (res.header && res.header.result) {
           this.files = this.files.filter(f => f.id !== item.id);
         } else {
-          // Alert yerine basit bir log veya toast
           console.error(res.header?.msg);
         }
       },

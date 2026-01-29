@@ -7,34 +7,60 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class ContentLibraryApiService {
-  private baseUrl = environment.apiUrl + '/ContentLibrary'; // Controller ismini buraya yazacağız
+  private baseUrl = environment.apiUrl + '/ContentLibrary'; 
 
   constructor(private http: HttpClient) { }
 
-  // 1. Kütüphane Listesini Getir
   getLibrary(): Observable<any> {
     return this.http.get(`${this.baseUrl}/GetList`);
   }
 
-  // 2. Dosya Yükle (Progress Bar için 'reportProgress: true' önemli)
-  uploadFile(file: File): Observable<HttpEvent<any>> {
-    const formData: FormData = new FormData();
+  // // Yeni dosya yükleme (Create)
+  // uploadFile(file: File): Observable<HttpEvent<any>> {
+  //   const formData: FormData = new FormData();
+  //   formData.append('file', file);
+
+  //   const req = new HttpRequest('POST', `${this.baseUrl}/Upload`, formData, {
+  //     reportProgress: true,
+  //     responseType: 'json'
+  //   });
+
+  //   return this.http.request(req);
+  // }
+
+  // --- EKSİK OLAN METOT BU (EKLE BUNU) ---
+  // Var olan bir kayda (ID) dosya basmak için (Retry/Repair)
+  uploadMedia(id: number, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('id', id.toString());
     formData.append('file', file);
 
-    const req = new HttpRequest('POST', `${this.baseUrl}/Upload`, formData, {
-      reportProgress: true,
-      responseType: 'json'
-    });
-
-    return this.http.request(req);
+    // Backend Metodu: public async Task<Response<CommonResponse>> UploadMediaAsync(long id, IFormFile file)
+    // Eğer backend'de metodun adı 'RetryUpload' ise URL'i ona göre güncelle.
+    // Şimdilik standart UploadMedia varsayıyorum.
+    return this.http.post<any>(`${this.baseUrl}/UploadFile`, formData);
   }
+  // ----------------------------------------
 
-  // 3. Dosya Sil
   deleteFile(id: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/Delete`, id); // Backend post bekliyor olabilir, delete ise http.delete yap
+    return this.http.post(`${this.baseUrl}/DeleteContent`, id); // Backend metod adını kontrol et (Delete vs DeleteContent)
   }
 
   updateContent(id: number, data: { title: string, description: string }): Observable<any> {
-  return this.http.put(`${this.baseUrl}/Update`, { id, ...data });
-}
+    return this.http.put(`${this.baseUrl}/UpdateContent`, { id, ...data });
+  }
+
+  addYoutubeContent(title: string, url: string, description: string): Observable<any> {
+    return this.http.post<any>(
+      this.baseUrl + '/AddYoutubeContent',
+      null, 
+      {
+        params: {
+          title: title,
+          url: url,
+          description: description || '' 
+        }
+      }
+    );
+  }
 }

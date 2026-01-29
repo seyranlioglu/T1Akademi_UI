@@ -1,6 +1,21 @@
 <div class="upload-modal-content">
     
-    <form [formGroup]="uploadForm" (ngSubmit)="startUpload()">
+    <div class="modal-tabs mb-4">
+        <button type="button" 
+                class="tab-btn" 
+                [class.active]="activeTab === 'file'" 
+                (click)="switchTab('file')">
+            <i class='bx bx-cloud-upload me-2'></i> Dosya Yükle
+        </button>
+        <button type="button" 
+                class="tab-btn" 
+                [class.active]="activeTab === 'youtube'" 
+                (click)="switchTab('youtube')">
+            <i class='bx bxl-youtube me-2'></i> YouTube Ekle
+        </button>
+    </div>
+
+    <form *ngIf="activeTab === 'file'" [formGroup]="uploadForm" (ngSubmit)="startUpload()">
         
         <div class="mb-4">
             <label class="form-label fw-bold">Dosya</label>
@@ -34,7 +49,7 @@
                 <input type="file" #fileInput 
                        (change)="onFileSelected($event)" 
                        style="display: none;" 
-                       accept=".mp4,.pdf,.png,.jpg,.jpeg">
+                       accept=".jpg, .jpeg, .png, .pdf, .mp4, .avi, .mov, .mkv">
             </div>
         </div>
 
@@ -55,4 +70,45 @@
             </button>
         </div>
     </form>
+
+
+    <form *ngIf="activeTab === 'youtube'" [formGroup]="youtubeForm" (ngSubmit)="saveYoutube()">
+        
+        <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+            <i class='bx bxs-info-circle me-2 bx-sm'></i>
+            <div>
+                YouTube videoları sunucuda yer kaplamaz, link olarak kaydedilir.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">Video Linki</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white"><i class='bx bx-link'></i></span>
+                <input type="text" class="form-control" formControlName="url" placeholder="https://www.youtube.com/watch?v=...">
+            </div>
+            <small class="text-muted" *ngIf="youtubeForm.get('url')?.invalid && youtubeForm.get('url')?.touched">
+                Geçerli bir YouTube linki giriniz.
+            </small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-bold">İçerik Başlığı</label>
+            <input type="text" class="form-control" formControlName="title" placeholder="Video Başlığı">
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label fw-bold">Açıklama (Opsiyonel)</label>
+            <textarea class="form-control" rows="3" formControlName="description" placeholder="Video hakkında notlar..."></textarea>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" class="btn btn-outline-secondary" (click)="ref.close()">İptal</button>
+            <button type="submit" class="btn btn-primary" [disabled]="youtubeForm.invalid || youtubeLoading">
+                <i class='bx bxl-youtube me-2'></i> 
+                {{ youtubeLoading ? 'Kaydediliyor...' : 'Videoyu Ekle' }}
+            </button>
+        </div>
+    </form>
+
 </div>

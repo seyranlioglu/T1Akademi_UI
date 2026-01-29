@@ -1,42 +1,111 @@
-<div class="row">
-    <div class="col-md-8 bg-black d-flex align-items-center justify-content-center" style="min-height: 400px; background-color: #000;">
-        
-        <video *ngIf="isVideo" [src]="fullPath" controls class="w-100" style="max-height: 500px;" autoplay></video>
+<div class="row m-0 h-100">
+    <div class="col-md-8 bg-black d-flex align-items-center justify-content-center p-0 preview-col">
 
-        <object *ngIf="isPdf" [data]="fullPath | safeUrl" type="application/pdf" width="100%" height="500px">
-            <p>Tarayıcınız PDF göstermeyi desteklemiyor. <a [href]="fullPath" target="_blank">İndirmek için tıklayın.</a></p>
-        </object>
+        <div *ngIf="needsUpload" class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white p-4 fade-in">
+            
+            <div class="text-center mb-4">
+                <i class='bx bx-error-circle bx-lg text-danger mb-2'></i>
+                <h5 class="fw-light text-danger">Medya Dosyası Eksik veya Hatalı</h5>
+                <p class="text-white-50 small">{{ errorMessage || 'İçeriği görüntülemek için lütfen dosyayı tekrar yükleyin.' }}</p>
+            </div>
+
+            <div class="retry-drop-zone p-4 border border-secondary rounded text-center" 
+                 (click)="retryInput.click()">
+                
+                <input type="file" #retryInput (change)="onRetryFileSelected($event)" style="display:none">
+                
+                <div *ngIf="!selectedRetryFile && !isUploading">
+                    <i class='bx bx-cloud-upload bx-lg mb-2 text-primary'></i>
+                    <p class="mb-0 fw-bold">Dosyayı Buraya Bırakın</p>
+                    <small class="text-muted">veya seçmek için tıklayın</small>
+                </div>
+
+                <div *ngIf="selectedRetryFile && !isUploading">
+                    <i class='bx bx-file bx-md text-success mb-2'></i>
+                    <p class="mb-1 fw-bold">{{ selectedRetryFile.name }}</p>
+                    <span class="badge bg-success">Yüklemeye Hazır</span>
+                </div>
+
+                <div *ngIf="isUploading">
+                    <div class="spinner-border text-primary mb-2" role="status"></div>
+                    <p class="mb-0">Yükleniyor...</p>
+                </div>
+            </div>
+
+            <button *ngIf="selectedRetryFile && !isUploading" 
+                    class="btn btn-primary mt-3 px-4" 
+                    (click)="startRetryUpload()">
+                <i class='bx bx-refresh me-2'></i> Onar ve Yükle
+            </button>
+
+        </div>
+
+        <ng-container *ngIf="!needsUpload">
+            
+            <video *ngIf="isVideo" [src]="fullPath" controls autoplay controlsList="nodownload"></video>
+
+            <div *ngIf="isYoutube" class="w-100 h-100 position-relative">
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    [src]="youtubeEmbedUrl | safeUrl" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen
+                    class="youtube-iframe">
+                </iframe>
+            </div>
+
+            <iframe *ngIf="isPdf" 
+                    [src]="getGoogleViewerUrl(fullPath) | safeUrl" 
+                    class="pdf-viewer" 
+                    frameborder="0">
+            </iframe>
+
+            <img *ngIf="isImage" [src]="fullPath" alt="Önizleme" class="img-preview">
+
+            <div *ngIf="!isVideo && !isPdf && !isImage && !isYoutube" class="text-white text-center">
+                <i class='bx bx-file bx-lg mb-2'></i>
+                <p>Bu dosya türü için önizleme yapılamıyor.</p>
+                <a [href]="fullPath" target="_blank" class="btn btn-sm btn-outline-light">Dosyayı Aç</a>
+            </div>
+        </ng-container>
 
     </div>
 
-    <div class="col-md-4 p-4 d-flex flex-column">
+    <div class="col-md-4 p-4 d-flex flex-column bg-white form-col">
         <h5 class="mb-4">İçerik Detayları</h5>
 
-        <form [formGroup]="editForm" (ngSubmit)="saveChanges()">
+        <form [formGroup]="editForm" (ngSubmit)="saveChanges()" class="h-100 d-flex flex-column">
             
             <div class="mb-3">
-                <label class="form-label text-muted">İçerik Başlığı</label>
+                <label class="form-label text-muted small">İçerik Başlığı</label>
                 <input type="text" class="form-control" formControlName="title" placeholder="Başlık giriniz...">
             </div>
 
             <div class="mb-3">
-                <label class="form-label text-muted">Açıklama</label>
+                <label class="form-label text-muted small">Açıklama</label>
                 <textarea class="form-control" formControlName="description" rows="5" placeholder="İçerik hakkında notlar..."></textarea>
-                <small class="text-muted d-block text-end mt-1">{{ editForm.get('description')?.value?.length || 0 }} karakter</small>
+                <small class="text-muted d-block text-end mt-1" style="font-size: 11px;">
+                    {{ editForm.get('description')?.value?.length || 0 }} karakter
+                </small>
             </div>
 
-            <div class="p-3 bg-light rounded mb-4">
+            <div class="p-3 bg-light rounded mb-4 border">
                 <div class="d-flex justify-content-between mb-2">
                     <small class="text-muted">Dosya Adı:</small>
-                    <small class="fw-semibold text-truncate" style="max-width: 150px;" [title]="data.fileName">{{ data.fileName }}</small>
+                    <small class="fw-semibold text-truncate text-dark" style="max-width: 150px;" [title]="data.fileName">
+                        {{ data.fileName }}
+                    </small>
                 </div>
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between mb-2">
                     <small class="text-muted">Boyut:</small>
-                    <small class="fw-semibold">{{ data.documentFileSize }} MB</small>
+                    <small class="fw-semibold text-dark">{{ data.documentFileSize }} MB</small>
                 </div>
                 <div class="d-flex justify-content-between" *ngIf="data.videoDuration">
                     <small class="text-muted">Süre:</small>
-                    <small class="fw-semibold">{{ data.videoDuration }}</small>
+                    <small class="fw-semibold text-dark">{{ data.videoDuration }}</small>
                 </div>
             </div>
 
