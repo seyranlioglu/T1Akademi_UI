@@ -19,10 +19,10 @@
                 <i (click)="deleteContent()" class="bx bx-trash"></i>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <button *ngIf="!hasContent && !(isUploaderVisible || isTitleEditorVisible || isExamLibraryVisible)"
+                <!-- <button *ngIf="!hasContent && !(isUploaderVisible || isTitleEditorVisible || isExamLibraryVisible)"
                     (click)="data.contentType.code==='lec' ?toggleUploader():toggleExamLibrary()"
                     class="btn btn-outline-dark btn-sm me-1" style="width: fit-content;">+
-                    {{data.contentType.code==='lec' ? 'İçerik' : 'Sınav'}}</button>
+                    {{data.contentType.code==='lec' ? 'İçerik' : 'Sınav'}}</button> -->
                 <i *ngIf="hasContent" class='actions bx bx-sm' (click)="toggleContentDetails()"
                     [ngClass]="isContentDetailsVisible ? 'bx-chevron-up' : 'bx-chevron-down'"></i>
                 <i *ngIf="!isTitleEditorVisible" class='actions bx bx-menu sort'></i>
@@ -44,9 +44,9 @@
         <div class="d-flex flex-column">
             <div>{{data.trainingContentLibraryDto?.trainingContentLibraryFileName}}</div>
             <div>{{data.trainingContentLibraryDto?.trainingContentLibraryVideoDuration}}</div>
-            <div class="edit-link d-flex align-items-center gap-1" (click)="toggleUploader()">
+            <!-- <div class="edit-link d-flex align-items-center gap-1" (click)="toggleUploader()">
                 <i class="bx bx-pencil"></i>İçeriği Düzenle
-            </div>
+            </div> -->
         </div>
     </div>
 
