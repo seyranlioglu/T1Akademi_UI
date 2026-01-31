@@ -1,35 +1,59 @@
-.section {
-    border: 1px solid;
-    background: #ededed;
+.section-card {
+    transition: all 0.2s ease;
+    &:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; }
+}
 
-    i:not(.sort) {
-        cursor: pointer;
+.cursor-move { cursor: grab; &:active { cursor: grabbing; } }
+.hover-primary:hover { color: var(--primaryColor) !important; }
+
+.new-content-card {
+    background-color: #fff;
+    border-color: #e0e0e0 !important;
+}
+
+.bg-light-subtle {
+    background-color: #f8f9fa;
+}
+
+.upload-placeholder {
+    border: 2px dashed #ccc;
+    background-color: #fcfcfc;
+    transition: all 0.2s;
+    
+    &:hover {
+        border-color: var(--primaryColor);
+        background-color: #f0f8ff;
     }
+}
 
-    .actions {
-        visibility: hidden;
+.nav-pills .nav-link {
+    color: #6c757d;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    margin-right: 5px;
+    
+    &.active {
+        color: #fff;
+        background-color: var(--primaryColor);
+        border-color: var(--primaryColor);
     }
+}
 
-    .section-header {
-        cursor: move;
+.custom-placeholder {
+    background: #f8f9fa;
+    border: 2px dashed #ccc;
+    min-height: 50px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
 
-        &:hover {
-            .actions {
-                visibility: visible;
+/* Dialog Arka Planı (Şeffaflık Önlemi) */
+::ng-deep .p-dialog .p-dialog-content {
+    background-color: #fff !important;
+    padding: 0 !important;
+}
 
-            }
-        }
-    }
-
-    .new-content-selector {
-        display: flex;
-        padding: 7px 7px;
-        background: white;
-        border: 1px dashed;
-    }
-
-    .new-content-form {
-        background-color: white;
-        border: 1px solid;
-    }
+::ng-deep .p-dialog .p-dialog-header {
+    background-color: #fff !important;
+    border-bottom: 1px solid #eee;
 }

@@ -110,7 +110,8 @@ import { DialogService, DynamicDialogModule } from 'primeng/dynamicdialog';
 import { SafeUrlPipe } from './shared/pipes/safe-url.pipe';
 import { ContentPreviewModalComponent } from './components/common/modals/content-preview-modal/content-preview-modal.component';
 import { DialogModule } from 'primeng/dialog';
-
+import { ContentLibrarySelectorComponent } from './components/common/content-library-selector/content-library-selector.component';
+import { TooltipModule } from 'primeng/tooltip';
 @NgModule({
     declarations: [
         AppComponent,
@@ -201,7 +202,8 @@ import { DialogModule } from 'primeng/dialog';
         UploadWidgetComponent,
         UploadModalComponent,
         SafeUrlPipe,
-        ContentPreviewModalComponent
+        ContentPreviewModalComponent,
+        ContentLibrarySelectorComponent
         
     ],
     imports: [
@@ -224,7 +226,8 @@ import { DialogModule } from 'primeng/dialog';
         CarouselModule,
         NgSelectModule,
         DynamicDialogModule,
-        DialogModule
+        DialogModule,
+        TooltipModule
     ],
     providers: [
         {

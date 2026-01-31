@@ -1,0 +1,95 @@
+.library-container {
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.content-grid {
+    display: grid;
+    /* TAM İSTEDİĞİN GİBİ: 175px'lik kutular */
+    grid-template-columns: repeat(auto-fill, 175px); 
+    gap: 10px;
+    padding: 10px;
+    justify-content: center; /* Ortala */
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.content-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 6px;
+    overflow: hidden; 
+    background-color: #fff;
+    
+    /* TAM İSTEDİĞİN GİBİ: Sabit Yükseklik ve Genişlik */
+    height: 175px; 
+    width: 175px;
+    
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        border-color: var(--primaryColor) !important;
+    }
+
+    &.selected {
+        border-color: var(--primaryColor) !important;
+        box-shadow: 0 0 0 2px rgba(var(--primaryColor-rgb), 0.2) !important;
+    }
+
+    .object-fit-cover {
+        object-fit: cover;
+    }
+}
+
+.tiny-text {
+    font-size: 0.65rem;
+}
+
+.z-1 { z-index: 1; }
+.z-2 { z-index: 2; }
+
+.no-shadow:focus {
+    box-shadow: none !important;
+}
+
+/* Custom Dropdown Stili - Konumlandırma Düzeltildi */
+.custom-dropdown-menu {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    z-index: 1050;
+    min-width: 100px;
+    padding: 2px 0;
+    margin-bottom: 2px;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: .25rem;
+    animation: fadeIn 0.1s ease-out;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.hover-bg-light:hover {
+    background-color: #f8f9fa;
+}
+
+.selected-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(var(--primaryColor-rgb), 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    animation: fadeIn 0.2s;
+    pointer-events: none; 
+}
+
+.custom-scrollbar::-webkit-scrollbar { width: 5px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background-color: #ddd; border-radius: 4px; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

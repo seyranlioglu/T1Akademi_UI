@@ -1,60 +1,161 @@
-<div class="section">
-    <div class="section-header d-flex  px-5 py-3">
-        <div *ngIf="!isTitleEditorVisible" class="me-1 fw-bold">Bölüm {{index}}:</div>
-        <div *ngIf="!isTitleEditorVisible" class="section-name">{{data.trainingSectionTitle}}</div>
-        <div *ngIf="isTitleEditorVisible" class="d-flex flex-column w-100 gap-2">
-            <div class="d-flex">
-                <div class="align-content-center me-1 fw-bold" style="white-space: nowrap;">Bölüm {{index}}:</div>
-                <input [(ngModel)]="sectionTitle" class="form-control form-control-sm shadow-none" type="text">
+<div class="section-card bg-white border rounded-3 mb-3 shadow-sm overflow-hidden">
+    
+    <div class="section-header p-3 d-flex align-items-center justify-content-between bg-light border-bottom">
+        <div class="d-flex align-items-center gap-3 flex-grow-1">
+            
+            <div class="drag-handle text-muted cursor-move" cdkDragHandle>
+                <i class='bx bx-grid-vertical fs-4'></i>
             </div>
-            <div class="d-flex gap-2 justify-content-end">
-                <button class="btn btn-sm " (click)="toggleTitleEditor()">İptal</button>
-                <button [disabled]="sectionTitle.length===0" class="btn btn-outline-dark btn-sm me-1"
-                    (click)="updateSection()">Bölümü Kaydet</button>
+
+            <div class="fw-bold text-dark d-flex align-items-center gap-2 flex-grow-1">
+                <span class="text-muted text-nowrap">Bölüm {{index}}:</span>
+                
+                <span *ngIf="!sectionTitleEdit" class="text-truncate cursor-pointer" (click)="toggleExpand()">
+                    {{ data.trainingSectionTitle || data.title }}
+                </span>
+                
+                <input *ngIf="sectionTitleEdit" 
+                       [(ngModel)]="data.trainingSectionTitle" 
+                       (blur)="updateSectionTitle()" 
+                       (keydown.enter)="updateSectionTitle()" 
+                       class="form-control form-control-sm w-100" autoFocus>
+                
+                <i *ngIf="!sectionTitleEdit" class='bx bx-pencil text-muted cursor-pointer hover-primary ms-2' (click)="$event.stopPropagation(); sectionTitleEdit = true"></i>
             </div>
         </div>
-        <div *ngIf="!isTitleEditorVisible" class="actions d-flex justify-content-between flex-fill align-items-center">
-            <div class="align-items-center d-flex gap-1 ms-2">
-                <i (click)="toggleTitleEditor()" class="bx bx-pencil"></i>
-                <i (click)="deleteSection()" class="bx bx-trash"></i>
-            </div>
-            <i class='bx bx-menu sort'></i>
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-sm btn-outline-danger border-0" (click)="$event.stopPropagation(); deleteSection()"><i class='bx bx-trash'></i></button>
+            <i class='bx fs-4 cursor-pointer text-muted' (click)="toggleExpand()" [ngClass]="isExpanded ? 'bx-chevron-up' : 'bx-chevron-down'"></i>
         </div>
     </div>
 
-    <div cdkDropList [cdkDropListData]="data.trainingContents"
-        class="content-container d-flex flex-column gap-3 px-5 py-4" [id]="data.trainingSectionId"
-        [cdkDropListConnectedTo]="cdkDropListConnectedTo" (cdkDropListDropped)="onContentDropped($event)">
-        <app-course-content cdkDrag *ngFor="let content of data.trainingContents;"
-            [data]="content"></app-course-content>
-
-
-        <div *ngIf="isNewContentSelectorVisible" class="new-content-selector gap-1">
-            <button (click)="toggleNewContentEditor('lecture')" class="align-items-center btn d-flex"><i
-                    class="bx bx-plus"></i>Ders</button>
-            <button (click)="toggleNewContentEditor('exam')" class="align-items-center btn d-flex"><i
-                    class="bx bx-plus"></i>Sınav</button>
-            <button class="align-items-center btn d-flex ms-auto" (click)="toggleNewContentSelector()"><i
-                    class="bx bx-x fs-5"></i></button>
+    <div class="section-body p-3 bg-white" *ngIf="isExpanded">
+        
+        <div cdkDropList [cdkDropListData]="data.trainingContents" (cdkDropListDropped)="contentDropped.emit($event)" class="d-flex flex-column gap-2">
+            <app-course-content *ngFor="let content of data.trainingContents" [data]="content" cdkDrag>
+                <div *cdkDragPlaceholder class="custom-placeholder"></div>
+            </app-course-content>
         </div>
 
-        <div *ngIf="isNewContentFormVisible" class="new-content-form d-flex flex-column w-100 gap-2 p-2">
-            <div class="d-flex">
-                <div class="align-content-center me-2" style="white-space: nowrap;">{{newContentEditorTitle}}</div>
-                <input [(ngModel)]="newContentTitle" class="form-control form-control-sm shadow-none" type="text">
+        <div *ngIf="!isNewContentFormVisible" class="mt-3 text-center">
+            <button class="btn btn-outline-primary btn-sm rounded-pill px-4" (click)="toggleNewContentForm()">
+                <i class='bx bx-plus'></i> Ders Ekle
+            </button>
+        </div>
+
+        <div *ngIf="isNewContentFormVisible" class="new-content-card mt-3 border rounded shadow-sm">
+            
+            <div class="d-flex align-items-center gap-2 p-3 border-bottom bg-light-subtle">
+                <input type="text" class="form-control" placeholder="Ders başlığını giriniz..." [(ngModel)]="newContentTitle">
+                <button class="btn btn-light border" (click)="isSettingsDialogVisible = true" title="Ders Ayarları">
+                    <i class='bx bx-cog'></i>
+                </button>
             </div>
-            <div class="d-flex gap-2 justify-content-end">
-                <button class="btn btn-sm " (click)="toggleNewContentEditor()">İptal</button>
-                <button (click)="addNewContent()" [disabled]="newContentTitle.length===0"
-                    class="btn btn-outline-dark btn-sm me-1">Kaydet</button>
+
+            <div class="p-3">
+                <div class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <button class="nav-link btn-sm" [class.active]="newContentType === 'material'" (click)="newContentType = 'material'">
+                        <i class='bx bx-video'></i> Video / Belge
+                    </button>
+                    <button class="nav-link btn-sm" [class.active]="newContentType === 'exam'" (click)="newContentType = 'exam'">
+                        <i class='bx bx-task'></i> Sınav
+                    </button>
+                </div>
+
+                <div *ngIf="newContentType === 'material'">
+                    <div *ngIf="!selectedLibraryItem" class="upload-placeholder p-4 text-center border-dashed rounded cursor-pointer hover-bg-light" 
+                         (click)="openLibrarySelector()">
+                        <i class='bx bx-cloud-upload display-4 text-primary mb-2'></i>
+                        <h6 class="fw-bold">Kütüphaneden İçerik Seç</h6>
+                        <p class="small text-muted mb-0">Video veya PDF dosyalarınızı bağlayın.</p>
+                    </div>
+
+                    <div *ngIf="selectedLibraryItem" class="selected-item-card d-flex align-items-center gap-3 p-3 border rounded bg-white">
+                        <img [src]="selectedLibraryItem.thumbnail || 'assets/images/file-types/file.png'" class="rounded" width="60" height="60" style="object-fit: cover;">
+                        <div class="flex-grow-1 overflow-hidden">
+                            <h6 class="mb-1 text-truncate">{{ selectedLibraryItem.fileName }}</h6>
+                            <span class="badge bg-light text-secondary border">{{ selectedLibraryItem.fileType?.includes('video') ? 'Video' : 'Belge' }}</span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" (click)="selectedLibraryItem = null">Değiştir</button>
+                    </div>
+                </div>
+
+                <div *ngIf="newContentType === 'exam'">
+                    <div class="text-center p-4 border rounded bg-light">
+                        <i class='bx bx-task display-4 text-warning mb-2'></i>
+                        <h6>Sınav Modülü</h6>
+                        <button class="btn btn-warning btn-sm" (click)="openExamSelector()">Sınav Seç / Oluştur</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 p-3 border-top bg-light-subtle">
+                <button class="btn btn-light btn-sm" (click)="toggleNewContentForm()">İptal</button>
+                <button class="btn btn-dark btn-sm px-4" (click)="saveContent()" 
+                        [disabled]="!newContentTitle || (newContentType === 'material' && !selectedLibraryItem)">
+                    <i class='bx bx-save'></i> Kaydet
+                </button>
             </div>
         </div>
-        <!-- <button *ngIf="!isNewContentSelectorVisible && !isNewContentFormVisible" (click)="toggleNewContentSelector()"
-        class="btn btn-outline-dark" style="width: fit-content;">+ Müfrefat öğesi</button> -->
-    </div>
-    <div class="  d-flex flex-column gap-3 px-5 pb-4">
-        <button *ngIf="!isNewContentSelectorVisible && !isNewContentFormVisible" (click)="toggleNewContentSelector()"
-            class="btn btn-outline-dark" style="width: fit-content;">+ Müfrefat öğesi</button>
-    </div>
 
+    </div>
 </div>
+
+<p-dialog header="Ders Ayarları" 
+          [(visible)]="isSettingsDialogVisible" 
+          [modal]="true" 
+          [style]="{width: '400px'}" 
+          [draggable]="false" 
+          [resizable]="false"
+          [contentStyle]="{'overflow': 'visible'}">
+    
+    <div class="d-flex flex-column gap-3 p-4 bg-white rounded">
+        
+        <div class="form-check form-switch d-flex justify-content-between align-items-center border-bottom pb-2">
+            <label class="form-check-label" for="mandatorySwitch">
+                <span class="fw-bold d-block">Zorunlu İçerik</span>
+                <small class="text-muted">Öğrenci bu dersi geçmek zorunda.</small>
+            </label>
+            <input class="form-check-input" type="checkbox" id="mandatorySwitch" [(ngModel)]="contentSettings.mandatory">
+        </div>
+
+        <div class="form-check form-switch d-flex justify-content-between align-items-center border-bottom pb-2">
+            <label class="form-check-label" for="previewSwitch">
+                <span class="fw-bold d-block">Önizleme (Vitrin)</span>
+                <small class="text-muted">Satın almadan önce izlenebilir.</small>
+            </label>
+            <input class="form-check-input" type="checkbox" id="previewSwitch" [(ngModel)]="contentSettings.isPreview">
+        </div>
+
+        <div class="form-check form-switch d-flex justify-content-between align-items-center border-bottom pb-2">
+            <label class="form-check-label" for="seekingSwitch">
+                <span class="fw-bold d-block">İleri Sarma İzni</span>
+                <small class="text-muted">Video ileri sarılabilir mi?</small>
+            </label>
+            <input class="form-check-input" type="checkbox" id="seekingSwitch" [(ngModel)]="contentSettings.allowSeeking">
+        </div>
+
+        <div class="border-bottom pb-2">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="fw-bold small m-0">Tamamlanma Kabul Oranı</label>
+                <span class="badge bg-primary rounded-pill">%{{ contentSettings.completedRate }}</span>
+            </div>
+            
+            <input type="range" 
+                   class="form-range custom-range" 
+                   [(ngModel)]="contentSettings.completedRate" 
+                   min="1" max="100" step="5"
+                   (mousedown)="$event.stopPropagation()"
+                   (touchstart)="$event.stopPropagation()"
+                   (click)="$event.stopPropagation()">
+            
+            <small class="text-muted d-block mt-1 text-center fst-italic" style="font-size: 0.7rem;">
+                Videonun <strong class="text-dark">%{{ contentSettings.completedRate }}</strong> kısmı izlenince tamamlandı sayılacak.
+            </small>
+        </div>
+
+    </div>
+    <ng-template pTemplate="footer">
+        <button class="btn btn-primary btn-sm w-100" (click)="isSettingsDialogVisible = false">Tamam</button>
+    </ng-template>
+</p-dialog>

@@ -236,4 +236,10 @@ export class TrainingApiService {
     // Backend Controller Endpoint: [HttpGet("GetMyTrainings")]
     return this.http.get<any>(`${API_TRAINING_URL}/GetInstructorTrainings`);
   }
+
+  // 🔥 YENİ: İçerik Sıralama (Reorder)
+  reorderContent(payload: any): Observable<any> {
+    // Backend endpoint: api/Training/ReorderContent
+    return this.http.put<any>(`${API_TRAINING_URL}/ReorderContent`, payload);
+  }
 }

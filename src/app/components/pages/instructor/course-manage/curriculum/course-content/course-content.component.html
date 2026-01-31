@@ -1,55 +1,134 @@
-<div class="content d-flex flex-column ">
-    <div class="content-header d-flex w-100 align-items-center">
-        <div *ngIf="!isTitleEditorVisible" class="me-1">{{data.contentType.code==='lec' ? 'Ders' : 'Sınav'}} {{data.globalIndex}}:</div>
-        <div *ngIf="!isTitleEditorVisible" class="content-title">{{data.title}}</div>
-        <div *ngIf="isTitleEditorVisible" class="d-flex flex-column w-100 gap-2">
-            <div class="d-flex">
-                <div class="align-content-center me-2" style="white-space: nowrap;">{{data.contentType.code==='lec' ?
-                    'Ders' : 'Sınav'}} {{data.globalIndex}}:</div>
-                <input class="form-control form-control-sm shadow-none" [(ngModel)]="contentTitle" type="text">
-            </div>
-            <div class="d-flex gap-2 justify-content-end">
-                <button class="btn btn-sm " (click)="toggleTitleEditor()">İptal</button>
-                <button class="btn btn-outline-dark btn-sm me-1" (click)="updateContent()">Kaydet</button>
-            </div>
+<div class="content-card d-flex align-items-center justify-content-between p-2 border rounded mb-2 bg-white shadow-sm position-relative cursor-pointer"
+     (click)="toggleEdit()"
+     [class.border-primary]="isEditing">
+    
+    <div class="d-flex align-items-center gap-2 flex-grow-1 overflow-hidden">
+        <div class="drag-handle text-muted cursor-move p-1" cdkDragHandle (click)="$event.stopPropagation()">
+            <i class='bx bx-grid-vertical fs-5'></i>
         </div>
-        <div *ngIf="!isTitleEditorVisible" class="d-flex justify-content-between flex-fill align-items-center">
-            <div class="actions align-items-center d-flex gap-1 ms-2">
-                <i (click)="toggleTitleEditor()" class="bx bx-pencil"></i>
-                <i (click)="deleteContent()" class="bx bx-trash"></i>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <!-- <button *ngIf="!hasContent && !(isUploaderVisible || isTitleEditorVisible || isExamLibraryVisible)"
-                    (click)="data.contentType.code==='lec' ?toggleUploader():toggleExamLibrary()"
-                    class="btn btn-outline-dark btn-sm me-1" style="width: fit-content;">+
-                    {{data.contentType.code==='lec' ? 'İçerik' : 'Sınav'}}</button> -->
-                <i *ngIf="hasContent" class='actions bx bx-sm' (click)="toggleContentDetails()"
-                    [ngClass]="isContentDetailsVisible ? 'bx-chevron-up' : 'bx-chevron-down'"></i>
-                <i *ngIf="!isTitleEditorVisible" class='actions bx bx-menu sort'></i>
+
+        <div class="content-icon">
+            <i class='bx fs-4' [ngClass]="getIconClass(data)"></i>
+        </div>
+
+        <div class="content-info flex-grow-1 overflow-hidden">
+            <h6 class="mb-0 text-truncate small fw-bold" [title]="data.title">{{ data.title }}</h6>
+            <div class="d-flex align-items-center gap-2 mt-1">
+                <span class="badge bg-light text-secondary border tiny-text">
+                    {{ data.contentType?.code === 'exm' ? 'SINAV' : 'MATERYAL' }}
+                </span>
+                <span *ngIf="data.time" class="tiny-text text-muted">
+                    <i class='bx bx-time-five'></i> {{ data.time }}
+                </span>
+                <span *ngIf="data.mandatory" class="badge bg-danger bg-opacity-10 text-danger tiny-text px-1">Zorunlu</span>
             </div>
         </div>
     </div>
 
-    <div *ngIf="isContentDetailsVisible" class="content-details align-items-center d-flex gap-2">
-        <div class="d-flex justify-content-center align-items-center"
-            style="width: 100px;height: 60px;border: 1px solid;">
-            <ng-container *ngIf="data.trainingContentLibraryDto?.trainingContentLibraryVideoDuration">
-                <img [src]="data.trainingContentLibraryDto?.trainingContentLibraryThumbnail" alt="">
-            </ng-container>
-            <ng-container *ngIf="!data.trainingContentLibraryDto?.trainingContentLibraryVideoDuration">
-                <i class='bx bxs-file-pdf bx-lg'></i>
-            </ng-container>
-        </div>
+    <div class="d-flex align-items-center gap-1">
+        <button class="btn btn-sm btn-icon btn-light text-primary" (click)="$event.stopPropagation(); openPreview()" title="Önizle">
+            <i class='bx bx-show'></i>
+        </button>
+        <button class="btn btn-sm btn-icon btn-light text-danger" (click)="$event.stopPropagation(); deleteContent()" title="Sil">
+            <i class='bx bx-trash'></i>
+        </button>
+        <i class='bx fs-5 text-muted ms-1' [ngClass]="isEditing ? 'bx-chevron-up' : 'bx-chevron-down'"></i>
+    </div>
+</div>
 
-        <div class="d-flex flex-column">
-            <div>{{data.trainingContentLibraryDto?.trainingContentLibraryFileName}}</div>
-            <div>{{data.trainingContentLibraryDto?.trainingContentLibraryVideoDuration}}</div>
-            <!-- <div class="edit-link d-flex align-items-center gap-1" (click)="toggleUploader()">
-                <i class="bx bx-pencil"></i>İçeriği Düzenle
-            </div> -->
+<div *ngIf="isEditing" class="edit-panel p-3 border border-top-0 rounded-bottom bg-light mb-2 animate-slide-down shadow-sm">
+    
+    <h6 class="small fw-bold text-uppercase text-muted mb-3 border-bottom pb-2">Ders Detayları</h6>
+
+    <div class="mb-3">
+        <label class="small fw-bold text-muted mb-1">Ders Başlığı</label>
+        <input type="text" class="form-control form-control-sm" [(ngModel)]="data.title">
+    </div>
+
+    <div class="mb-3">
+        <label class="small fw-bold text-muted mb-1">Ders Açıklaması</label>
+        <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="data.description" placeholder="Öğrenciler için kısa bir açıklama..."></textarea>
+    </div>
+
+    <div class="mb-3" *ngIf="data.contentType?.code !== 'exm'">
+        <label class="small fw-bold text-muted mb-1">Bağlı İçerik</label>
+        
+        <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-white">
+            <div class="d-flex align-items-center gap-2 overflow-hidden flex-grow-1">
+                <i class='bx fs-4' [ngClass]="data.newLibraryItem ? 'bx-check-circle text-success' : getIconClass(data)"></i>
+                <div class="text-truncate small flex-grow-1">
+                    <div *ngIf="data.newLibraryItem">
+                        <span class="text-success fw-bold d-block">Yeni Seçim:</span>
+                        {{ data.newLibraryItem.fileName }}
+                    </div>
+                    <div *ngIf="!data.newLibraryItem">
+                        <span *ngIf="data.contentLibrary?.fileName || data.contentLibrary?.FileName" class="text-dark fw-bold">
+                            {{ data.contentLibrary?.fileName || data.contentLibrary?.FileName }}
+                        </span>
+                        <span *ngIf="!(data.contentLibrary?.fileName || data.contentLibrary?.FileName) && data.trainingContentLibraryDto?.trainingContentLibraryFileName">
+                            {{ data.trainingContentLibraryDto.trainingContentLibraryFileName }}
+                        </span>
+                        <span *ngIf="!data.contentLibrary && !data.trainingContentLibraryDto?.trainingContentLibraryFileName" class="text-danger fst-italic">
+                            <i class='bx bx-error-circle'></i> Dosya Bağlantısı Yok
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex gap-1">
+                <button class="btn btn-sm btn-outline-secondary" (click)="openPreview()" title="İçeriği Gör">
+                    <i class='bx bx-show'></i>
+                </button>
+                <button class="btn btn-sm btn-outline-primary" (click)="changeContent()">
+                    <i class='bx bx-library'></i> Değiştir
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="mandatoryCheck" [(ngModel)]="data.mandatory">
+                <label class="form-check-label small cursor-pointer" for="mandatoryCheck">Zorunlu İçerik</label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="previewCheck" [(ngModel)]="data.isPreview">
+                <label class="form-check-label small cursor-pointer" for="previewCheck">Vitrin (Önizleme)</label>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="seekingCheck" [(ngModel)]="data.allowSeeking">
+                <label class="form-check-label small cursor-pointer" for="seekingCheck">İleri Sarma İzni</label>
+            </div>
         </div>
     </div>
 
+<div class="mb-3 pt-2 border-top">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <label class="small fw-bold text-muted m-0">Tamamlandı Kabul Oranı</label>
+            <span class="badge bg-primary rounded-pill small">%{{ data.completedRate || 95 }}</span>
+        </div>
+        
+        <input type="range" class="form-range custom-range" 
+               [ngModel]="data.completedRate || 95" 
+               (ngModelChange)="data.completedRate = $event"
+               min="1" max="100" step="1">
+               
+        <div class="d-flex justify-content-between text-muted tiny-text px-1">
+            <span>%0</span>
+            <span>%50</span>
+            <span>%100</span>
+        </div>
+    </div>
 
-    <app-exam-library *ngIf="isExamLibraryVisible" (close)="toggleExamLibrary()"></app-exam-library>
+    <div class="d-flex justify-content-end gap-2 mt-2">
+        <button class="btn btn-light btn-sm" (click)="toggleEdit()">Kapat</button>
+        <button class="btn btn-success btn-sm px-3" (click)="saveChanges()">
+            <i class='bx bx-save'></i> Kaydet
+        </button>
+    </div>
 </div>
