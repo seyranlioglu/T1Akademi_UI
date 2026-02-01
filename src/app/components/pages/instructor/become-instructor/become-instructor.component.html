@@ -1,0 +1,99 @@
+<app-navbar></app-navbar>
+
+<!-- Page Banner -->
+<div class="page-banner-area item-bg1">
+    <div class="d-table">
+        <div class="d-table-cell">
+            <div class="container">
+                <div class="page-banner-content">
+                    <h2>Eğitmen Ol</h2>
+                    <ul>
+                        <li><a routerLink="/">Anasayfa</a></li>
+                        <li>Başvuru Formu</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Application Form Area -->
+<div class="become-instructor-area ptb-100">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 col-md-12">
+                <div class="become-instructor-image">
+                    <img src="assets/images/become-instructor.png" alt="image">
+                </div>
+            </div>
+
+            <div class="col-lg-6 col-md-12">
+                <div class="become-instructor-content">
+                    <h2>Bilgilerinizi ve yeteneklerinizi dünya ile paylaşın!</h2>
+                    <p>T1 Akademi eğitmeni olarak, uzmanlığınızı milyonlarca öğrenciye ulaştırabilir ve gelir elde edebilirsiniz.</p>
+                    
+                    <form [formGroup]="instructorForm" (ngSubmit)="onSubmit()">
+                        <div class="row">
+                            <!-- Title -->
+                            <div class="col-lg-12 col-md-12">
+                                <div class="form-group">
+                                    <label>Unvanınız (Örn: Kıdemli Yazılım Mühendisi)*</label>
+                                    <input type="text" class="form-control" formControlName="title" placeholder="Unvan giriniz">
+                                    <div *ngIf="instructorForm.get('title')?.touched && instructorForm.get('title')?.invalid" class="text-danger small mt-1">
+                                        Unvan zorunludur (min 5 karakter).
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bio -->
+                            <div class="col-lg-12 col-md-12">
+                                <div class="form-group">
+                                    <label>Biyografi (Kendinizi tanıtın)*</label>
+                                    <textarea class="form-control" formControlName="bio" rows="5" placeholder="Deneyimlerinizden bahsedin..."></textarea>
+                                    <div *ngIf="instructorForm.get('bio')?.touched && instructorForm.get('bio')?.invalid" class="text-danger small mt-1">
+                                        Biyografi zorunludur (min 20 karakter).
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Social Media -->
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <label>LinkedIn</label>
+                                    <input type="text" class="form-control" formControlName="linkedin" placeholder="https://linkedin.com/in/...">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <label>Web Sitesi</label>
+                                    <input type="text" class="form-control" formControlName="website" placeholder="https://...">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <label>Twitter (X)</label>
+                                    <input type="text" class="form-control" formControlName="twitter" placeholder="https://twitter.com/...">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6">
+                                <div class="form-group">
+                                    <label>Facebook</label>
+                                    <input type="text" class="form-control" formControlName="facebook" placeholder="https://facebook.com/...">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12 col-md-12">
+                                <button type="submit" class="default-btn" [disabled]="isSubmitting || instructorForm.invalid">
+                                    <span *ngIf="!isSubmitting">Başvuruyu Gönder</span>
+                                    <span *ngIf="isSubmitting">Gönderiliyor...</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-footer></app-footer>

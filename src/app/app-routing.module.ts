@@ -55,6 +55,7 @@ import { FaqPageComponent } from './components/pages/faq-page/faq-page.component
 import { PrivacyPolicyPageComponent } from './components/pages/privacy-policy-page/privacy-policy-page.component';
 import { TermsConditionsPageComponent } from './components/pages/terms-conditions-page/terms-conditions-page.component';
 import { TestimonialsPageComponent } from './components/pages/testimonials-page/testimonials-page.component';
+import { BecomeInstructorComponent } from './components/pages/instructor/become-instructor/become-instructor.component'; // YENİ EKLENDİ
 
 // Instructor Components (Eğitmen)
 import { InstructorComponent } from './components/pages/instructor/instructor.component';
@@ -67,7 +68,7 @@ import { CoursePricingComponent } from './components/pages/instructor/course-man
 import { ExamLibraryComponent } from './components/pages/instructor/course-manage/curriculum/exam-library/exam-library.component';
 import { ExamEditorComponent } from './components/pages/instructor/course-manage/curriculum/exam-editor/exam-editor.component';
 import { PerformanceComponent } from './components/pages/instructor/performance/performance.component';
-import { LibraryComponent } from './components/pages/instructor/library/library.component'; // YENİ
+import { LibraryComponent } from './components/pages/instructor/library/library.component';
 
 const routes: Routes = [
 
@@ -102,6 +103,7 @@ const routes: Routes = [
             { path: 'about', component: AboutPageComponent },
             { path: 'instructors', component: InstructorsPageComponent },
             { path: 'instructor-profile', component: InstructorProfilePageComponent },
+            { path: 'become-instructor', component: BecomeInstructorComponent }, // YENİ ROTA
             { path: 'courses-grid', component: CoursesGridPageComponent },
             { path: 'courses-list', component: CoursesListPageComponent },
             { path: 'course/:id', component: CourseDetailsPageComponent },

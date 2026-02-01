@@ -4,7 +4,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { RouterModule } from '@angular/router'; // YENİ EKLENDİ
+import { RouterModule } from '@angular/router'; 
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -32,7 +32,7 @@ import { FunfactsComponent } from './components/common/funfacts/funfacts.compone
 import { FeaturedBoxesComponent } from './components/common/featured-boxes/featured-boxes.component';
 import { HometwoBannerComponent } from './components/pages/home-demo-two/hometwo-banner/hometwo-banner.component';
 import { TopHeaderComponent } from './components/common/top-header/top-header.component';
-import { OverviewComponent } from './components/dashboard/overview/overview.component'; // YOLU KONTROL EDİLDİ
+import { OverviewComponent } from './components/dashboard/overview/overview.component';
 import { VideoComponent } from './components/common/video/video.component';
 import { HomethreeBannerComponent } from './components/pages/home-demo-three/homethree-banner/homethree-banner.component';
 import { ContactPageComponent } from './components/pages/contact-page/contact-page.component';
@@ -100,7 +100,7 @@ import { CalendarViewComponent } from './components/dashboard/calendar-view/cale
 import { CarouselModule } from 'ngx-owl-carousel-o';
 import { CourseCardComponent } from './components/common/course-card/course-card.component';
 import { CompanyEmployeesComponent } from './components/dashboard/company-employees/company-employees.component';
-import { NgSelectModule } from '@ng-select/ng-select'; // <-- Import
+import { NgSelectModule } from '@ng-select/ng-select'; 
 import { AccountVerificationComponent } from './components/pages/login-page/account-verification/account-verification.component';
 import { LibraryComponent } from './components/pages/instructor/library/library.component';
 import { UploadWidgetComponent } from './components/common/upload-widget/upload-widget.component';
@@ -112,6 +112,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ContentLibrarySelectorComponent } from './components/common/content-library-selector/content-library-selector.component';
 import { TooltipModule } from 'primeng/tooltip';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+import { BecomeInstructorComponent } from './components/pages/instructor/become-instructor/become-instructor.component'; // YENİ EKLENDİ
 
 @NgModule({
     declarations: [
@@ -203,7 +204,8 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
         UploadModalComponent,
         SafeUrlPipe,
         ContentPreviewModalComponent,
-        ContentLibrarySelectorComponent
+        ContentLibrarySelectorComponent,
+        BecomeInstructorComponent // YENİ EKLENDİ
         
     ],
     imports: [
@@ -218,7 +220,7 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
         NgbModule,
         DragDropModule,
         MatTabsModule,
-        RouterModule, // KRİTİK: routerLink'in çalışması için eklendi
+        RouterModule,
         ToastrModule.forRoot({positionClass: 'toast-top-right'}),
         StoreModule.forRoot({ course: courseReducer }),
         EffectsModule.forRoot([CourseEffects]),
