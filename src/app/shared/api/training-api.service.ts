@@ -5,12 +5,7 @@ import { environment } from 'src/environments/environment';
 import { TrainingCard } from '../models/dashboard.model'; 
 import { SearchTrainingRequest, AddReviewDto } from '../models/training-list.model';
 
-const API_TRAINING_URL = `${environment.apiUrl}/Training`; // Note: Controller name is usually plural 'Trainings' based on standard conventions, but I will stick to your existing constant logic or adjust specific calls. 
-// However, looking at your provided code: const API_TRAINING_URL = `${environment.apiUrl}/Training`; 
-// The previous backend controller code shared was: [Route("api/[controller]")] public class TrainingsController
-// So the URL should ideally be .../Trainings. 
-// I will use API_TRAINING_URL but ensure the endpoint matches the backend method name exactly.
-
+const API_TRAINING_URL = `${environment.apiUrl}/Training`;
 const API_DASHBOARD_URL = `${environment.apiUrl}/Dashboard`; 
 const API_TRAINING_CATEGORY_URL = `${environment.apiUrl}/TrainingCategory`;
 const API_TRAINING_CONTENT_URL = `${environment.apiUrl}/TrainingContent`;
@@ -22,6 +17,15 @@ const API_WHAT_YOU_WILL_LEARN_URL = `${environment.apiUrl}/WhatYouWillLearn`;
 })
 export class TrainingApiService {
   constructor(private http: HttpClient) {}
+
+  // ===========================================================================
+  // 🔥 YENİ: ÖNİZLEME TOKEN'I ALMA (Manage Component için)
+  // ===========================================================================
+  getTrainingPreviewToken(trainingId: number): Observable<any> {
+    return this.http.get<any>(`${API_TRAINING_URL}/GetPreviewToken/${trainingId}`).pipe(
+        map(res => res.data || res.body || res)
+    );
+  }
 
   // ===========================================================================
   // DASHBOARD CONTROLLER 
@@ -55,8 +59,6 @@ export class TrainingApiService {
   // TRAINING CONTROLLER (Eğitim İşlemleri)
   // ===========================================================================
 
-  // YENİ EKLENEN: Public Detay Sayfası için
-  // Backend: [HttpGet("GetPublicDetail/{id}")]
   getTrainingPublicDetail(id: number): Observable<any> {
     return this.http.get<any>(`${API_TRAINING_URL}/GetPublicDetail/${id}`).pipe(
       map(res => res.data || res.body || res)
@@ -71,7 +73,6 @@ export class TrainingApiService {
 
     if (request.searchText) params = params.set('searchText', request.searchText);
     if (request.minRating) params = params.set('minRating', request.minRating.toString());
-    // Yeni eklenen sıralama parametresi
     if (request.sortBy) params = params.set('sortBy', request.sortBy);
 
     if (request.categoryIds) {
@@ -133,8 +134,16 @@ export class TrainingApiService {
     return this.http.get<any>(`${API_TRAINING_URL}/GetList`);
   }
 
-  getTrainingById(id: number): Observable<any> {
-    return this.http.get<any>(`${API_TRAINING_URL}/GetById?id=${id}`);
+  // 🔥 GÜNCELLENEN METOD: Token parametresi eklendi
+  getTrainingById(id: number, previewToken?: string): Observable<any> {
+    let params = new HttpParams().set('id', id.toString());
+    
+    // Eğer token varsa parametreye ekle
+    if (previewToken) {
+        params = params.set('previewToken', previewToken);
+    }
+
+    return this.http.get<any>(`${API_TRAINING_URL}/GetById`, { params });
   }
 
   deleteTraining(id: number): Observable<any> {
@@ -233,13 +242,11 @@ export class TrainingApiService {
   }
 
   getInstructorTrainingList(): Observable<any> {
-    // Backend Controller Endpoint: [HttpGet("GetMyTrainings")]
     return this.http.get<any>(`${API_TRAINING_URL}/GetInstructorTrainings`);
   }
 
   // 🔥 YENİ: İçerik Sıralama (Reorder)
   reorderContent(payload: any): Observable<any> {
-    // Backend endpoint: api/Training/ReorderContent
     return this.http.put<any>(`${API_TRAINING_URL}/ReorderContent`, payload);
   }
 }

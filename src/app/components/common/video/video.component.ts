@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
     selector: 'app-video',
@@ -6,6 +6,10 @@ import { Component } from '@angular/core';
     styleUrls: ['./video.component.scss']
 })
 export class VideoComponent {
+
+    // 🔥 Bu Input'ları ekledik ki dışarıdan veri alabilsin
+    @Input() url: string | undefined;
+    @Input() tumb: string | undefined;
 
     isOpen = false;
 

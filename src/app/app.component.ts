@@ -9,39 +9,28 @@ import { filter } from 'rxjs/operators';
 })
 export class AppComponent implements OnInit {
     
-    // Navbar ve Footer'ın GİZLENECEĞİ durumlar
     hideNavbar = false;
     hideFooter = false;
 
-    constructor(public router: Router) {
-        // Sayfa her değiştiğinde kontrol et
+    constructor(public router: Router) {}
+
+    ngOnInit() {
         this.router.events.pipe(
             filter((event): event is NavigationEnd => event instanceof NavigationEnd)
         ).subscribe((event: NavigationEnd) => {
             this.checkVisibility(event.url);
         });
-    }
-
-    ngOnInit() {
-        // İlk açılışta da kontrol et
         this.checkVisibility(this.router.url);
     }
 
     checkVisibility(url: string) {
-        // 1. Auth sayfaları (Login/Register) -> Hepsi gizli
         const isAuth = url.includes('/auth');
-
-        // 2. Instructor Paneli -> Navbar gizlenebilir (isteğe bağlı)
         const isInstructor = url.includes('/instructor');
-
-        // 3. Ders İzleme Ekranı (watch) -> Navbar gizli
-        const isPlayer = url.includes('/watch');
-
-        // Karar Ver:
-        // Eğer Auth, Instructor veya Player sayfasındaysak Navbar'ı gizle
-        this.hideNavbar = isAuth || isInstructor || isPlayer;
         
-        // Footer da aynı mantıkla gizlensin
+        // 🔥 GÜNCELLEME: '/watch' yerine veya ek olarak '/course-player' kontrolü
+        const isPlayer = url.includes('/watch') || url.includes('/course-player');
+
+        this.hideNavbar = isAuth || isInstructor || isPlayer;
         this.hideFooter = isAuth || isInstructor || isPlayer;
     }
 }

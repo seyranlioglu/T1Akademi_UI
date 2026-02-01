@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { TrainingApiService } from 'src/app/shared/api/training-api.service';
+import { TrainingApiService } from 'src/app/shared/api/training-api.service'; // 🔥 TrainingApi kullanıyoruz
 import { CartService } from 'src/app/shared/services/cart.service';
+import { PublicCourseDetail } from 'src/app/shared/models/public-course-detail.model';  
 
 @Component({
     selector: 'app-course-details-page',
@@ -11,88 +11,52 @@ import { CartService } from 'src/app/shared/services/cart.service';
 })
 export class CourseDetailsPageComponent implements OnInit {
 
-    trainingId: number = 0;
-    training: any = null; // HTML'de "training" kullanılacak
-    isLoading = true;
-    currentTab = 'tab1';
-    isOpen = false;
-    safeVideoUrl: SafeResourceUrl | null = null;
-    openSectionIndex: number = 0; 
+    courseId!: number;
+    course: PublicCourseDetail | null = null;
+    isLoading: boolean = true;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private trainingService: TrainingApiService,
-        private cartService: CartService,
-        private sanitizer: DomSanitizer
+        private trainingApi: TrainingApiService, // Servisi ekledik
+        public cartService: CartService
     ) { }
 
     ngOnInit(): void {
         this.route.params.subscribe(params => {
-            if (params['id']) {
-                this.trainingId = +params['id'];
-                this.loadTrainingDetail();
-            } else {
-                this.router.navigate(['/']);
+            const id = params['id'];
+            if (id) {
+                this.courseId = +id;
+                this.loadCourseData();
             }
         });
     }
 
-    loadTrainingDetail() {
+    loadCourseData() {
         this.isLoading = true;
-        this.trainingService.getTrainingPublicDetail(this.trainingId).subscribe({
-            next: (res: any) => {
-                this.training = res.data || res.body || res;
+        // Servisteki map() işlemi sayesinde data direkt obje olarak geliyor
+        this.trainingApi.getTrainingPublicDetail(this.courseId).subscribe({
+            next: (data) => {
+                this.course = data;
                 this.isLoading = false;
-
-                if (this.training?.previewVideoPath) {
-                    this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.training.previewVideoPath);
-                }
             },
             error: (err) => {
-                console.error("Hata:", err);
+                console.error("Kurs detay hatası:", err);
                 this.isLoading = false;
             }
         });
-    }
-
-    switchTab(event: MouseEvent, tab: string) {
-        event.preventDefault();
-        this.currentTab = tab;
-    }
-
-    toggleSection(index: number): void {
-        if (this.openSectionIndex === index) {
-            this.openSectionIndex = -1;
-        } else {
-            this.openSectionIndex = index;
-        }
-    }
-
-    isSectionOpen(index: number): boolean {
-        return this.openSectionIndex === index;
-    }
-
-    openPopup(): void {
-        if (this.safeVideoUrl) this.isOpen = true;
-    }
-
-    closePopup(): void {
-        this.isOpen = false;
     }
 
     addToCart() {
-        if (!this.training) return;
-        this.cartService.addToCart(this.training.id, 1).subscribe({
-            next: (res) => console.log("Sepete eklendi"),
-            error: (err) => console.error(err)
-        });
+        if (this.course) {
+            this.cartService.addToCart(this.course.id);
+        }
     }
 
     buyNow() {
-        if (!this.training) return;
-        this.cartService.addToCart(this.training.id, 1).subscribe({
-            next: (res) => this.router.navigate(['/dashboard/cart'])
-        });
+        if (this.course) {
+            this.cartService.addToCart(this.course.id);
+            this.router.navigate(['/dashboard/cart']);
+        }
     }
 }

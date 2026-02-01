@@ -170,7 +170,9 @@ export class CourseContentComponent {
             next: () => {
                 this.toastr.success('İçerik silindi.');
                 // Silme işleminden sonra da Store'u tetiklemek en temizidir
-                this.store.dispatch(loadCourse({}));
+                this.store.dispatch(loadCourse({ 
+                    courseId: this.data.trainingId // Varsa gönder, yoksa effect store'dan bulur.
+                }));
             },
             error: (err) => this.toastr.error('Silme hatası.')
         });

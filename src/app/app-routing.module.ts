@@ -43,7 +43,6 @@ import { InstructorsPageComponent } from './components/pages/instructors-page/in
 import { InstructorProfilePageComponent } from './components/pages/instructor-profile-page/instructor-profile-page.component';
 import { CoursesGridPageComponent } from './components/pages/courses-grid-page/courses-grid-page.component';
 import { CoursesListPageComponent } from './components/pages/courses-list-page/courses-list-page.component';
-import { CourseComponent } from './components/pages/course/course.component';
 import { EventsPageComponent } from './components/pages/events-page/events-page.component';
 import { EventDetailsPageComponent } from './components/pages/event-details-page/event-details-page.component';
 import { SuccessStoriesPageComponent } from './components/pages/success-stories-page/success-stories-page.component';
@@ -90,9 +89,6 @@ const routes: Routes = [
         path: 'course/:id/watch',
         component: PlayerLayoutComponent,
         canActivate: [AuthGuard, IdValidatorGuard],
-        children: [
-            { path: '', component: CourseComponent }
-        ]
     },
     // =================================================================
     // 1. ANA PLATFORM (Öğrenci Arayüzü - Navbar & Footer Var)
@@ -108,7 +104,7 @@ const routes: Routes = [
             { path: 'instructor-profile', component: InstructorProfilePageComponent },
             { path: 'courses-grid', component: CoursesGridPageComponent },
             { path: 'courses-list', component: CoursesListPageComponent },
-            { path: 'course/:id', component: CourseComponent },
+            { path: 'course/:id', component: CourseDetailsPageComponent },
             { path: 'events', component: EventsPageComponent },
             { path: 'event-details', component: EventDetailsPageComponent },
             { path: 'success-stories', component: SuccessStoriesPageComponent },
@@ -189,9 +185,6 @@ const routes: Routes = [
         path: 'course-player/:id',
         component: PlayerLayoutComponent,
         canActivate: [AuthGuard, IdValidatorGuard],
-        children: [
-            { path: '', component: CourseDetailsPageComponent }
-        ]
     },
 
     // 404

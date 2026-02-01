@@ -1,3 +1,233 @@
-<div class="player-content">
-    <router-outlet></router-outlet>
+<div class="player-header d-flex align-items-center justify-content-between px-3">
+    <div class="d-flex align-items-center gap-3">
+        <a routerLink="/instructor/courses" class="text-white text-decoration-none d-flex align-items-center back-link">
+            <i class='bx bx-chevron-left fs-4'></i> 
+            <span class="d-none d-sm-inline ms-1 small fw-bold">Kurslara Dön</span>
+        </a>
+        <div class="vertical-divider"></div>
+        <h6 class="m-0 text-white text-truncate course-title" [title]="course?.title">
+            {{ course?.title || 'Eğitim Yükleniyor...' }}
+        </h6>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <div class="d-none d-md-flex align-items-center gap-2 text-white small">
+            <div class="progress" style="width: 100px; height: 6px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+            </div>
+            <span>%0</span>
+        </div>
+        <span *ngIf="isPreviewMode" class="badge bg-warning text-dark animate-pulse cursor-pointer" title="Önizleme Modu">
+            <i class='bx bx-show'></i> Önizleme
+        </span>
+    </div>
+</div>
+
+<div class="player-body d-flex">
+    
+    <div class="player-main flex-grow-1 d-flex flex-column" [class.full-width]="!isSidebarOpen">
+        
+        <div class="viewer-container bg-black d-flex align-items-center justify-content-center position-relative"
+             [ngClass]="{'bg-light': viewType === 'pdf' || viewType === 'image'}"
+             [style.height]="viewType === 'pdf' ? '85vh' : '65vh'">
+            
+            <div *ngIf="!currentContent" class="text-white text-center">
+                <div class="spinner-border text-light mb-3"></div>
+                <p>İçerik yükleniyor...</p>
+            </div>
+
+            <ng-container *ngIf="viewType === 'video'">
+                <div class="w-100 h-100 bg-black">
+                    <iframe *ngIf="getCurrentFilePath().includes('http')" 
+                            [src]="getVideoUrl() | safeUrl" 
+                            class="w-100 h-100 border-0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                    </iframe>
+                    <video *ngIf="!getCurrentFilePath().includes('http')" 
+                           [src]="getCurrentFilePath()" 
+                           controls 
+                           controlsList="nodownload"
+                           class="w-100 h-100" 
+                           [poster]="getCurrentThumbnail()">
+                    </video>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="viewType === 'image'">
+                <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center p-4 position-relative">
+                    <img [src]="getCurrentFilePath()" class="img-fluid rounded shadow-sm" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                    <div class="mt-3" *ngIf="!canProceed && !isPreviewMode">
+                        <span class="badge bg-dark rounded-pill px-3 py-2">
+                            <i class='bx bx-time-five animate-spin me-1'></i> 
+                            {{ requiredTimePerPage - timeSpentOnPage }} sn
+                        </span>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="viewType === 'pdf'">
+                <div class="pdf-preview-wrapper w-100 h-100 d-flex flex-column align-items-center justify-content-center text-center bg-light p-4">
+                    <i class='bx bxs-file-pdf text-danger' style="font-size: 5rem;"></i>
+                    <h5 class="mt-3 text-dark">PDF İçerik</h5>
+                    <p class="text-muted mb-4">Bu içeriği görüntülemek ve süreyi başlatmak için tam ekran moduna geçiniz.</p>
+                    <button class="btn btn-primary btn-lg d-flex align-items-center gap-2 px-4 shadow" (click)="openPdfModal()">
+                        <i class='bx bx-fullscreen'></i> Tam Ekran Oku
+                    </button>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="viewType === 'unknown' || viewType === 'exam'">
+                <div class="text-center p-5">
+                    <i class='bx bx-error-circle fs-1 text-muted'></i>
+                    <h5 class="mt-3 text-dark">Bu içerik önizlenemez.</h5>
+                </div>
+            </ng-container>
+        </div>
+
+        <div class="content-tabs mt-3 px-4 pb-5">
+            <ul class="nav nav-tabs border-bottom-0 gap-3">
+                <li class="nav-item cursor-pointer">
+                    <a class="nav-link border-0 border-bottom border-2 text-dark" 
+                       [class.active]="activeTab === 'overview'" 
+                       [class.border-dark]="activeTab === 'overview'" 
+                       (click)="setActiveTab('overview')">Genel Bakış</a>
+                </li>
+                <li class="nav-item cursor-pointer">
+                    <a class="nav-link border-0 border-bottom border-2 text-muted" 
+                       [class.active]="activeTab === 'learn'" 
+                       [class.border-dark]="activeTab === 'learn'" 
+                       [class.text-dark]="activeTab === 'learn'"
+                       (click)="setActiveTab('learn')">Neler Öğreneceksiniz</a>
+                </li>
+                <li class="nav-item cursor-pointer">
+                    <a class="nav-link border-0 border-bottom border-2 text-muted" 
+                       [class.active]="activeTab === 'instructor'" 
+                       [class.border-dark]="activeTab === 'instructor'" 
+                       [class.text-dark]="activeTab === 'instructor'"
+                       (click)="setActiveTab('instructor')">Eğitmen</a>
+                </li>
+                <li class="nav-item cursor-pointer">
+                    <a class="nav-link border-0 border-bottom border-2 text-muted" 
+                       [class.active]="activeTab === 'reviews'" 
+                       [class.border-dark]="activeTab === 'reviews'" 
+                       [class.text-dark]="activeTab === 'reviews'"
+                       (click)="setActiveTab('reviews')">Değerlendirmeler</a>
+                </li>
+            </ul>
+
+            <div class="tab-content py-4">
+                
+                <div *ngIf="activeTab === 'overview'">
+                    <h5 class="fw-bold mb-2">{{ currentContent?.title }}</h5>
+                    <p class="text-muted mb-4">{{ currentContent?.description || 'Bu ders için özel bir açıklama bulunmuyor.' }}</p>
+                    
+                    <hr class="my-4 text-muted">
+                    
+                    <h6 class="fw-bold">Eğitim Hakkında</h6>
+                    <div class="text-muted small" [innerHTML]="course?.description"></div>
+                </div>
+
+                <div *ngIf="activeTab === 'learn'">
+                    <h6 class="fw-bold mb-3">Bu eğitimde şunları öğreneceksiniz:</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-2" *ngFor="let item of course?.whatYouWillLearns">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class='bx bx-check text-success fs-5 mt-1'></i>
+                                <span class="text-muted">{{ item.title }}</span>
+                            </div>
+                        </div>
+                        <div class="col-12" *ngIf="!course?.whatYouWillLearns?.length">
+                            <p class="text-muted">Bu bilgi henüz eklenmemiş.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="activeTab === 'instructor'">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <img [src]="course?.instructorPicturePath || 'assets/images/defaults/defaultuser.png'" 
+                             class="rounded-circle" width="60" height="60" style="object-fit: cover;">
+                        <div>
+                            <h6 class="fw-bold mb-0">{{ course?.instructorTitle }}</h6>
+                            <small class="text-muted">Eğitmen</small>
+                        </div>
+                    </div>
+                    <p class="text-muted small">
+                        {{ course?.instructorEmail }} - {{ course?.instructorAddress }}
+                    </p>
+                </div>
+
+                <div *ngIf="activeTab === 'reviews'">
+                    <p class="text-muted">Henüz değerlendirme yapılmamış.</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="player-sidebar border-start bg-white d-flex flex-column" [class.closed]="!isSidebarOpen">
+        <div class="sidebar-header p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+            <h6 class="m-0 fw-bold">Ders İçeriği</h6>
+            <button class="btn btn-sm btn-icon text-muted" (click)="toggleSidebar()"><i class='bx bx-x fs-5'></i></button>
+        </div>
+        <div class="sidebar-content flex-grow-1 overflow-auto">
+            <div *ngFor="let section of course?.trainingSections; let sIndex = index" class="accordion-item border-bottom">
+                <div class="section-header p-3 bg-light cursor-pointer d-flex justify-content-between align-items-center" 
+                     (click)="toggleSection(section.trainingSectionId || section.id)">
+                    <div class="overflow-hidden">
+                        <h6 class="m-0 fw-bold small text-dark text-truncate">Bölüm {{ sIndex + 1 }}: {{ section.trainingSectionTitle || section.title }}</h6>
+                        <span class="tiny-text text-muted">{{ section.trainingContents?.length || 0 }} Ders</span>
+                    </div>
+                    <i class='bx ms-2' [ngClass]="openSections[section.trainingSectionId || section.id] ? 'bx-chevron-up' : 'bx-chevron-down'"></i>
+                </div>
+                <div class="section-body" [class.d-none]="!openSections[section.trainingSectionId || section.id]">
+                    <div *ngFor="let content of section.trainingContents; let cIndex = index" 
+                         class="lesson-item p-3 d-flex align-items-start gap-2 cursor-pointer border-bottom-light"
+                         [class.active-lesson]="currentContent?.id === content.id"
+                         (click)="selectContent(content)">
+                        <div class="mt-1"><input type="checkbox" class="form-check-input" [checked]="false" disabled></div>
+                        <div class="flex-grow-1 overflow-hidden">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="lesson-title small mb-1 d-block text-truncate">{{ cIndex + 1 }}. {{ content.title }}</span>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary tiny-text ms-2 flex-shrink-0" *ngIf="content.time">{{ content.time }}</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-1 text-muted tiny-text">
+                                <i class='bx' [ngClass]="getIconClass(content)"></i>
+                                <span>{{ content.contentType?.code === 'exm' ? 'Sınav' : 'İçerik' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button *ngIf="!isSidebarOpen" class="btn btn-dark sidebar-toggle-btn position-absolute shadow" style="right: 0; top: 80px; border-radius: 4px 0 0 4px; z-index: 1040;" (click)="toggleSidebar()"><i class='bx bx-menu'></i></button>
+</div>
+
+<div class="pdf-modal-overlay" *ngIf="isPdfModalOpen && viewType === 'pdf'">
+    <div class="pdf-modal-header d-flex justify-content-between align-items-center px-4 py-2 bg-dark text-white">
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-danger animate-pulse" *ngIf="!isTimerGreen">Okuma Süresi</span>
+            <span class="badge bg-success" *ngIf="isTimerGreen">Tamamlandı</span>
+            <h6 class="m-0 text-truncate" style="max-width: 300px;">{{ currentContent?.title }}</h6>
+        </div>
+        <button class="btn btn-icon text-white" (click)="closePdfModal()" title="Kapat"><i class='bx bx-x fs-3'></i></button>
+    </div>
+    <div class="pdf-modal-body">
+        <ngx-extended-pdf-viewer
+            [src]="pdfSrc" [height]="'100%'" [pageViewMode]="'book'" [showSidebarButton]="true"
+            [showFindButton]="true" [showPagingButtons]="false" [showDrawEditor]="false"
+            [showTextEditor]="false" [showSecondaryToolbarButton]="false" [zoom]="'page-fit'"
+            [handTool]="true" [(page)]="currentPdfPage" (pagesLoaded)="onPdfLoaded($event)">
+        </ngx-extended-pdf-viewer>
+    </div>
+    <div class="pdf-modal-footer d-flex justify-content-center align-items-center gap-4 py-3 bg-dark text-white">
+        <button class="btn btn-outline-light d-flex align-items-center gap-2" (click)="prevPdfPage()" [disabled]="currentPdfPage <= 1"><i class='bx bx-chevron-left'></i> Önceki Sayfa</button>
+        <div class="timer-box d-flex flex-column align-items-center px-4 py-1 rounded" [ngClass]="isTimerGreen ? 'bg-success bg-opacity-25 border border-success' : 'bg-danger bg-opacity-25 border border-danger'">
+            <small class="text-uppercase fw-bold" style="font-size: 0.7rem;">{{ isTimerGreen ? 'Süre Doldu' : 'Kalan Süre' }}</small>
+            <div class="fw-bold fs-4 font-monospace">{{ timeRemaining }}s</div>
+            <div class="progress mt-1 w-100" style="height: 4px;"><div class="progress-bar" [ngClass]="isTimerGreen ? 'bg-success' : 'bg-danger'" [style.width.%]="(elapsedTime / totalPageTime) * 100"></div></div>
+        </div>
+        <button class="btn btn-light d-flex align-items-center gap-2" (click)="nextPdfPage()" [disabled]="currentPdfPage >= totalPdfPages">Sonraki Sayfa <i class='bx bx-chevron-right'></i></button>
+        <div class="text-white-50 ms-3 small">Sayfa {{ currentPdfPage }} / {{ totalPdfPages }}</div>
+    </div>
 </div>

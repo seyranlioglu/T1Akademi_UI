@@ -1,174 +1,44 @@
-// Page Banner
-.page-banner-content {
-    max-width: 720px;
-    position: relative;
-    z-index: 1;
-
-    .list {
-        margin-bottom: 15px;
-        .list-item {
-            margin-right: 25px;
-            color: #fff; // Metin beyaz
-            font-weight: 500;
-            
-            i {
-                line-height: 1;
-                vertical-align: middle;
-            }
-            &::before {
-                top: 50%;
-                width: 1px;
-                right: -13px;
-                content: "";
-                height: 16px;
-                position: absolute;
-                background-color: rgba(255,255,255,0.3);
-                transform: translateY(-50%);
-            }
-            &:last-child {
-                margin-right: 0;
-                &::before { display: none; }
-            }
-        }
-    }
+.course-header {
+    background-color: #1c1d1f;
 }
 
-// Course Details
-.course-details-desc {
-    .nav-tabs {
-        margin-bottom: 35px;
-        border-bottom: 1px solid #eee;
-
-        .nav-link {
-            padding: 0 0 10px 0;
-            color: var(--bodyColor);
-            font-size: 16px;
-            font-weight: 600;
-            margin-right: 30px;
-            background: transparent;
-            
-            &::before {
-                left: 0;
-                width: 0;
-                height: 2px;
-                content: '';
-                bottom: -1px;
-                position: absolute;
-                transition: var(--transition);
-                background: var(--primaryColor);
-            }
-            &.active, &:hover {
-                color: var(--primaryColor);
-                &::before { width: 100%; }
-            }
-        }
-    }
-
-    .overview-details-content {
-        .features-list {
-            li {
-                width: 50%;
-                margin-bottom: 10px;
-                span {
-                    position: relative;
-                    padding-left: 25px;
-                    display: block;
-                    i {
-                        left: 0;
-                        top: 2px;
-                        position: absolute;
-                        color: var(--secondaryColor); // Yeşil tik
-                    }
-                }
-            }
-        }
-    }
-
-    // Accordion
-    .accordion-section {
-        border: 1px solid #eee;
-        margin-bottom: 15px;
-        border-radius: 5px;
-        overflow: hidden;
-
-        .accordion-header {
-            padding: 15px 20px;
-            background: #f9f9f9;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-
-            &:hover { background: #f1f1f1; }
-            &.open { 
-                background: #fff; 
-                color: var(--primaryColor);
-                border-bottom: 1px solid #eee;
-            }
-        }
-
-        .accordion-content {
-            padding: 0;
-            
-            ul li {
-                padding: 12px 20px;
-                border-bottom: 1px solid #f8f8f8;
-                font-size: 14px;
-                
-                &:last-child { border-bottom: none; }
-                &:hover { background-color: #fafafa; }
-            }
-        }
-    }
+.text-info {
+    color: #cec0fc !important; /* Açık mor (Udemy Link Rengi) */
+    &:hover { color: #fff !important; }
 }
 
-// Sticky Sidebar
-.course-details-info {
-    // SCSS içinde sticky özelliği HTML'de style ile verildi ama burada da dursun
-    transition: top 0.3s;
+.text-shadow {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.tiny-text {
+    font-size: 0.75rem;
+}
+
+.course-sidebar-card {
+    border-radius: 0;
+    overflow: hidden;
+    /* Kartın mobilde içeriğin üstünde kalmasını önlemek için */
+}
+
+/* Play Butonu Animasyonu */
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+@media (max-width: 991px) {
+    .course-sidebar-card {
+        position: static !important; /* Mobilde yapışkanlığı kapat */
+        margin-bottom: 30px;
+    }
     
-    .video-btn {
-        width: 60px;
-        height: 60px;
-        background-color: var(--primaryColor);
-        transition: transform 0.2s;
-        
-        &:hover {
-            transform: translate(-50%, -50%) scale(1.1) !important;
-        }
+    .course-header {
+        text-align: center;
     }
 }
-
-// Video Popup Overlay (Modal)
-.video-popup-overlay {
-    position: fixed;
-    top: 0; 
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.85); // Koyu arka plan
-    z-index: 10000; // En üstte
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(5px);
-
-    .popup-inner {
-        width: 90%;
-        max-width: 800px;
-        position: relative;
-    }
-}
-
-// Responsive
-@media (max-width: 768px) {
-    .overview-details-content .features-list li { width: 100%; }
-    .page-banner-content .list { display: block; }
-    .page-banner-content .list .list-item { margin-bottom: 5px; }
-}
-
-// Helpers
-.bg-success-light { background-color: rgba(25, 135, 84, 0.1); }
-.hover-primary:hover { border-color: var(--primaryColor) !important; color: var(--primaryColor) !important; }

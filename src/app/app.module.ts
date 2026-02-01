@@ -85,7 +85,6 @@ import { CourseEffects } from './shared/store/course.effects';
 import { ExamEditorComponent } from './components/pages/instructor/course-manage/curriculum/exam-editor/exam-editor.component';
 import { ExamLibraryComponent } from './components/pages/instructor/course-manage/curriculum/exam-library/exam-library.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { CourseComponent } from './components/pages/course/course.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { WhatYouWillLearnComponent } from './components/pages/instructor/course-manage/what-you-will-learn/what-you-will-learn.component';
 import { CourseLandingComponent } from './components/pages/instructor/course-manage/course-landing/course-landing.component';
@@ -112,6 +111,8 @@ import { ContentPreviewModalComponent } from './components/common/modals/content
 import { DialogModule } from 'primeng/dialog';
 import { ContentLibrarySelectorComponent } from './components/common/content-library-selector/content-library-selector.component';
 import { TooltipModule } from 'primeng/tooltip';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -189,7 +190,6 @@ import { TooltipModule } from 'primeng/tooltip';
         WhatYouWillLearnComponent,
         CourseLandingComponent,
         CoursePricingComponent,
-        CourseComponent,
         SidebarComponent,
         UserMenuComponent,
         ResetPasswordPageComponent,
@@ -227,7 +227,8 @@ import { TooltipModule } from 'primeng/tooltip';
         NgSelectModule,
         DynamicDialogModule,
         DialogModule,
-        TooltipModule
+        TooltipModule,
+        NgxExtendedPdfViewerModule
     ],
     providers: [
         {

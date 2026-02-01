@@ -119,3 +119,66 @@ $menu-item-padding: 12px;
     }
   }
 }
+
+.course-manage-wrapper {
+    min-height: calc(100vh - 80px); /* Footer payı */
+    background-color: #f9f9f9;
+}
+
+.side-nav {
+    background-color: #fff;
+    border-right: 1px solid #e0e0e0;
+    padding-bottom: 2rem;
+}
+
+.section-title {
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    margin-top: 20px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.menu-link {
+    display: flex;
+    align-items: center;
+    color: #555;
+    text-decoration: none;
+    transition: all 0.3s;
+    border-radius: 4px;
+    font-size: 0.9rem;
+
+    &:hover {
+        background-color: #f0f0f0;
+        color: #000;
+    }
+
+    .completion {
+        margin-right: 10px;
+        color: #ccc;
+        
+        i { vertical-align: middle; }
+    }
+}
+
+.menu-item.active .menu-link {
+    background-color: #e6f0ff; /* Açık mavi */
+    color: #0056b3;
+    font-weight: 600;
+    border-left: 3px solid #0056b3;
+    
+    .completion {
+        color: #0056b3;
+    }
+}
+
+/* Header Butonları */
+.manage-header {
+    background-color: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}

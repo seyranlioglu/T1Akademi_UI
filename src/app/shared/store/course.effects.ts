@@ -22,11 +22,13 @@ export class CourseEffects {
         private trainingService: TrainingApiService
     ) {}
 
+    // 🔥 GÜNCELLENEN LOAD COURSE EFFECT
     loadCourse$ = createEffect(() =>
         this.actions$.pipe(
             ofType(loadCourse),
             withLatestFrom(this.store.select(selectSelectedCourse)),
             switchMap(([action, selectedCourse]) => {
+                // 1. ID Belirleme: Action'dan geleni al, yoksa Store'daki mevcut kursu kullan
                 const courseId = action.courseId || selectedCourse?.id;
 
                 if (!courseId) {
@@ -37,16 +39,20 @@ export class CourseEffects {
                     );
                 }
 
-                return this.trainingService.getTrainingById(courseId).pipe(
-                    map((response: any) =>
-                        loadCourseSuccess({ selectedCourse: response.body })
-                    ),
+                // 2. Servis Çağrısı: previewToken'ı da gönderiyoruz
+                return this.trainingService.getTrainingById(courseId, action.previewToken).pipe(
+                    map((response: any) => {
+                        // Backend Response<T> yapısına göre veriyi al
+                        const data = response.data || response.body || response;
+                        return loadCourseSuccess({ selectedCourse: data });
+                    }),
                     catchError((error) => of(loadCourseFailure({ error })))
                 );
             })
         )
     );
 
+    // 🔥 MEVCUT UPDATE ORDER EFFECT (Aynı kalıyor ama sağlam olsun diye tekrar veriyorum)
     updateContentOrder$ = createEffect(() =>
         this.actions$.pipe(
             ofType(updateContentOrder),
@@ -62,18 +68,21 @@ export class CourseEffects {
                     );
                 }
 
-                const formData = new FormData();
+                // FormData yerine JSON obje göndermek daha modern bir yaklaşım olabilir 
+                // ama mevcut yapıyı bozmayalım.
+                const payload = {
+                    trainingId: courseId,
+                    contentOrderIds: action.contentOrderIds
+                };
 
-                formData.append('id', courseId.toString());
-                formData.append(
-                    'contentOrderIds',
-                    JSON.stringify(action.contentOrderIds)
-                );
-
-                return this.trainingService.updateTraining(formData).pipe(
+                // Servis çağrısı (reorderContent metodunu daha önce eklemiştik)
+                return this.trainingService.reorderContent(payload).pipe(
                     switchMap((response: any) => [
-                        updateContentOrderSuccess({ selectedCourse: response.body }),
-                        loadCourse({ courseId })
+                        // Sıralama başarılı olunca...
+                        // 1. Success action'ı fırlat (gerekirse)
+                        updateContentOrderSuccess({ selectedCourse: response.body || response.data }),
+                        // 2. Listeyi tazelemek için LoadCourse çağır
+                        loadCourse({ courseId }) 
                     ]),
                     catchError((error) =>
                         of(updateContentOrderFailure({ error }))

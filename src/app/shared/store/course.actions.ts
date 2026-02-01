@@ -1,8 +1,9 @@
 import { createAction, props } from '@ngrx/store';
 
+// 🔥 DÜZELTME: courseId tekrar optional (?) yapıldı. previewToken eklendi.
 export const loadCourse = createAction(
-    '[Course] Load Course',
-    props<{ courseId?: number }>()
+  '[Course Page] Load Course',
+  props<{ courseId?: number; previewToken?: string }>() 
 );
 export const loadCourseSuccess = createAction(
     '[Course] Load Course Success',

@@ -1,6 +1,6 @@
 <div class="video-area bg-f6fafb position-relative z-1">
     <div class="container">
-        <div class="video-box" style="background-image: url(assets/images/video.jpg);">
+        <div class="video-box" [style.background-image]="tumb ? 'url(' + tumb + ')' : 'url(assets/images/video.jpg)'">
             <button type="button" class="video-btn p-0 border-0" (click)="openPopup()">
                 <i class='bx bx-play' ></i>
             </button>
@@ -11,10 +11,14 @@
     </div>
 </div>
 
-<!-- Video Popup -->
 <div class="video-popup" *ngIf="isOpen">
     <div class="popup-inner">
-        <iframe src="https://www.youtube.com/embed/XNQk1qt__Vw" title="Setup and Local Installation - React Nextjs Online Yoga Coaching &amp; Training Courses System" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        <iframe *ngIf="url" [src]="url | safeUrl" title="Ders Videosu" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        
+        <div *ngIf="!url" class="text-white text-center p-5">
+            <p>Video kaynağı bulunamadı.</p>
+        </div>
+
         <button (click)="closePopup()" type="button" class="close-btn">
             <i class='bx bx-x'></i>
         </button>

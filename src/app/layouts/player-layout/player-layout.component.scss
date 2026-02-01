@@ -1,0 +1,119 @@
+/* --- GENEL AYARLAR --- */
+.player-header {
+    height: 60px;
+    background-color: #1c1d1f;
+    border-bottom: 1px solid #3e4143;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1030;
+}
+
+.course-title {
+    max-width: 400px;
+    font-weight: 600;
+}
+
+.vertical-divider {
+    width: 1px; height: 24px; background-color: #3e4143;
+}
+
+.back-link:hover { color: #ccc !important; }
+
+/* --- BODY --- */
+.player-body {
+    margin-top: 60px;
+    height: calc(100vh - 60px);
+    overflow: hidden;
+    position: relative;
+    background-color: #fff;
+}
+
+/* --- VIEWER --- */
+.player-main {
+    overflow-y: auto;
+    background-color: #fff;
+    transition: all 0.3s ease;
+    &::-webkit-scrollbar { width: 8px; }
+    &::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 4px; }
+}
+
+.viewer-container {
+    width: 100%;
+    /* Default yükseklik */
+    height: 65vh; 
+    min-height: 400px;
+    background-color: #000;
+    overflow: hidden;
+    transition: height 0.3s ease;
+
+    &.bg-light { background-color: #f3f4f6 !important; }
+}
+
+/* PDF Preview (Placeholder) */
+.pdf-preview-wrapper {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+}
+
+/* --- SIDEBAR --- */
+.player-sidebar {
+    width: 350px; min-width: 350px; height: 100%;
+    overflow: hidden; transition: margin-right 0.3s ease;
+    z-index: 1020;
+    &.closed { margin-right: -350px; }
+}
+
+.section-header:hover { background-color: #e9ecef !important; }
+
+.lesson-item {
+    border-bottom: 1px solid #f0f0f0; transition: background-color 0.2s;
+    &:hover { background-color: #f8f9fa; }
+    &.active-lesson { background-color: #e6f0ff; border-left: 3px solid #0d6efd; .lesson-title { font-weight: 700; color: #0d6efd; } }
+}
+
+.tiny-text { font-size: 0.75rem; }
+.cursor-pointer { cursor: pointer; }
+
+/* Animasyonlar */
+.animate-pulse { animation: pulse 2s infinite; }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+.animate-spin { animation: spin 2s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* --- PDF MODAL --- */
+.pdf-modal-overlay {
+    position: fixed; top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-color: #1c1d1f;
+    z-index: 99999; /* En üstte */
+    display: flex; flex-direction: column;
+}
+
+.pdf-modal-header { height: 60px; border-bottom: 1px solid #3e4143; flex-shrink: 0; }
+
+.pdf-modal-body {
+    flex-grow: 1;
+    background-color: #525659;
+    overflow: hidden; position: relative;
+    
+    ::ng-deep .ng-extended-pdf-viewer-container {
+        height: 100% !important;
+        background-color: #525659 !important;
+    }
+}
+
+.pdf-modal-footer {
+    height: 80px; border-top: 1px solid #3e4143; flex-shrink: 0;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+}
+
+.timer-box { min-width: 140px; transition: all 0.3s ease; }
+
+/* Mobil */
+@media (max-width: 768px) {
+    .player-body { flex-direction: column; height: auto; overflow: visible; }
+    .viewer-container { height: 350px; }
+    .player-sidebar { width: 100%; height: auto; border-left: none; border-top: 1px solid #dee2e6; &.closed { display: none; } }
+}

@@ -1,64 +1,33 @@
 <div class="course-manage-wrapper d-flex pt-4">
 
     <div class="side-nav col-lg-3">
+        <div class="mb-3 px-2">
+            <a routerLink="/instructor/courses" class="text-muted text-decoration-none small">
+                <i class='bx bx-arrow-back'></i> Kurslarıma Dön
+            </a>
+        </div>
+
         <ul class="menu-sections">
             <li class="menu-section">
                 <div class="section-title">Kursunuzu planlayın</div>
                 <ul class="menu-items">
-                    <li class="menu-item"  [ngClass]="{'active':(router.url.indexOf('/what-you-will-learn')>-1)}">
+                    <li class="menu-item" [ngClass]="{'active':(router.url.indexOf('/what-you-will-learn')>-1)}">
                         <a [routerLink]="'/instructor/course-manage/'+courseId+'/what-you-will-learn'" class="menu-link p-2">
-                            <span class="completion">
-                                <!-- <i class='bx bx-check-circle bx-sm'></i> -->
-                                <i class='bx bx-circle bx-sm'></i>
-                            </span>
+                            <span class="completion"><i class='bx bx-circle bx-sm'></i></span>
                             <span>Hedef öğrenciler</span>
                         </a>
                     </li>
-                    <!-- <li class="menu-item">
-                        <a routerLink="/instructor/course/6306447/manage/course-structure" class="menu-link p-2">
-                            <span class="completion">
-                                <i class='bx bx-circle bx-sm'></i>
-                            </span>
-                            <span>Kurs yapısı</span>
-                        </a>
-                    </li> -->
-                    <!-- <li class="menu-item">
-                        <a routerLink="/instructor/course/6306447/manage/setup" class="menu-link p-2">
-                            <span class="completion">
-                                <i class='bx bx-circle bx-sm'></i>
-                            </span>
-                            <span>Kurulum ve test videosu</span>
-                        </a>
-                    </li> -->
                 </ul>
             </li>
             <li class="menu-section">
                 <div class="section-title">İçeriğinizi oluşturun</div>
                 <ul class="menu-items">
-                    <!-- <li class="menu-item">
-                        <a routerLink="/instructor/course/6306447/manage/film" class="menu-link p-2">
-                            <span class="completion">
-                                <i class='bx bx-circle bx-sm'></i>
-                            </span>
-                            <span>Çekim ve düzenleme</span>
-                        </a>
-                    </li> -->
                     <li class="menu-item" [ngClass]="{'active':(router.url.indexOf('/curriculum')>-1)}">
                         <a [routerLink]="'/instructor/course-manage/'+courseId+'/curriculum'" class="menu-link p-2">
-                            <span class="completion">
-                                <i class='bx bx-circle bx-sm'></i>
-                            </span>
+                            <span class="completion"><i class='bx bx-circle bx-sm'></i></span>
                             <span>Müfredat</span>
                         </a>
                     </li>
-                    <!-- <li class="menu-item" [ngClass]="{'active':(router.url.indexOf('/pricing')>-1)}">
-                        <a [routerLink]="'/instructor/course-manage/'+courseId+'/pricing'" class="menu-link p-2">
-                            <span class="completion">
-                                <i class='bx bx-circle bx-sm'></i>
-                            </span>
-                            <span>Altyazı (isteğe bağlı)</span>
-                        </a>
-                    </li> -->
                 </ul>
             </li>
             <li class="menu-section">
@@ -66,37 +35,49 @@
                 <ul class="menu-items">
                     <li class="menu-item" [ngClass]="{'active':(router.url.indexOf('/course-landing')>-1)}">
                         <a [routerLink]="'/instructor/course-manage/'+courseId+'/course-landing'" class="menu-link p-2">
-                            <span class="completion">
-                                <i class='bx bx-circle bx-sm'></i>
-                            </span>
+                            <span class="completion"><i class='bx bx-circle bx-sm'></i></span>
                             <span>Eğitim açılış sayfası</span>
                         </a>
                     </li>
                     <li class="menu-item" [ngClass]="{'active':(router.url.indexOf('/course-pricing')>-1)}">
                         <a [routerLink]="'/instructor/course-manage/'+courseId+'/course-pricing'" class="menu-link p-2">
-                            <span class="completion">
-                                <i class='bx bx-circle bx-sm'></i>
-                            </span>
+                            <span class="completion"><i class='bx bx-circle bx-sm'></i></span>
                             <span>Fiyatlandırma</span>
                         </a>
                     </li>
-                    <!-- <li class="menu-item">
-                        <a routerLink="/instructor/course/6306447/manage/promotions" class="menu-link p-2">
-                            <span class="completion">
-                                <i class='bx bx-circle bx-sm'></i>
-                            </span>
-                            <span>Promosyonlar</span>
-                        </a>
-                    </li> -->
                 </ul>
             </li>
         </ul>
-        <button class="default-btn" type="button">İnceleme için Gönder</button>
+
+        <button class="default-btn mt-3 w-100" type="button">İnceleme için Gönder</button>
     </div>
 
-    <div class="col-lg-9 col-md-9 col-sm-8">
+    <div class="col-lg-9 col-md-9 col-sm-8 ps-md-4">
+        
+        <div class="manage-header d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+            <div>
+                <h4 class="mb-1 fw-bold">Eğitim Yönetimi</h4>
+                <p class="text-muted small mb-0">Eğitiminizi düzenleyin, içerik ekleyin ve anlık önizleyin.</p>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-secondary d-flex align-items-center gap-2" 
+                        (click)="previewAsCustomer()" 
+                        title="Müşteri Gözüyle Vitrin Sayfası">
+                    <i class='bx bx-store fs-5'></i> 
+                    <span class="d-none d-md-inline small fw-bold">Vitrin Önizleme</span>
+                </button>
+
+                <button class="btn btn-dark d-flex align-items-center gap-2" 
+                        (click)="previewAsStudent()" 
+                        title="Öğrenci Gözüyle Ders İzleme">
+                    <i class='bx bx-play-circle fs-5'></i> 
+                    <span class="d-none d-md-inline small fw-bold">Öğrenci Gibi İzle</span>
+                </button>
+            </div>
+        </div>
+
         <router-outlet></router-outlet>
     </div>
-
 
 </div>
