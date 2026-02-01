@@ -6,6 +6,17 @@ export interface MenuItemDto {
     expanded?: boolean; // UI için
 }
 
+// 🔥 EKSİK OLAN USER MODELİNİ BURAYA EKLİYORUZ
+export interface User {
+    id: number;
+    name: string;
+    surname: string;
+    email: string;
+    phoneNumber?: string;
+    profileImagePath?: string; // Profil resmi için
+    roles?: string[];
+}
+
 export interface UserMenuBody {
     isInstructor: boolean;
     menuItems: MenuItemDto[];

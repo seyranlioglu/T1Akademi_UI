@@ -23,18 +23,33 @@ export interface PublicCourseDetail {
     instructorRating: number;
     instructorTotalStudents: number;
     instructorTotalCourses: number;
-    sections: CourseSection[];
-    whatYouWillLearn: any[]; // Detay veri yapısı varsa tip eklenebilir
-    topReviews: any[];
+    
+    // İlişkisel Veriler
+    sections: PublicSectionDto[];
+    whatYouWillLearn: string[];
+    topReviews: PublicReviewDto[];
 }
 
-export interface CourseSection {
+export interface PublicSectionDto {
+    id: number;
     title: string;
-    contents: CourseContent[];
+    orderId: number;
+    contents: PublicContentDto[];
 }
 
-export interface CourseContent {
+// 🔥 DÜZELTİLEN KISIM: 'CourseContent' yerine 'PublicContentDto' ve 'durationMinutes' eklendi
+export interface PublicContentDto {
+    id: number;
     title: string;
-    duration: string;
-    isFree?: boolean; // Önizleme için gerekebilir
+    isPreview: boolean;
+    durationMinutes: number; // HTML'de kullanılan alan burası
+    type: string;
+}
+
+export interface PublicReviewDto {
+    userName: string;
+    userImage: string;
+    rating: number;
+    comment: string;
+    date: string;
 }

@@ -4,6 +4,7 @@ import { map, Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { TrainingCard } from '../models/dashboard.model'; 
 import { SearchTrainingRequest, AddReviewDto } from '../models/training-list.model';
+import { PublicCourseDetail } from '../models/public-course-detail.model';
 
 const API_TRAINING_URL = `${environment.apiUrl}/Training`;
 const API_DASHBOARD_URL = `${environment.apiUrl}/Dashboard`; 
@@ -59,8 +60,13 @@ export class TrainingApiService {
   // TRAINING CONTROLLER (Eğitim İşlemleri)
   // ===========================================================================
 
-  getTrainingPublicDetail(id: number): Observable<any> {
-    return this.http.get<any>(`${API_TRAINING_URL}/GetPublicDetail/${id}`).pipe(
+getTrainingPublicDetail(id: number, previewToken?: string): Observable<PublicCourseDetail> {
+    let params = new HttpParams();
+    if (previewToken) {
+      params = params.set('previewToken', previewToken);
+    }
+
+    return this.http.get<any>(`${API_TRAINING_URL}/GetPublicDetail/${id}`, { params }).pipe(
       map(res => res.data || res.body || res)
     );
   }

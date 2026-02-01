@@ -1,63 +1,38 @@
-import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CourseState, selectSelectedCourse } from 'src/app/shared/store/course.reducer';
-import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
+import { AuthService } from 'src/app/shared/services/auth.service';
+import { User } from 'src/app/shared/models/user-menu.model'; // Veya uygun user modeli
 
 @Component({
-    selector: 'app-instructor',
-    templateUrl: './instructor.component.html',
-    styleUrls: ['./instructor.component.scss'],
+  selector: 'app-instructor',
+  templateUrl: './instructor.component.html',
+  styleUrls: ['./instructor.component.scss']
 })
-export class InstructorComponent implements OnInit, OnDestroy {
-    private unsubscribe: Subscription[] = [];
-    
-    // YENİ EKLENEN DEĞİŞKENLER (Hataları çözecek olanlar)
-    isSidebarCollapsed = false;  // Menü açık mı kapalı mı?
-    isSmallScreen = false;       // Mobil mi?
-    
-    // Mevcut değişkenler (Gerekirse kalsın)
-    currentCourse: any = null;
+export class InstructorComponent implements OnInit {
 
-    constructor(
-        public router: Router,
-        private store: Store<{ course: CourseState }>
-    ) {}
+  isSidebarCollapsed = false;
+  user$: Observable<User | null>;
 
-    // Ekran boyutu değişince tetiklenir
-    @HostListener('window:resize', [])
-    onResize(): void {
-        this.checkScreenSize();
-    }
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.user$ = this.authService.currentUser$; // User bilgisini al
+  }
 
-    ngOnInit(): void {
-        this.checkScreenSize();
+  ngOnInit(): void {}
 
-        // Store'dan seçili kurs bilgisini al (Varsa kullanırız)
-        const storeSubs = this.store
-            .select(selectSelectedCourse)
-            .subscribe((val) => {
-                this.currentCourse = val;
-            });
-        this.unsubscribe.push(storeSubs);
-    }
+  toggleSidebar() {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+  }
 
-    // Ekran boyutuna göre mobil moduna geç
-    private checkScreenSize(): void {
-        this.isSmallScreen = window.innerWidth <= 992; // 992px altı mobil sayılır
-        if (this.isSmallScreen) {
-            this.isSidebarCollapsed = true; // Mobilde otomatik kapat
-        } else {
-            this.isSidebarCollapsed = false; // Masaüstünde aç
-        }
-    }
-
-    // Sidebar aç/kapa
-    toggleSidebar(): void {
-        this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    }
-
-    ngOnDestroy(): void {
-        this.unsubscribe.forEach((sb) => sb.unsubscribe());
-    }
+  logout() {
+    // AuthService'de logout metodu varsa onu çağır
+    this.authService.logout(); 
+    // Veya manuel silme:
+    // localStorage.removeItem('token');
+    // localStorage.removeItem('user');
+    this.router.navigate(['/']);
+  }
 }

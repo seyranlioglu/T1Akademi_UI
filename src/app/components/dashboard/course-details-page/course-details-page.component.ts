@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TrainingApiService } from 'src/app/shared/api/training-api.service'; // 🔥 TrainingApi kullanıyoruz
+import { TrainingApiService } from 'src/app/shared/api/training-api.service';
 import { CartService } from 'src/app/shared/services/cart.service';
-import { PublicCourseDetail } from 'src/app/shared/models/public-course-detail.model';  
+import { PublicCourseDetail } from 'src/app/shared/models/public-course-detail.model';
+import { combineLatest } from 'rxjs';
 
 @Component({
     selector: 'app-course-details-page',
@@ -12,19 +13,24 @@ import { PublicCourseDetail } from 'src/app/shared/models/public-course-detail.m
 export class CourseDetailsPageComponent implements OnInit {
 
     courseId!: number;
+    previewToken: string | null = null;
     course: PublicCourseDetail | null = null;
     isLoading: boolean = true;
+    errorMsg: string | null = null;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private trainingApi: TrainingApiService, // Servisi ekledik
+        private trainingApi: TrainingApiService,
         public cartService: CartService
     ) { }
 
     ngOnInit(): void {
-        this.route.params.subscribe(params => {
+        // Hem parametreleri (id) hem query parametrelerini (token) aynı anda dinleyelim
+        combineLatest([this.route.params, this.route.queryParams]).subscribe(([params, queryParams]) => {
             const id = params['id'];
+            this.previewToken = queryParams['previewToken'];
+
             if (id) {
                 this.courseId = +id;
                 this.loadCourseData();
@@ -34,8 +40,10 @@ export class CourseDetailsPageComponent implements OnInit {
 
     loadCourseData() {
         this.isLoading = true;
-        // Servisteki map() işlemi sayesinde data direkt obje olarak geliyor
-        this.trainingApi.getTrainingPublicDetail(this.courseId).subscribe({
+        this.errorMsg = null;
+
+        // previewToken varsa servise gönderiyoruz (undefined ise zaten gitmez)
+        this.trainingApi.getTrainingPublicDetail(this.courseId, this.previewToken || undefined).subscribe({
             next: (data) => {
                 this.course = data;
                 this.isLoading = false;
@@ -43,6 +51,13 @@ export class CourseDetailsPageComponent implements OnInit {
             error: (err) => {
                 console.error("Kurs detay hatası:", err);
                 this.isLoading = false;
+                if (err.status === 404) {
+                    this.errorMsg = "Eğitim bulunamadı veya yayında değil.";
+                } else if (err.status === 403) {
+                    this.errorMsg = "Önizleme süresi dolmuş veya yetkiniz yok.";
+                } else {
+                    this.errorMsg = "Bir hata oluştu.";
+                }
             }
         });
     }
