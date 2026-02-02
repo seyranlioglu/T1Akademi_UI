@@ -1,95 +1,81 @@
-<div class="library-container">
+<div class="content-library-container">
+    
+    <!-- Search Bar -->
+    <div class="search-bar mb-3">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Dosya ara..." 
+                   [(ngModel)]="searchText" (keyup.enter)="onSearch()">
+            <button class="btn btn-outline-primary" type="button" (click)="onSearch()">
+                <i class='bx bx-search'></i> Ara
+            </button>
+        </div>
+    </div>
 
-    <div class="library-header d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-        <h6 class="fw-bold m-0 text-dark">
-            <i class='bx bx-library'></i> Kütüphanem
-        </h6>
-        
-        <button class="btn btn-primary btn-sm py-1 px-2 d-flex align-items-center gap-1" (click)="openUploadModal()" style="font-size: 0.8rem;">
-            <i class='bx bx-plus'></i> Yeni
+    <!-- Content Grid -->
+    <div class="content-grid" *ngIf="!isLoading; else loadingTemplate">
+        <div class="row" *ngIf="contents.length > 0; else noDataTemplate">
+            <div class="col-md-3 col-6 mb-4" *ngFor="let item of contents">
+                <div class="library-item" 
+                     [class.selected]="selectedItem?.id === item.id"
+                     (click)="selectItem(item)">
+                    
+                    <!-- Görsel Önizleme -->
+                    <div class="item-preview">
+                        <!-- Eğer resimse göster, değilse ikon göster -->
+                        <img *ngIf="item.contentType?.includes('image') || item.fileName.endsWith('.jpg') || item.fileName.endsWith('.png')" 
+                             [src]="item.filePath" 
+                             alt="{{item.fileName}}">
+                        
+                        <div *ngIf="!(item.contentType?.includes('image') || item.fileName.endsWith('.jpg') || item.fileName.endsWith('.png'))" 
+                             class="file-icon">
+                             <i class='bx bx-file'></i>
+                        </div>
+                    </div>
+
+                    <div class="item-info">
+                        <small>{{ item.fileName }}</small>
+                    </div>
+                    
+                    <div class="selected-overlay" *ngIf="selectedItem?.id === item.id">
+                        <i class='bx bx-check'></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination (Basit) -->
+        <div class="pagination-area text-center" *ngIf="totalItems > pageSize">
+            <button class="btn btn-sm btn-light me-2" 
+                    [disabled]="currentPage === 1" 
+                    (click)="onPageChange(currentPage - 1)">Önceki</button>
+            <span>Sayfa {{currentPage}}</span>
+            <button class="btn btn-sm btn-light ms-2" 
+                    [disabled]="contents.length < pageSize" 
+                    (click)="onPageChange(currentPage + 1)">Sonraki</button>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="modal-footer-actions mt-3 text-end">
+        <button class="btn btn-secondary me-2" (click)="cancel()">İptal</button>
+        <button class="btn btn-primary" (click)="confirmSelection()" [disabled]="!selectedItem">
+            Seç
         </button>
     </div>
 
-    <div class="library-content d-flex flex-column h-100 overflow-hidden">
-        
-        <div class="search-bar mb-2 position-relative">
-            <input type="text" class="form-control form-control-sm ps-4" 
-                   placeholder="Ara..." 
-                   [ngModel]="searchText" 
-                   (ngModelChange)="onSearchChange($event)">
-            <i class='bx bx-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted small'></i>
-        </div>
-
-        <div *ngIf="loading" class="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-muted">
-            <div class="spinner-border spinner-border-sm text-primary mb-1" role="status"></div>
-            <span class="tiny-text">Yükleniyor...</span>
-        </div>
-
-        <div *ngIf="!loading && filteredContents.length === 0" class="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-muted">
-            <i class='bx bx-ghost fs-3 mb-1 opacity-50'></i>
-            <span class="tiny-text">İçerik Yok</span>
-        </div>
-
-        <div *ngIf="!loading && filteredContents.length > 0" class="content-grid custom-scrollbar">
-            
-            <div *ngFor="let item of filteredContents" 
-                 class="content-card card border-0 shadow-sm"
-                 [class.selected]="selectedId === item.id"
-                 (click)="selectContent(item)">
-                
-                <div class="card-img-top position-relative bg-light d-flex align-items-center justify-content-center overflow-hidden" style="height: 115px;">
-                    <img *ngIf="item.thumbnail && item.thumbnail !== 'none'" 
-                         [src]="item.thumbnail" 
-                         class="w-100 h-100 object-fit-cover">
-                    
-                    <div *ngIf="!item.thumbnail || item.thumbnail === 'none'" class="text-center">
-                        <i class='bx fs-1' 
-                           [ngClass]="item.fileType?.includes('video') ? 'bx-video text-primary' : 'bxs-file-pdf text-danger'"></i>
-                    </div>
-
-                    <span *ngIf="item.duration" class="badge bg-dark bg-opacity-75 position-absolute bottom-0 end-0 m-1 font-monospace tiny-text">
-                        {{ item.duration }}
-                    </span>
-                </div>
-
-                <div class="card-body p-2 d-flex justify-content-between align-items-center position-relative z-2">
-                    
-                    <div class="overflow-hidden flex-grow-1 me-1">
-                        <h6 class="card-title text-truncate fw-bold mb-0" [title]="item.title" style="font-size: 0.75rem;">
-                            {{ item.title }}
-                        </h6>
-                        <div class="d-flex align-items-center tiny-text text-muted mt-1">
-                            <span class="badge bg-light text-secondary border me-1 px-1 py-0 fw-normal" style="font-size: 0.6rem;">
-                                {{ item.fileType?.includes('video') ? 'VID' : 'DOC' }}
-                            </span>
-                            <span *ngIf="item.fileSize">
-                                {{ formatBytes(item.fileSize) }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="position-relative" (click)="$event.stopPropagation()">
-                        <button class="btn btn-sm btn-link text-muted p-0 no-shadow" 
-                                type="button" 
-                                (click)="toggleMenu(item.id, $event)">
-                            <i class='bx bx-dots-vertical-rounded' style="font-size: 1.1rem;"></i>
-                        </button>
-                        
-                        <div *ngIf="openMenuId === item.id" class="custom-dropdown-menu shadow-sm border rounded bg-white">
-                            <a class="dropdown-item d-flex align-items-center gap-2 p-2 small text-dark text-decoration-none cursor-pointer hover-bg-light" 
-                               (click)="openPreview(item, $event)">
-                                <i class='bx bx-show text-primary'></i> <span style="font-size: 0.75rem;">Önizle</span>
-                            </a>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div *ngIf="selectedId === item.id" class="selected-overlay z-1">
-                    <i class='bx bx-check-circle text-white fs-2'></i>
-                </div>
+    <!-- Templates -->
+    <ng-template #loadingTemplate>
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Yükleniyor...</span>
             </div>
-
         </div>
-    </div>
+    </ng-template>
+
+    <ng-template #noDataTemplate>
+        <div class="text-center py-5 text-muted">
+            <i class='bx bx-folder-open fs-1'></i>
+            <p>İçerik bulunamadı.</p>
+        </div>
+    </ng-template>
 </div>

@@ -1,145 +1,121 @@
-import { Component, OnInit, HostListener } from '@angular/core';
-import { DynamicDialogRef, DynamicDialogConfig, DialogService } from 'primeng/dynamicdialog';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import { ContentLibraryApiService } from 'src/app/shared/api/content-library-api.service';
-import { UploadModalComponent } from 'src/app/components/common/modals/upload-modal/upload-modal.component';
-import { ContentPreviewModalComponent } from 'src/app/components/common/modals/content-preview-modal/content-preview-modal.component';
 
 @Component({
   selector: 'app-content-library-selector',
   templateUrl: './content-library-selector.component.html',
-  styleUrls: ['./content-library-selector.component.scss'],
-  providers: [DialogService]
+  styleUrls: ['./content-library-selector.component.scss']
 })
 export class ContentLibrarySelectorComponent implements OnInit {
 
-  contents: any[] = []; 
-  filteredContents: any[] = []; 
-  loading: boolean = true;
-  searchText: string = '';
+  // --- Inputs ---
+  /**
+   * Seçicinin ne döndüreceğini belirler.
+   * 'id': Sadece Guid döner (Default - Mevcut sistemler için).
+   * 'path': Dosya yolunu (URL) string olarak döner (Eğitmen Profili vb. için).
+   * 'object': Tüm DTO objesini döner.
+   */
+  @Input() returnType: 'id' | 'path' | 'object' = 'id';
+
+  /**
+   * Sadece belirli dosya tiplerini filtrelemek için (Örn: ['.jpg', '.png'] veya ContentTypeId)
+   * Opsiyonel, backend desteğine bağlı.
+   */
+  @Input() fileTypeFilter: string | null = null; 
+
+  // --- Outputs ---
+  @Output() onSelect = new EventEmitter<any>();
+  @Output() onCancel = new EventEmitter<void>();
+
+  // --- Variables ---
+  contents: any[] = [];
+  isLoading: boolean = false;
+  selectedItem: any = null;
   
-  selectedId: number | null = null;
-  openMenuId: number | null = null;
+  // Pagination
+  currentPage: number = 1;
+  pageSize: number = 12; // Grid görünümü için 12 ideal
+  totalItems: number = 0;
+  searchText: string = '';
 
   constructor(
-    public ref: DynamicDialogRef,
-    public config: DynamicDialogConfig,
-    private contentLibraryService: ContentLibraryApiService,
-    private dialogService: DialogService
+    private contentLibraryApi: ContentLibraryApiService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
-    this.loadLibrary();
+    this.loadContents();
   }
 
-  @HostListener('document:click')
-  closeMenu() {
-    this.openMenuId = null;
-  }
-
-  loadLibrary() {
-    this.loading = true;
-    this.contentLibraryService.getLibrary().subscribe({
+  loadContents(): void {
+    this.isLoading = true;
+    
+    // API servisinde getList metodunun parametre yapısına göre düzenlendi
+    // Eğer backend'de fileType filtresi varsa buraya eklenebilir.
+    this.contentLibraryApi.getList(this.currentPage, this.pageSize, this.searchText).subscribe({
       next: (res: any) => {
-        const rawData = res.data || res.body || res || [];
-        
-        // Backend'den gelen veri yapısını koruyoruz, sadece eksik alan varsa dolduruyoruz.
-        this.contents = rawData.map((item: any) => {
-            // Eğer backend 'FileName' (PascalCase) dönüyorsa 'fileName' (camelCase) de olsun.
-            // Ama orijinal item'ı bozmadan genişletiyoruz.
-            return {
-                ...item, // Orijinal verileri koru
-                id: item.id || item.Id,
-                fileName: item.fileName || item.FileName,
-                title: item.title || item.Title || item.fileName || item.FileName, 
-                fileType: item.fileType || item.FileType || '',
-                thumbnail: item.thumbnail || item.Thumbnail,
-                duration: item.videoDuration || item.VideoDuration,
-                pageCount: item.documentPageCount || item.DocumentPageCount,
-                fileSize: item.documentFileSize || item.DocumentFileSize,
-                filePath: item.filePath || item.FilePath
-            };
-        });
-
-        this.onSearchChange(this.searchText);
-        this.loading = false;
+        if (res.success) {
+          this.contents = res.data.items; // PagedList yapısı
+          this.totalItems = res.data.totalCount;
+        }
+        this.isLoading = false;
       },
       error: (err) => {
-        console.error("Kütüphane yüklenemedi", err);
-        this.loading = false;
+        console.error('Kütüphane yüklenemedi:', err);
+        this.toastr.error('İçerikler yüklenirken hata oluştu.');
+        this.isLoading = false;
       }
     });
   }
 
-  onSearchChange(searchValue: string) {
-    this.searchText = searchValue;
-    if (!this.searchText || this.searchText.trim() === '') {
-      this.filteredContents = [...this.contents];
+  // Kullanıcı bir öğeye tıkladığında
+  selectItem(item: any): void {
+    this.selectedItem = item;
+  }
+
+  // "Seç" butonuna basıldığında
+  confirmSelection(): void {
+    if (!this.selectedItem) {
+      this.toastr.warning('Lütfen bir içerik seçin.');
       return;
     }
-    const term = this.searchText.toLowerCase();
-    this.filteredContents = this.contents.filter(item => 
-      (item.fileName && item.fileName.toLowerCase().includes(term)) || 
-      (item.title && item.title.toLowerCase().includes(term))
-    );
-  }
 
-  selectContent(item: any) {
-    if (this.openMenuId !== null) {
-        this.openMenuId = null;
-        return;
+    let returnValue: any;
+
+    switch (this.returnType) {
+      case 'path':
+        // Backend entity'sinde "FilePath" olduğunu analiz etmiştik.
+        // Frontend modelinde küçük harfle "filePath" olabilir, kontrol edip atıyoruz.
+        returnValue = this.selectedItem.filePath || this.selectedItem.FilePath;
+        break;
+      
+      case 'object':
+        returnValue = this.selectedItem;
+        break;
+
+      case 'id':
+      default:
+        returnValue = this.selectedItem.id || this.selectedItem.Id;
+        break;
     }
-    this.selectedId = item.id;
-    setTimeout(() => {
-      this.ref.close(item);
-    }, 150);
+
+    this.onSelect.emit(returnValue);
   }
 
-  toggleMenu(id: number, event: Event) {
-    event.stopPropagation();
-    if (this.openMenuId === id) {
-        this.openMenuId = null;
-    } else {
-        this.openMenuId = id;
-    }
+  cancel(): void {
+    this.onCancel.emit();
   }
 
-  openUploadModal() {
-    const uploadRef = this.dialogService.open(UploadModalComponent, {
-      header: 'Yeni İçerik Yükle',
-      width: '500px', // LibraryComponent ile aynı genişlik
-      contentStyle: { overflow: 'visible' },
-      baseZIndex: 10001,
-      modal: true,
-      dismissableMask: false
-    });
-
-    uploadRef.onClose.subscribe((success: boolean) => {
-      if (success) this.loadLibrary();
-    });
+  // Arama işlemi
+  onSearch(): void {
+    this.currentPage = 1;
+    this.loadContents();
   }
 
-  // 🔥 DÜZELTİLDİ: Veri Gönderim Formatı LibraryComponent ile Eşleşti
-  openPreview(item: any, event: Event) {
-    event.stopPropagation();
-    this.openMenuId = null;
-
-    this.dialogService.open(ContentPreviewModalComponent, {
-        header: item.fileName || item.title, // Header dosya adı olsun
-        width: '80%',
-        height: 'auto',
-        baseZIndex: 10002,
-        modal: true,
-        dismissableMask: true,
-        data: item // 🔥 KRİTİK: item objesi doğrudan gönderiliyor
-    });
-  }
-
-  formatBytes(bytes: number, decimals = 2) {
-    if (!bytes || bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  // Sayfa değişimi
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadContents();
   }
 }

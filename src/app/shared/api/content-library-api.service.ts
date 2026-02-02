@@ -1,4 +1,4 @@
-import { HttpClient, HttpEvent, HttpRequest } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpParams, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -7,60 +7,76 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class ContentLibraryApiService {
-  private baseUrl = environment.apiUrl + '/ContentLibrary'; 
+  private baseUrl = environment.apiUrl + '/ContentLibrary';
 
   constructor(private http: HttpClient) { }
 
-  getLibrary(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/GetList`);
+  /**
+   * Kütüphane içeriklerini sayfalı ve filtreli getirir.
+   * Component tarafındaki çağrı: getList(page, size, search)
+   */
+  getList(page: number = 1, size: number = 12, search: string = ''): Observable<any> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (search) {
+      params = params.set('search', search);
+    }
+    
+    // Backend'de genellikle metodun adı GetList olur ama route boş olabilir.
+    // Eğer backend "[HttpGet]" ve route vermemişse direkt baseUrl'e atarız.
+    // Garanti olsun diye /GetList ekliyorum, 404 alırsak burayı düzeltiriz.
+    return this.http.get<any>(`${this.baseUrl}/GetList`, { params });
   }
 
-  // // Yeni dosya yükleme (Create)
-  // uploadFile(file: File): Observable<HttpEvent<any>> {
-  //   const formData: FormData = new FormData();
-  //   formData.append('file', file);
+  // Eski metot - Geriye dönük uyumluluk için parametresiz hali (Opsiyonel, gerekirse kalsın)
+  getLibrary(): Observable<any> {
+    return this.getList(1, 1000); // Hepsini getir gibi davranır
+  }
 
-  //   const req = new HttpRequest('POST', `${this.baseUrl}/Upload`, formData, {
-  //     reportProgress: true,
-  //     responseType: 'json'
-  //   });
+  /**
+   * Yeni dosya yükleme (Create)
+   * @param file Yüklenecek dosya
+   */
+  uploadFile(file: File): Observable<any> {
+    const formData: FormData = new FormData();
+    formData.append('file', file);
 
-  //   return this.http.request(req);
-  // }
+    // Backend: public async Task<Response<ContentLibraryDto>> UploadAsync(IFormFile file)
+    return this.http.post<any>(`${this.baseUrl}/Upload`, formData);
+  }
 
-  // --- EKSİK OLAN METOT BU (EKLE BUNU) ---
-  // Var olan bir kayda (ID) dosya basmak için (Retry/Repair)
-  uploadMedia(id: number, file: File): Observable<any> {
+  /**
+   * Var olan bir kayda (ID) dosya basmak için (Retry/Repair/Update Image)
+   * @param id ContentLibrary Id
+   * @param file Yeni dosya
+   */
+  uploadMedia(id: number | string, file: File): Observable<any> {
     const formData = new FormData();
+    // Backend'deki parametre ismine dikkat: 'id' ve 'file'
     formData.append('id', id.toString());
     formData.append('file', file);
 
-    // Backend Metodu: public async Task<Response<CommonResponse>> UploadMediaAsync(long id, IFormFile file)
-    // Eğer backend'de metodun adı 'RetryUpload' ise URL'i ona göre güncelle.
-    // Şimdilik standart UploadMedia varsayıyorum.
-    return this.http.post<any>(`${this.baseUrl}/UploadFile`, formData);
-  }
-  // ----------------------------------------
-
-  deleteFile(id: number): Observable<any> {
-    return this.http.post(`${this.baseUrl}/DeleteContent`, id); // Backend metod adını kontrol et (Delete vs DeleteContent)
+    return this.http.post<any>(`${this.baseUrl}/UploadMedia`, formData);
   }
 
-  updateContent(id: number, data: { title: string, description: string }): Observable<any> {
-    return this.http.put(`${this.baseUrl}/UpdateContent`, { id, ...data });
+  deleteFile(id: string): Observable<any> {
+    // Backend: HttpDelete veya HttpPost olabilir. Genelde Delete işleminde ID url'den gider.
+    return this.http.delete<any>(`${this.baseUrl}/${id}`);
+  }
+
+  updateContent(id: string, data: { title: string, description: string }): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/UpdateContent`, { id, ...data });
   }
 
   addYoutubeContent(title: string, url: string, description: string): Observable<any> {
-    return this.http.post<any>(
-      this.baseUrl + '/AddYoutubeContent',
-      null, 
-      {
-        params: {
-          title: title,
-          url: url,
-          description: description || '' 
-        }
-      }
-    );
+    // Query string params yerine body kullanmak daha modern bir yaklaşımdır ama mevcut yapıya sadık kalıyoruz.
+    let params = new HttpParams()
+        .set('title', title)
+        .set('url', url)
+        .set('description', description || '');
+
+    return this.http.post<any>(`${this.baseUrl}/AddYoutubeContent`, null, { params });
   }
 }
