@@ -3,10 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-// Eğer projede global bir Response interface'i varsa onu import etmeliyiz, 
-// şimdilik inline veya any olarak generic tutuyorum ancak backend DTO'ları ile uyumludur.
-// Normalde: import { Response } from '../models/response.model';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -17,38 +13,39 @@ export class InstructorApiService {
 
   /**
    * Eğitmenlik başvurusu yapar.
-   * Backend: InstructorManager.ApplyAsInstructorAsync
-   * @param data Başvuru formu verisi (Title, Bio, Resume vb.)
+   * Endpoint: POST api/Instructor/Apply
    */
   applyAsInstructor(data: any): Observable<any> {
-    return this.http.post<any>(`${this.controllerUrl}/apply`, data);
+    return this.http.post<any>(`${this.controllerUrl}/Apply`, data);
   }
 
   /**
-   * Giriş yapmış olan mevcut kullanıcının eğitmen profilini getirir.
-   * Backend: InstructorManager.GetInstructorProfileAsync
+   * Giriş yapmış kullanıcının eğitmen profilini getirir.
+   * Endpoint: GET api/Instructor/GetMyProfile
    */
-  getCurrentInstructorProfile(): Observable<any> {
-    return this.http.get<any>(`${this.controllerUrl}/profile/current`);
+  getMyProfile(): Observable<any> {
+    return this.http.get<any>(`${this.controllerUrl}/GetMyProfile`);
   }
+
+  /**
+   * Eğitmen profilini günceller.
+   * Endpoint: PUT api/Instructor/UpdateProfile
+   */
+  updateProfile(data: any): Observable<any> {
+    return this.http.put<any>(`${this.controllerUrl}/UpdateProfile`, data);
+  }
+
   /**
    * Belirli bir eğitmenin detaylarını getirir (Public/Vitrin).
-   * Backend: InstructorManager.GetInstructorByIdAsync
-   * @param instructorId Eğitmen ID'si
+   * Endpoint: GET api/Instructor/{id}
    */
   getInstructorById(instructorId: string): Observable<any> {
     return this.http.get<any>(`${this.controllerUrl}/${instructorId}`);
   }
-  getMyProfile(): Observable<any> {
-      // Backend'de endpoint "GetMyProfile" olarak görünüyor, "profile/current" değil.
-      return this.http.get<any>(`${this.controllerUrl}/GetMyProfile`);
-    }
+
   /**
-   * Eğitmen listesini getirir (Filtreleme ile).
-   * Backend: InstructorManager.GetInstructorListAsync
-   * @param page Sayfa numarası
-   * @param size Sayfa boyutu
-   * @param search Arama kelimesi (opsiyonel)
+   * Eğitmen listesini getirir (Filtreleme ile - Admin Panel).
+   * Endpoint: GET api/Instructor
    */
   getInstructorsList(page: number = 1, size: number = 10, search: string = ''): Observable<any> {
     let params = new HttpParams()
@@ -63,31 +60,17 @@ export class InstructorApiService {
   }
 
   /**
-   * Eğitmen profilini günceller.
-   * Backend: InstructorManager.UpdateInstructorProfileAsync
-   * @param data Güncellenecek veri (Dto)
-   */
-  updateInstructorProfile(data: any): Observable<any> {
-    return this.http.put<any>(`${this.controllerUrl}/profile`, data);
-  }
-
-  updateProfile(data: any): Observable<any> {
-    return this.http.put<any>(`${this.controllerUrl}/UpdateProfile`, data);
-  }
-  /**
    * Eğitmen başvurusunu onaylar (Admin paneli için).
-   * Backend: InstructorManager.ApproveInstructorAsync
-   * @param instructorId Eğitmen ID
+   * Endpoint: PUT api/Instructor/Approve/{id}
    */
-  approveInstructor(instructorId: string): Observable<any> {
-    return this.http.put<any>(`${this.controllerUrl}/approve/${instructorId}`, {});
+  approveInstructor(requestId: string): Observable<any> {
+    // Backend'de RequestId beklediğimizi konuşmuştuk, endpoint ona göre olmalı
+    // Veya InstructorManager proxy methoduna gider.
+    return this.http.put<any>(`${this.controllerUrl}/Approve/${requestId}`, {});
   }
 
   /**
-   * Eğitmenin hesap durumunu değiştirir (Aktif/Pasif).
-   * Backend: InstructorManager.ChangeInstructorStatusAsync
-   * @param instructorId Eğitmen ID
-   * @param status Yeni durum (enum veya int)
+   * Eğitmenin durumunu değiştirir.
    */
   changeInstructorStatus(instructorId: string, status: number): Observable<any> {
     return this.http.put<any>(`${this.controllerUrl}/status/${instructorId}`, { status });

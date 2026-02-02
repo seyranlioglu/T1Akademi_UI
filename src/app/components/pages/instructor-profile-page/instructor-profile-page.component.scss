@@ -2,7 +2,7 @@
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.5);
-    z-index: 1050; /* Navbarın üstünde olsun */
+    z-index: 1050; 
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,6 +23,12 @@
     height: 180px;
 }
 
-.form-control-lg {
-    font-size: 1.1rem;
+.tiny-text {
+    font-size: 0.75rem;
+}
+
+/* Form alanlarını biraz daha ferahlat */
+.form-control:disabled, .form-control[readonly] {
+    background-color: #f8f9fa;
+    opacity: 1;
 }

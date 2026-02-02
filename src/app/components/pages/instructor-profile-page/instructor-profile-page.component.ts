@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { InstructorApiService } from 'src/app/shared/api/instructor-api.service'; // Yeni servis
-import { UserApiService } from 'src/app/shared/api/user-api.service';
+import { InstructorApiService } from 'src/app/shared/api/instructor-api.service';
+import { DialogService } from 'primeng/dynamicdialog'; 
+// import { PhoneVerificationModalComponent } from '...'; // İleride eklenecek
 
 @Component({
   selector: 'app-instructor-profile-page',
   templateUrl: './instructor-profile-page.component.html',
-  styleUrls: ['./instructor-profile-page.component.scss']
+  styleUrls: ['./instructor-profile-page.component.scss'],
+  providers: [DialogService]
 })
 export class InstructorProfilePageComponent implements OnInit {
 
@@ -18,23 +20,31 @@ export class InstructorProfilePageComponent implements OnInit {
   // Resim Seçici Kontrolü
   showImageSelector = false;
   
-  // Profil Verisi
+  // Profil Verisi (API'den gelen ham data)
   currentProfile: any = null;
-  defaultImage = 'assets/images/defaults/defaultuser.png';
+  defaultImage = 'assets/img/user/default-user.png'; // assets yolunu düzelttim
 
   constructor(
     private fb: FormBuilder,
-    private instructorApi: InstructorApiService, // Backend'de yazdığımız Controller'a bağlanır
-    private toastr: ToastrService
+    private instructorApi: InstructorApiService,
+    private toastr: ToastrService,
+    private dialogService: DialogService
   ) {
     this.profileForm = this.fb.group({
       id: [0],
+      
+      // Read-Only Alanlar (User tablosundan gelir)
+      firstName: [{ value: '', disabled: true }],
+      lastName: [{ value: '', disabled: true }],
+      email: [{ value: '', disabled: true }],
+      phone: [{ value: '', disabled: true }],
+
+      // Editable Alanlar (Instructor tablosuna gider)
       title: ['', [Validators.required, Validators.maxLength(150)]],
       bio: ['', [Validators.required, Validators.minLength(50)]],
       linkedin: [''],
       twitter: [''],
       website: [''],
-      // Görseli form içinde tutuyoruz ama path olarak
       profileImage: [''] 
     });
   }
@@ -43,16 +53,24 @@ export class InstructorProfilePageComponent implements OnInit {
     this.loadProfile();
   }
 
-  loadProfile() {
+loadProfile() {
     this.isLoading = true;
-    this.instructorApi.getCurrentInstructorProfile().subscribe({
+    this.instructorApi.getMyProfile().subscribe({
       next: (res) => {
-        const data = res.data || res;
+        // 🔥 DÜZELTME BURADA:
+        // Gelen veri "body" içindeyse onu al, yoksa "data"ya bak, o da yoksa direkt response'u al.
+        const data = res.body || res.data || res;
+        
         this.currentProfile = data;
         
-        // Formu doldur (Backend'den gelen DTO ile eşleşmeli)
+        // Formu doldur
         this.profileForm.patchValue({
             id: data.id,
+            firstName: data.firstName, // Artık body.firstName'i okuyacak
+            lastName: data.lastName,
+            email: data.email,
+            phone: data.phone,
+            
             title: data.title,
             bio: data.bio,
             linkedin: data.linkedin,
@@ -60,28 +78,42 @@ export class InstructorProfilePageComponent implements OnInit {
             website: data.website,
             profileImage: data.profileImage
         });
+        
         this.isLoading = false;
       },
       error: () => {
+        this.toastr.error('Profil bilgileri alınamadı.');
         this.isLoading = false;
-        // Eğer profil yoksa (ilk kez giriyorsa) hata vermeyebiliriz, form boş kalır.
       }
     });
   }
-
   // --- RESİM SEÇME İŞLEMLERİ ---
   openImageSelector() {
     this.showImageSelector = true;
   }
 
   onImageSelected(path: string) {
-    // Selector'dan gelen dosya yolu
     this.profileForm.patchValue({ profileImage: path });
+    // Anlık güncelleme için:
+    if(this.currentProfile) this.currentProfile.profileImage = path;
     this.showImageSelector = false;
   }
 
   onImageSelectionCancel() {
     this.showImageSelector = false;
+  }
+
+  // --- TELEFON GÜNCELLEME (MODAL) ---
+  openPhoneVerification() {
+      // Buraya modal açma kodu gelecek. Şimdilik toast.
+      this.toastr.info('Telefon güncelleme modülü yapım aşamasında.');
+      
+      /*
+      const ref = this.dialogService.open(PhoneVerificationModalComponent, {
+          header: 'Telefon Numarası Güncelle',
+          width: '400px'
+      });
+      */
   }
 
   // --- KAYDETME ---
@@ -92,13 +124,27 @@ export class InstructorProfilePageComponent implements OnInit {
     }
 
     this.isSaving = true;
-    const formData = this.profileForm.value;
+    
+    // Formdan değerleri alıp Backend'in beklediği DTO formatına getiriyoruz
+    const formData = {
+        id: this.currentProfile.id,
+        title: this.profileForm.get('title')?.value,
+        bio: this.profileForm.get('bio')?.value,
+        linkedin: this.profileForm.get('linkedin')?.value,
+        twitter: this.profileForm.get('twitter')?.value,
+        website: this.profileForm.get('website')?.value,
+        
+        // 🔥 EKLENDİ: Profil Fotoğrafı Yolu
+        // Form control'ünden değeri alıyoruz (ContentLibrarySelector burayı doldurmuştu)
+        profileImage: this.profileForm.get('profileImage')?.value 
+    };
 
-    // Backend'de UpdateInstructorProfileAsync metoduna gider
-    this.instructorApi.updateInstructorProfile(formData).subscribe({
+    this.instructorApi.updateProfile(formData).subscribe({
       next: (res) => {
         this.toastr.success('Profiliniz başarıyla güncellendi.');
         this.isSaving = false;
+        // Güncel halini tekrar çekelim
+        this.loadProfile(); 
       },
       error: (err) => {
         console.error(err);

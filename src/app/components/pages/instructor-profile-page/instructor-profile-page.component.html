@@ -2,7 +2,9 @@
     <div class="selector-modal shadow-lg">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold m-0">Profil Fotoğrafı Seç</h5>
-            <button class="btn btn-sm btn-light" (click)="onImageSelectionCancel()"><i class='bx bx-x fs-4'></i></button>
+            <button class="btn btn-sm btn-light" (click)="onImageSelectionCancel()">
+                <i class='bx bx-x fs-4'></i>
+            </button>
         </div>
         <app-content-library-selector 
             [fileType]="'image'" 
@@ -13,7 +15,7 @@
     </div>
 </div>
 
-<div class="instructor-profile-area pt-4 pb-100">
+<div class="instructor-profile-area ptb-100 bg-light">
     <div class="container">
         
         <div *ngIf="isLoading" class="text-center py-5">
@@ -21,15 +23,16 @@
         </div>
 
         <div class="row" *ngIf="!isLoading">
-            <div class="col-lg-4">
-                <div class="card border-0 shadow-sm text-center p-4 sticky-top" style="top: 100px;">
+            
+            <div class="col-lg-4 col-md-12 mb-4">
+                <div class="card border-0 shadow-sm text-center p-4 h-100 sticky-top" style="top: 100px; z-index: 1;">
                     <div class="profile-img-wrapper mb-3 mx-auto position-relative">
                         <img [src]="profileForm.get('profileImage')?.value || defaultImage" 
                              class="rounded-circle img-thumbnail shadow-sm" 
                              style="width: 180px; height: 180px; object-fit: cover;">
                         
                         <button class="btn btn-primary btn-sm position-absolute bottom-0 end-0 rounded-circle p-2" 
-                                style="margin-right: 15px;"
+                                style="margin-right: 10px;"
                                 (click)="openImageSelector()"
                                 title="Fotoğrafı Değiştir">
                             <i class='bx bxs-camera fs-5'></i>
@@ -39,63 +42,109 @@
                     <h5 class="fw-bold mb-1">{{ currentProfile?.firstName }} {{ currentProfile?.lastName }}</h5>
                     <p class="text-muted small mb-3">{{ profileForm.get('title')?.value || 'Unvan Girilmemiş' }}</p>
                     
-                    <div class="d-flex justify-content-center gap-2">
-                        <span class="badge bg-success bg-opacity-10 text-success" *ngIf="currentProfile?.status === 1">Onaylı Eğitmen</span>
-                        <span class="badge bg-warning bg-opacity-10 text-warning" *ngIf="currentProfile?.status === 0">Onay Bekliyor</span>
+                    <div class="d-flex justify-content-center gap-2 mb-3">
+                        <span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2" *ngIf="currentProfile?.status === 1">
+                            <i class='bx bx-check-circle me-1'></i> Onaylı Eğitmen
+                        </span>
+                        <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2" *ngIf="currentProfile?.status === 0">
+                            <i class='bx bx-time-five me-1'></i> Onay Bekliyor
+                        </span>
+                        <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3 py-2" *ngIf="currentProfile?.status === 2">
+                            <i class='bx bx-x-circle me-1'></i> Reddedildi
+                        </span>
+                    </div>
+                    
+                    <hr>
+                    <div class="text-start small text-muted">
+                        <div><strong>Kullanıcı Kodu:</strong> {{ currentProfile?.instructorCode }}</div>
+                        <div *ngIf="currentProfile?.applyDate"><strong>Kayıt Tarihi:</strong> {{ currentProfile?.applyDate | date:'dd.MM.yyyy' }}</div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-8">
+            <div class="col-lg-8 col-md-12">
                 <div class="card border-0 shadow-sm p-4">
                     <h4 class="fw-bold border-bottom pb-3 mb-4">Profil Bilgileri</h4>
                     
                     <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
                         
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Unvan <span class="text-danger">*</span></label>
-                            <input type="text" formControlName="title" class="form-control form-control-lg" placeholder="Örn: Kıdemli Yazılım Mimarı">
-                            <div class="form-text">Vitrin sayfasında isminizin hemen altında görünür.</div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Biyografi <span class="text-danger">*</span></label>
-                            <textarea formControlName="bio" rows="6" class="form-control" placeholder="Kendinizden bahsedin..."></textarea>
-                            <div class="form-text">Öğrencilerin sizi tanıması için en az 50 karakter yazmalısınız.</div>
-                        </div>
-
-                        <h5 class="fw-bold mt-5 mb-3">Sosyal Medya</h5>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">LinkedIn</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class='bx bxl-linkedin'></i></span>
-                                    <input type="text" formControlName="linkedin" class="form-control" placeholder="Profil URL">
+                        <div class="section mb-4">
+                            <h6 class="text-primary mb-3">Hesap Bilgileri</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted">Ad</label>
+                                    <input type="text" formControlName="firstName" class="form-control bg-light">
                                 </div>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Twitter (X)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class='bx bxl-twitter'></i></span>
-                                    <input type="text" formControlName="twitter" class="form-control" placeholder="Profil URL">
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted">Soyad</label>
+                                    <input type="text" formControlName="lastName" class="form-control bg-light">
                                 </div>
-                            </div>
-
-                            <div class="col-md-12 mb-4">
-                                <label class="form-label">Web Sitesi</label>
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class='bx bx-globe'></i></span>
-                                    <input type="text" formControlName="website" class="form-control" placeholder="https://...">
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted">E-Posta</label>
+                                    <input type="email" formControlName="email" class="form-control bg-light">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted">Telefon</label>
+                                    <div class="input-group">
+                                        <input type="text" formControlName="phone" class="form-control bg-light">
+                                        <button class="btn btn-outline-secondary" type="button" (click)="openPhoneVerification()">
+                                            <i class='bx bx-edit'></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text tiny-text">Numara değişikliği doğrulama gerektirir.</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="d-grid mt-3">
-                            <button type="submit" class="btn btn-primary btn-lg fw-bold" [disabled]="isSaving">
+                        <div class="section mb-4">
+                            <h6 class="text-primary mb-3">Eğitmen Detayları</h6>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Unvan <span class="text-danger">*</span></label>
+                                <input type="text" formControlName="title" class="form-control" placeholder="Örn: Kıdemli Yazılım Mimarı">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Biyografi <span class="text-danger">*</span></label>
+                                <textarea formControlName="bio" rows="6" class="form-control" placeholder="Kendinizden bahsedin..."></textarea>
+                                <div class="form-text">Öğrencilerin sizi tanıması için en az 50 karakter yazmalısınız.</div>
+                            </div>
+                        </div>
+
+                        <div class="section mb-4">
+                            <h6 class="text-primary mb-3">Sosyal Medya</h6>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">LinkedIn</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class='bx bxl-linkedin'></i></span>
+                                        <input type="text" formControlName="linkedin" class="form-control" placeholder="Profil URL">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Twitter (X)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class='bx bxl-twitter'></i></span>
+                                        <input type="text" formControlName="twitter" class="form-control" placeholder="Profil URL">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label">Web Sitesi</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class='bx bx-globe'></i></span>
+                                        <input type="text" formControlName="website" class="form-control" placeholder="https://...">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold" [disabled]="isSaving || profileForm.invalid">
                                 <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
-                                Değişiklikleri Kaydet
+                                {{ isSaving ? 'Kaydediliyor...' : 'Kaydet' }}
                             </button>
                         </div>
 
