@@ -102,7 +102,6 @@ const routes: Routes = [
             { path: '', component: OverviewComponent },
             { path: 'about', component: AboutPageComponent },
             { path: 'instructors', component: InstructorsPageComponent },
-            { path: 'instructor-profile', component: InstructorProfilePageComponent },
             { path: 'become-instructor', component: BecomeInstructorComponent }, // YENİ ROTA
             { path: 'courses-grid', component: CoursesGridPageComponent },
             { path: 'courses-list', component: CoursesListPageComponent },
@@ -158,7 +157,7 @@ const routes: Routes = [
             
             { path: 'performance', component: PerformanceComponent },
             { path: 'courses', component: CoursesComponent },
-            
+            { path: 'instructor-profile', component: InstructorProfilePageComponent },
             // YENİ: Kütüphane
             { path: 'library', component: LibraryComponent }, 
 

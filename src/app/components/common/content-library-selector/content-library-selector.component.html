@@ -1,81 +1,100 @@
-<div class="content-library-container">
+<div class="selector-container">
     
-    <!-- Search Bar -->
-    <div class="search-bar mb-3">
+    <div class="search-bar d-flex gap-2 mb-3">
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="Dosya ara..." 
-                   [(ngModel)]="searchText" (keyup.enter)="onSearch()">
-            <button class="btn btn-outline-primary" type="button" (click)="onSearch()">
-                <i class='bx bx-search'></i> Ara
-            </button>
+            <span class="input-group-text bg-white"><i class='bx bx-search'></i></span>
+            <input type="text" 
+                   class="form-control border-start-0 ps-0" 
+                   placeholder="Dosya ara..." 
+                   [(ngModel)]="searchText" 
+                   (keyup.enter)="onSearch()">
         </div>
+        <button class="btn btn-primary" type="button" (click)="onSearch()">Ara</button>
     </div>
 
-    <!-- Content Grid -->
-    <div class="content-grid" *ngIf="!isLoading; else loadingTemplate">
-        <div class="row" *ngIf="contents.length > 0; else noDataTemplate">
-            <div class="col-md-3 col-6 mb-4" *ngFor="let item of contents">
-                <div class="library-item" 
-                     [class.selected]="selectedItem?.id === item.id"
+    <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-muted small">Kütüphane yükleniyor...</p>
+    </div>
+
+    <div class="content-grid-wrapper mb-3" *ngIf="!isLoading">
+        <div class="row g-3">
+            
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="upload-card h-100 d-flex flex-column align-items-center justify-content-center p-3 border border-2 border-dashed rounded bg-light cursor-pointer"
+                     (click)="openUploadModal()">
+                    <div class="icon-circle bg-white shadow-sm p-3 rounded-circle mb-2 text-primary">
+                        <i class='bx bx-cloud-upload fs-2'></i>
+                    </div>
+                    <span class="fw-bold small text-primary">Yeni Yükle</span>
+                    <span class="tiny-text text-muted">Cihazından seç</span>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-4 col-lg-3" *ngFor="let item of paginatedContents">
+                <div class="file-card card h-100 border shadow-sm position-relative overflow-hidden cursor-pointer"
+                     [class.selected-card]="selectedItem?.id === item.id"
                      (click)="selectItem(item)">
                     
-                    <!-- Görsel Önizleme -->
-                    <div class="item-preview">
-                        <!-- Eğer resimse göster, değilse ikon göster -->
-                        <img *ngIf="item.contentType?.includes('image') || item.fileName.endsWith('.jpg') || item.fileName.endsWith('.png')" 
-                             [src]="item.filePath" 
-                             alt="{{item.fileName}}">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center overflow-hidden" style="height: 120px;">
                         
-                        <div *ngIf="!(item.contentType?.includes('image') || item.fileName.endsWith('.jpg') || item.fileName.endsWith('.png'))" 
-                             class="file-icon">
-                             <i class='bx bx-file'></i>
+                        <img *ngIf="['.jpg','.png','.jpeg','.webp','.gif'].includes(getExtension(item.filePath))" 
+                             [src]="item.filePath" 
+                             class="w-100 h-100" 
+                             style="object-fit: cover;">
+                        
+                        <img *ngIf="item.thumbnail && !(['.jpg','.png','.jpeg','.webp','.gif'].includes(getExtension(item.filePath)))"
+                             [src]="item.thumbnail"
+                             class="w-100 h-100" 
+                             style="object-fit: cover;">
+
+                        <i *ngIf="!item.thumbnail && !(['.jpg','.png','.jpeg','.webp','.gif'].includes(getExtension(item.filePath)))" 
+                           class='bx bxs-file-doc fs-1 text-secondary'></i>
+
+                        <div class="play-overlay" *ngIf="['.mp4','.avi','.mov'].includes(getExtension(item.filePath))">
+                            <i class='bx bx-play-circle text-white fs-1'></i>
                         </div>
                     </div>
 
-                    <div class="item-info">
-                        <small>{{ item.fileName }}</small>
+                    <div class="card-body p-2">
+                        <p class="card-text text-truncate small mb-0 fw-medium" [title]="item.title || item.fileName">
+                            {{ item.title || item.fileName }}
+                        </p>
+                        <small class="text-muted tiny-text">{{ item.createdDate | date:'dd.MM.yyyy' }}</small>
                     </div>
-                    
+
                     <div class="selected-overlay" *ngIf="selectedItem?.id === item.id">
-                        <i class='bx bx-check'></i>
+                        <i class='bx bx-check-circle text-white fs-2'></i>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Pagination (Basit) -->
-        <div class="pagination-area text-center" *ngIf="totalItems > pageSize">
-            <button class="btn btn-sm btn-light me-2" 
-                    [disabled]="currentPage === 1" 
-                    (click)="onPageChange(currentPage - 1)">Önceki</button>
-            <span>Sayfa {{currentPage}}</span>
-            <button class="btn btn-sm btn-light ms-2" 
-                    [disabled]="contents.length < pageSize" 
-                    (click)="onPageChange(currentPage + 1)">Sonraki</button>
+            <div *ngIf="paginatedContents.length === 0" class="col-12 text-center py-4">
+                <p class="text-muted">Görüntülenecek dosya bulunamadı.</p>
+            </div>
+
         </div>
     </div>
 
-    <!-- Actions -->
-    <div class="modal-footer-actions mt-3 text-end">
-        <button class="btn btn-secondary me-2" (click)="cancel()">İptal</button>
-        <button class="btn btn-primary" (click)="confirmSelection()" [disabled]="!selectedItem">
-            Seç
+    <div class="d-flex justify-content-between align-items-center border-top pt-3 mb-3" *ngIf="totalItems > 0">
+        <button class="btn btn-sm btn-outline-secondary" 
+                [disabled]="currentPage === 1" 
+                (click)="onPageChange(currentPage - 1)">
+            <i class='bx bx-chevron-left'></i>
+        </button>
+        
+        <span class="small text-muted fw-bold">Sayfa {{currentPage}} / {{ totalPages }}</span>
+        
+        <button class="btn btn-sm btn-outline-secondary" 
+                [disabled]="currentPage >= totalPages" 
+                (click)="onPageChange(currentPage + 1)">
+            <i class='bx bx-chevron-right'></i>
         </button>
     </div>
 
-    <!-- Templates -->
-    <ng-template #loadingTemplate>
-        <div class="text-center py-5">
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Yükleniyor...</span>
-            </div>
-        </div>
-    </ng-template>
+    <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-light" (click)="cancel()">İptal</button>
+        <button class="btn btn-primary px-4" [disabled]="!selectedItem" (click)="confirmSelection()">Seçimi Onayla</button>
+    </div>
 
-    <ng-template #noDataTemplate>
-        <div class="text-center py-5 text-muted">
-            <i class='bx bx-folder-open fs-1'></i>
-            <p>İçerik bulunamadı.</p>
-        </div>
-    </ng-template>
 </div>

@@ -52,7 +52,7 @@
 
         <div class="sidebar-footer p-3 mt-auto border-top border-secondary border-opacity-25">
             
-            <a routerLink="/dashboard/my-profile" class="d-flex align-items-center gap-3 text-decoration-none text-white-50 p-2 rounded-3 hover-bg">
+            <a routerLink="/instructor/instructor-profile" class="d-flex align-items-center gap-3 text-decoration-none text-white-50 p-2 rounded-3 hover-bg">
                 <div class="avatar-circle bg-secondary text-white fw-bold d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%;">
                     {{ (user$ | async)?.name?.charAt(0) || 'E' }}
                 </div>

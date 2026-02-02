@@ -1,11 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpEventType, HttpRequest, HttpEvent } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog'; // PrimeNG Importları
+import { UploadModalComponent } from 'src/app/components/common/modals/upload-modal/upload-modal.component';
 
-// Widget'ta gösterilecek öğenin yapısı
 export interface UploadItem {
-  id: string; // Widget için geçici ID (Listede takibi için)
+  id: string;
   file: File;
   metaData: { title: string; description: string; [key: string]: any };
   progress: number;
@@ -17,138 +18,104 @@ export interface UploadItem {
   providedIn: 'root'
 })
 export class GlobalUploadService {
-  // API Controller Yolu
   private baseUrl = environment.apiUrl + '/ContentLibrary';
   
-  // Widget için State Yönetimi (Aktif yüklemeler listesi)
   private uploadsSubject = new BehaviorSubject<UploadItem[]>([]);
   public uploads$ = this.uploadsSubject.asObservable();
 
-  constructor(private http: HttpClient) { }
+  public onUploadFinished = new EventEmitter<void>();
+  
+  // Modal Referansı (Kapatmak istersek diye)
+  private ref: DynamicDialogRef | undefined;
 
-  // =================================================================================================
-  // 1. AŞAMA: BAŞLATMA (Initialize)
-  // Kullanıcı "Yükle" butonuna bastığında burası çağrılır.
-  // =================================================================================================
+  constructor(
+      private http: HttpClient,
+      private dialogService: DialogService // PrimeNG Dialog Service
+  ) { }
+
+  // --- MODAL AÇMA METODU ---
+  openUploadDialog() {
+      this.ref = this.dialogService.open(UploadModalComponent, {
+          header: 'Yeni İçerik Yükle',
+          width: '50vw',
+          contentStyle: { "overflow": "auto" },
+          baseZIndex: 10000,
+          maximizable: true,
+          closeOnEscape: false, // Yükleme sırasında yanlışlıkla kapanmasın
+          closable: true 
+      });
+
+      // Modal kapandığında tetiklenecek işlemler (gerekirse)
+      this.ref.onClose.subscribe(() => {
+          // Modal kapandı
+      });
+  }
+
+  // ... (Diğer startUpload, uploadFileActual vb. metodlar aynen kalıyor) ...
+  
   startUpload(file: File, metaData: any) {
-    // Widget'ta göstermek için geçici bir ID oluşturuyoruz (Timestamp)
     const tempWidgetId = Date.now().toString();
-    
-    // Listeye 'Pending' (Bekliyor) olarak ekle
-    const newItem: UploadItem = {
-      id: tempWidgetId,
-      file: file,
-      metaData: metaData,
-      progress: 0,
-      status: 'pending' 
-    };
+    const newItem: UploadItem = { id: tempWidgetId, file: file, metaData: metaData, progress: 0, status: 'pending' };
     this.addUploadToList(newItem);
 
-    // Backend'e gidip Kayıt Aç (Initialize Endpoint)
-    // Beklenen Response Yapısı: { header: { result: true }, body: { id: 90 } }
     this.http.post<any>(`${this.baseUrl}/Initialize`, { 
         title: metaData.title, 
         description: metaData.description || '' 
     }).subscribe({
         next: (res) => {
-            // Response Wrapper Kontrolü
-            if (res && res.header && res.header.result === true) {
-                // Başarılı: Backend'den gerçek ID'yi al
-                // Not: Loglarında body: { id: 90 } olarak görünüyor.
-                const realDbId = res.body.id; 
-                
-                // 2. Aşamaya Geç: Dosyayı Yükle
-                this.uploadFileActual(realDbId, file, tempWidgetId);
+            // Response yapısı: res.data veya res.body olabilir, backend'e göre ayarla
+            // Senin backend common response dönüyorsa: res.data.id
+            const result = res.data || res.body || res;
+            if (result && result.id) {
+                this.uploadFileActual(result.id, file, tempWidgetId);
             } else {
-                // Başarısız: Hata mesajını göster
-                const errorMsg = res?.header?.msg || 'Başlatma işlemi başarısız.';
-                this.updateItemState(tempWidgetId, { status: 'error', message: errorMsg });
+                this.updateItemState(tempWidgetId, { status: 'error', message: 'Başlatma hatası.' });
             }
         },
         error: (err) => {
-            console.error('Upload Initialize Error:', err);
-            this.updateItemState(tempWidgetId, { status: 'error', message: 'Sunucuya erişilemedi.' });
+            console.error(err);
+            this.updateItemState(tempWidgetId, { status: 'error', message: 'Sunucu hatası.' });
         }
     });
   }
 
-  // =================================================================================================
-  // 2. AŞAMA: FİZİKSEL DOSYA YÜKLEME (UploadFile)
-  // Kayıt açıldıktan sonra ID ile dosyayı gönderir.
-  // =================================================================================================
   private uploadFileActual(dbId: number, file: File, widgetItemId: string) {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('id', dbId.toString()); // Backend bu ID'ye göre update yapacak
+    formData.append('id', dbId.toString());
 
-    // Dosya yükleme isteği (Progress Report Açık)
-    const req = new HttpRequest('POST', `${this.baseUrl}/UploadFile`, formData, {
-      reportProgress: true
-    });
-
-    // Durumu 'Uploading' yap (Widget rengi değişsin)
+    const req = new HttpRequest('POST', `${this.baseUrl}/UploadFile`, formData, { reportProgress: true });
     this.updateItemState(widgetItemId, { status: 'uploading' });
 
     this.http.request(req).subscribe({
       next: (event: HttpEvent<any>) => {
-        // A. Yükleme Devam Ediyor
         if (event.type === HttpEventType.UploadProgress) {
-          // Yüzdelik hesapla
           const percent = Math.round(100 * event.loaded / (event.total || 1));
           this.updateItemState(widgetItemId, { progress: percent });
-        } 
-        // B. Yükleme Bitti (Sunucudan Cevap Geldi)
-        else if (event.type === HttpEventType.Response) {
-          const body = event.body;
-
-          // Response Wrapper Kontrolü
-          // Beklenen: { header: { result: true }, body: { ... } }
-          if (body && body.header && body.header.result === true) {
-             // Başarılı
+        } else if (event.type === HttpEventType.Response) {
              this.updateItemState(widgetItemId, { status: 'completed', progress: 100 });
-             
-             // 5 Saniye sonra widget listesinden sil
+             this.onUploadFinished.emit(); // Listeyi yenile
              setTimeout(() => this.removeUpload(widgetItemId), 5000);
-          } else {
-             // Sunucu hata döndü
-             const errorMsg = body?.header?.msg || 'Yükleme başarısız.';
-             this.updateItemState(widgetItemId, { status: 'error', message: errorMsg });
-          }
         }
       },
-      error: (err) => {
-        console.error('Upload File Error:', err);
-        this.updateItemState(widgetItemId, { status: 'error', message: 'Yükleme kesildi.' });
-      }
+      error: () => this.updateItemState(widgetItemId, { status: 'error', message: 'Yükleme hatası.' })
     });
   }
 
-  // =================================================================================================
-  // STATE YÖNETİMİ (HELPER METOTLAR)
-  // Widget listesini yöneten yardımcı fonksiyonlar
-  // =================================================================================================
-
-  // Listeye yeni eleman ekle
   private addUploadToList(item: UploadItem) {
-    const current = this.uploadsSubject.value;
-    this.uploadsSubject.next([...current, item]);
+    this.uploadsSubject.next([...this.uploadsSubject.value, item]);
   }
 
-  // Listedeki bir elemanın durumunu güncelle (Progress, Status vb.)
   private updateItemState(id: string, changes: Partial<UploadItem>) {
     const current = this.uploadsSubject.value;
     const index = current.findIndex(u => u.id === id);
     if (index > -1) {
-      const updatedItem = { ...current[index], ...changes };
-      const newList = [...current];
-      newList[index] = updatedItem;
-      this.uploadsSubject.next(newList);
+      current[index] = { ...current[index], ...changes };
+      this.uploadsSubject.next([...current]);
     }
   }
 
-  // Listeden eleman sil
   public removeUpload(id: string) {
-    const current = this.uploadsSubject.value.filter(u => u.id !== id);
-    this.uploadsSubject.next(current);
+    this.uploadsSubject.next(this.uploadsSubject.value.filter(u => u.id !== id));
   }
 }

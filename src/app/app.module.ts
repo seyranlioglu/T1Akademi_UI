@@ -237,7 +237,9 @@ import { BecomeInstructorComponent } from './components/pages/instructor/become-
             provide: HTTP_INTERCEPTORS,
             useClass: JwtInterceptor,
             multi: true,
+            
         },
+        DialogService
     ],
     bootstrap: [AppComponent],
 })

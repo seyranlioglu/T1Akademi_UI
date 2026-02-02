@@ -31,7 +31,6 @@ export class InstructorApiService {
   getCurrentInstructorProfile(): Observable<any> {
     return this.http.get<any>(`${this.controllerUrl}/profile/current`);
   }
-
   /**
    * Belirli bir eğitmenin detaylarını getirir (Public/Vitrin).
    * Backend: InstructorManager.GetInstructorByIdAsync
@@ -40,7 +39,10 @@ export class InstructorApiService {
   getInstructorById(instructorId: string): Observable<any> {
     return this.http.get<any>(`${this.controllerUrl}/${instructorId}`);
   }
-
+  getMyProfile(): Observable<any> {
+      // Backend'de endpoint "GetMyProfile" olarak görünüyor, "profile/current" değil.
+      return this.http.get<any>(`${this.controllerUrl}/GetMyProfile`);
+    }
   /**
    * Eğitmen listesini getirir (Filtreleme ile).
    * Backend: InstructorManager.GetInstructorListAsync
@@ -69,6 +71,9 @@ export class InstructorApiService {
     return this.http.put<any>(`${this.controllerUrl}/profile`, data);
   }
 
+  updateProfile(data: any): Observable<any> {
+    return this.http.put<any>(`${this.controllerUrl}/UpdateProfile`, data);
+  }
   /**
    * Eğitmen başvurusunu onaylar (Admin paneli için).
    * Backend: InstructorManager.ApproveInstructorAsync

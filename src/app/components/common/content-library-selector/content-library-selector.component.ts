@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { ContentLibraryApiService } from 'src/app/shared/api/content-library-api.service';
+import { GlobalUploadService } from 'src/app/shared/services/global-upload.service'; // Upload servisi
 
 @Component({
   selector: 'app-content-library-selector',
@@ -9,113 +10,150 @@ import { ContentLibraryApiService } from 'src/app/shared/api/content-library-api
 })
 export class ContentLibrarySelectorComponent implements OnInit {
 
-  // --- Inputs ---
-  /**
-   * Seçicinin ne döndüreceğini belirler.
-   * 'id': Sadece Guid döner (Default - Mevcut sistemler için).
-   * 'path': Dosya yolunu (URL) string olarak döner (Eğitmen Profili vb. için).
-   * 'object': Tüm DTO objesini döner.
-   */
-  @Input() returnType: 'id' | 'path' | 'object' = 'id';
+  // Girdiler
+  @Input() fileType: 'all' | 'image' | 'video' | 'document' = 'all';
+  @Input() returnType: 'id' | 'path' = 'id';
 
-  /**
-   * Sadece belirli dosya tiplerini filtrelemek için (Örn: ['.jpg', '.png'] veya ContentTypeId)
-   * Opsiyonel, backend desteğine bağlı.
-   */
-  @Input() fileTypeFilter: string | null = null; 
-
-  // --- Outputs ---
+  // Çıktılar
   @Output() onSelect = new EventEmitter<any>();
   @Output() onCancel = new EventEmitter<void>();
 
-  // --- Variables ---
-  contents: any[] = [];
-  isLoading: boolean = false;
+  // Veri Listeleri
+  allContents: any[] = [];
+  filteredContents: any[] = [];
+  paginatedContents: any[] = [];
+
+  // Seçim
   selectedItem: any = null;
-  
-  // Pagination
-  currentPage: number = 1;
-  pageSize: number = 12; // Grid görünümü için 12 ideal
-  totalItems: number = 0;
+  isLoading = false;
+
+  // Arama
   searchText: string = '';
+
+  // Sayfalama
+  currentPage: number = 1;
+  pageSize: number = 11; // 1 tane 'Yeni Ekle' kartı + 11 içerik = 12 grid
+  totalItems: number = 0;
+  totalPages: number = 1;
 
   constructor(
     private contentLibraryApi: ContentLibraryApiService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private globalUploadService: GlobalUploadService // Servisi inject ettik
   ) { }
 
   ngOnInit(): void {
     this.loadContents();
+
+    // Upload servisini dinle: Eğer bir dosya yüklenirse listeyi yenile
+    this.globalUploadService.onUploadFinished.subscribe(() => {
+        this.loadContents();
+    });
   }
 
-  loadContents(): void {
+  loadContents() {
     this.isLoading = true;
-    
-    // API servisinde getList metodunun parametre yapısına göre düzenlendi
-    // Eğer backend'de fileType filtresi varsa buraya eklenebilir.
-    this.contentLibraryApi.getList(this.currentPage, this.pageSize, this.searchText).subscribe({
+    this.contentLibraryApi.getList().subscribe({
       next: (res: any) => {
-        if (res.success) {
-          this.contents = res.data.items; // PagedList yapısı
-          this.totalItems = res.data.totalCount;
-        }
+        // 🔥 KRİTİK DÜZELTME: Backend yapısına göre Array 'body' içinde
+        this.allContents = res.body || res.data || (Array.isArray(res) ? res : []);
+        
+        this.applyFilters();
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Kütüphane yüklenemedi:', err);
-        this.toastr.error('İçerikler yüklenirken hata oluştu.');
+        console.error(err);
+        this.toastr.error('Kütüphane yüklenemedi');
         this.isLoading = false;
       }
     });
   }
 
-  // Kullanıcı bir öğeye tıkladığında
-  selectItem(item: any): void {
+  // --- UPLOAD MODALINI AÇ ---
+  openUploadModal() {
+      // Global upload servisini tetikle
+      this.globalUploadService.openUploadDialog(); 
+  }
+
+  // --- ARAMA VE FİLTRELEME ---
+  onSearch() {
+    this.currentPage = 1;
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    let temp = [...this.allContents]; // Referansı kopar
+
+    // 1. Dosya Türü Filtresi
+    if (this.fileType !== 'all') {
+      temp = temp.filter(item => {
+        // Backend'den FileType dönüyor olabilir veya uzantıdan buluruz
+        // item.fileTypeId veya uzantı kontrolü
+        const ext = this.getExtension(item.filePath);
+        
+        if (this.fileType === 'image') return ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext);
+        if (this.fileType === 'video') return ['.mp4', '.mov', '.avi', '.mkv', '.webm'].includes(ext);
+        if (this.fileType === 'document') return ['.pdf', '.doc', '.docx', '.xls', '.xlsx'].includes(ext);
+        
+        return true;
+      });
+    }
+
+    // 2. Metin Arama Filtresi
+    if (this.searchText) {
+      const searchLower = this.searchText.toLowerCase();
+      temp = temp.filter(item => 
+        (item.fileName && item.fileName.toLowerCase().includes(searchLower)) || 
+        (item.title && item.title.toLowerCase().includes(searchLower))
+      );
+    }
+
+    this.filteredContents = temp;
+    this.totalItems = this.filteredContents.length;
+    
+    // 3. Sayfa Sayısını Hesapla
+    this.totalPages = Math.ceil(this.totalItems / this.pageSize);
+    if (this.totalPages < 1) this.totalPages = 1;
+
+    // 4. Sayfalama
+    this.updatePagination();
+  }
+
+  updatePagination() {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedContents = this.filteredContents.slice(startIndex, endIndex);
+  }
+
+  onPageChange(newPage: number) {
+    if (newPage >= 1 && newPage <= this.totalPages) {
+      this.currentPage = newPage;
+      this.updatePagination();
+    }
+  }
+
+  // --- YARDIMCI METOTLAR ---
+  getExtension(path: string): string {
+    if (!path) return '';
+    try {
+        return '.' + path.split('.').pop()?.toLowerCase();
+    } catch { return ''; }
+  }
+
+  // --- SEÇİM İŞLEMLERİ ---
+  selectItem(item: any) {
     this.selectedItem = item;
   }
 
-  // "Seç" butonuna basıldığında
-  confirmSelection(): void {
-    if (!this.selectedItem) {
-      this.toastr.warning('Lütfen bir içerik seçin.');
-      return;
+  confirmSelection() {
+    if (this.selectedItem) {
+      // 🔥 İsteğine göre Path veya ID dönüyor
+      const valueToEmit = this.returnType === 'path' ? this.selectedItem.filePath : this.selectedItem.id;
+      this.onSelect.emit(valueToEmit);
     }
-
-    let returnValue: any;
-
-    switch (this.returnType) {
-      case 'path':
-        // Backend entity'sinde "FilePath" olduğunu analiz etmiştik.
-        // Frontend modelinde küçük harfle "filePath" olabilir, kontrol edip atıyoruz.
-        returnValue = this.selectedItem.filePath || this.selectedItem.FilePath;
-        break;
-      
-      case 'object':
-        returnValue = this.selectedItem;
-        break;
-
-      case 'id':
-      default:
-        returnValue = this.selectedItem.id || this.selectedItem.Id;
-        break;
-    }
-
-    this.onSelect.emit(returnValue);
   }
 
-  cancel(): void {
+  cancel() {
     this.onCancel.emit();
-  }
-
-  // Arama işlemi
-  onSearch(): void {
-    this.currentPage = 1;
-    this.loadContents();
-  }
-
-  // Sayfa değişimi
-  onPageChange(page: number): void {
-    this.currentPage = page;
-    this.loadContents();
   }
 }
