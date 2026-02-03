@@ -45,6 +45,9 @@ export class InstructorProfilePageComponent implements OnInit {
       linkedin: [''],
       twitter: [''],
       website: [''],
+      facebook: [''],
+      instagram: [''],
+      address: [''],
       profileImage: [''] 
     });
   }
@@ -76,6 +79,9 @@ loadProfile() {
             linkedin: data.linkedin,
             twitter: data.twitter,
             website: data.website,
+            facebook: data.facebook,
+            instagram: data.instagram,
+            address: data.address,
             profileImage: data.profileImage
         });
         
@@ -133,9 +139,9 @@ loadProfile() {
         linkedin: this.profileForm.get('linkedin')?.value,
         twitter: this.profileForm.get('twitter')?.value,
         website: this.profileForm.get('website')?.value,
-        
-        // 🔥 EKLENDİ: Profil Fotoğrafı Yolu
-        // Form control'ünden değeri alıyoruz (ContentLibrarySelector burayı doldurmuştu)
+        facebook: this.profileForm.get('facebook')?.value,
+    instagram: this.profileForm.get('instagram')?.value,
+    address: this.profileForm.get('address')?.value,
         profileImage: this.profileForm.get('profileImage')?.value 
     };
 
