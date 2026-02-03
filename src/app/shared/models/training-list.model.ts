@@ -37,7 +37,7 @@ export interface TrainingListItem {
     totalMinutes: number;
     lessonCount: number;
     
-    // 🔥 GÜNCELLENDİ: String listesi
+    // Backend'den string listesi geliyor
     whatYouWillLearn: string[]; 
 
     createdDate: Date;
@@ -51,6 +51,11 @@ export interface TrainingListItem {
     // Kullanıcı Durumu
     isFavorite: boolean;
     isAssigned: boolean;
+
+    // 🔥 EKLENEN EKSİK ALANLAR (Hataları Çözen Kısım)
+    priceTierId?: number;     
+    categoryId?: number;
+    parentCategoryId?: number;
 }
 
 export interface SearchTrainingRequest {
@@ -78,7 +83,6 @@ export interface PagedList<T> {
     hasNextPage: boolean;
 }
 
-// Yorum Ekleme Modeli (Yeni)
 export interface AddReviewDto {
     trainingId: number;
     rating: number;

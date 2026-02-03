@@ -15,7 +15,6 @@ import { GetTrainingListDto } from 'src/app/shared/models/GetTrainingListDto';
 export class CoursesComponent implements OnInit, OnDestroy {
     
     private unsubscribe: Subscription[] = [];
-    isHovered = false;
     formModalRef!: NgbModalRef;
     
     courseList: GetTrainingListDto[] = [];
@@ -38,7 +37,17 @@ export class CoursesComponent implements OnInit, OnDestroy {
         this.loading = true;
         const apiSubs = this.trainingApiService.getInstructorTrainingList().subscribe({
             next: (response: any) => {
-                const data = response.body || response.data || [];
+                // API yapısına göre data body içinde gelebilir
+                let data: GetTrainingListDto[] = [];
+
+                if (Array.isArray(response)) {
+                    data = response;
+                } else if (response && response.body && Array.isArray(response.body)) {
+                    data = response.body;
+                } else if (response && response.data && Array.isArray(response.data)) {
+                    data = response.data;
+                }
+
                 this.courseList = data;
                 this.shownCourses = data;
                 this.loading = false;
@@ -82,8 +91,7 @@ export class CoursesComponent implements OnInit, OnDestroy {
         }
     }
     
-    // ✅ DÜZELTİLDİ: src/ kaldırıldı
-    getCourseImage(path: string): string {
+    getCourseImage(path: string | null): string {
         if (!path || path === 'none' || path === 'null') {
             return 'assets/images/courses/TrainingDraft.png'; 
         }

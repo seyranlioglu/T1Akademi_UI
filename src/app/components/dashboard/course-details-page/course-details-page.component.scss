@@ -1,46 +1,146 @@
-.course-header {
-    background-color: #1c1d1f;
-}
-
-.text-info {
-    color: #cec0fc !important;
-    &:hover { color: #fff !important; }
-}
-
-.text-shadow {
-    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-}
-
-.tiny-text {
-    font-size: 0.75rem;
-}
-
-.course-sidebar-card {
-    border-radius: 0;
+/* 1. Hero Section */
+.course-hero-section {
+    background: linear-gradient(135deg, #1c1d1f 0%, #2c3e50 100%);
+    padding: 60px 0;
+    position: relative;
     overflow: hidden;
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.1;
+        background-image: radial-gradient(#ffffff 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    h1 {
+        line-height: 1.2;
+    }
 }
 
-/* Önizleme Modu Animasyonu */
+/* 2. Unified Standard Card */
+.standard-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: translateY(-2px);
+    }
+
+    .card-header-custom {
+        background-color: #f8f9fa;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #eef0f2;
+        
+        h4 {
+            font-size: 1.25rem;
+            color: #212529;
+        }
+    }
+}
+
+/* 3. Accordion Styling */
+.accordion-button {
+    background-color: #fff !important;
+    color: #333 !important;
+    font-weight: 600;
+    box-shadow: none !important;
+    padding: 1.2rem 1.5rem;
+
+    &:not(.collapsed) {
+        background-color: #f1f3f5 !important;
+        color: #cc2e59 !important; 
+    }
+}
+
+.list-group-item {
+    transition: background-color 0.2s;
+    border-bottom: 1px dashed #e0e0e0 !important;
+
+    &:last-child {
+        border-bottom: none !important;
+    }
+
+    /* ÖNİZLEME VARSA TIKLANABİLİR YAP */
+    &.preview-enabled {
+        cursor: pointer;
+        &:hover {
+            background-color: #f0f7ff; /* Hafif mavi hover */
+            .fw-medium { color: #cc2e59; }
+            .icon-box { background-color: #cc2e59 !important; color: #fff !important; }
+        }
+    }
+}
+
+.icon-box {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+/* 4. Animations */
 .animate-pulse { animation: pulse 2s infinite; }
-
-/* Play Butonu Animasyonu */
-.pulse-animation {
-    animation: pulse 2s infinite;
-}
+.pulse-animation { animation: pulse-shadow 2s infinite; }
 
 @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+@keyframes pulse-shadow {
     0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
-    70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
     100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
 
+.text-shadow { text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+.letter-spacing-1 { letter-spacing: 1px; }
+
+/* 5. VIDEO MODAL STYLES (Z-INDEX YÜKSEK) */
+.video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99999; /* Her şeyin üstünde */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Koyu siyah perde */
+    backdrop-filter: blur(5px);
+}
+
+.video-modal-content {
+    width: 90%;
+    max-width: 960px; /* Geniş ekran video */
+    z-index: 100000;
+    border: 1px solid #444;
+    overflow: hidden;
+}
+
+/* Responsive */
 @media (max-width: 991px) {
-    .course-sidebar-card {
-        position: static !important;
-        margin-bottom: 30px;
-    }
-    
-    .course-header {
-        text-align: center;
-    }
+    .course-hero-section { text-align: center; }
+    .sidebar-card-wrapper { position: static !important; margin-bottom: 40px; }
 }

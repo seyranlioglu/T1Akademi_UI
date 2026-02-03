@@ -33,6 +33,6 @@ export class InstructorComponent implements OnInit {
     // Veya manuel silme:
     // localStorage.removeItem('token');
     // localStorage.removeItem('user');
-    this.router.navigate(['/']);
+    this.router.navigate(['/auth/login']);
   }
 }

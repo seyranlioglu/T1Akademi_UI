@@ -2,56 +2,56 @@
 
     <div class="studio-sidebar d-flex flex-column" [class.collapsed]="isSidebarCollapsed">
         
-        <div class="sidebar-header p-4">
+        <div class="sidebar-header p-4 d-flex justify-content-center align-items-center">
             <a routerLink="/instructor/courses" class="d-flex align-items-center gap-2 text-decoration-none text-white">
-                <img src="assets/images/white-logo.png" alt="T1 Akademi" height="32" *ngIf="!isSidebarCollapsed">
-                <img src="assets/images/logos/t1-logo.png" alt="T1" height="32" *ngIf="isSidebarCollapsed">
+                <img src="assets/images/logos/t1-logo.png" alt="T1 Akademi" 
+                     class="bg-white p-2 rounded shadow-sm" 
+                     style="max-width: 80px; height: auto; display: block;" 
+                     *ngIf="!isSidebarCollapsed">
+                
+                <img src="assets/images/logos/t1-logo.png" alt="T1" 
+                     class="bg-white p-1 rounded shadow-sm" 
+                     style="max-width: 80px; height: auto;" 
+                     *ngIf="isSidebarCollapsed">
             </a>
         </div>
 
         <div class="sidebar-menu flex-grow-1 overflow-auto py-2">
             <ul class="nav flex-column gap-1 px-2">
-                
                 <li class="nav-item">
                     <a routerLink="/instructor/courses" routerLinkActive="active" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 text-white-50">
                         <i class='bx bx-play-circle fs-4'></i>
                         <span class="fw-medium" *ngIf="!isSidebarCollapsed">Kurslar</span>
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a routerLink="/instructor/communication" routerLinkActive="active" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 text-white-50">
                         <i class='bx bx-message-detail fs-4'></i>
                         <span class="fw-medium" *ngIf="!isSidebarCollapsed">İletişim</span>
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a routerLink="/instructor/performance" routerLinkActive="active" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 text-white-50">
                         <i class='bx bx-bar-chart-alt-2 fs-4'></i>
                         <span class="fw-medium" *ngIf="!isSidebarCollapsed">Performans</span>
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a routerLink="/instructor/tools" routerLinkActive="active" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 text-white-50">
                         <i class='bx bx-wrench fs-4'></i>
                         <span class="fw-medium" *ngIf="!isSidebarCollapsed">Araçlar</span>
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a routerLink="/instructor/library" routerLinkActive="active" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 text-white-50">
                         <i class='bx bx-folder fs-4'></i>
                         <span class="fw-medium" *ngIf="!isSidebarCollapsed">Kaynaklar</span>
                     </a>
                 </li>
-
             </ul>
         </div>
 
         <div class="sidebar-footer p-3 mt-auto border-top border-secondary border-opacity-25">
-            
             <a routerLink="/instructor/instructor-profile" class="d-flex align-items-center gap-3 text-decoration-none text-white-50 p-2 rounded-3 hover-bg">
                 <div class="avatar-circle bg-secondary text-white fw-bold d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; border-radius: 50%;">
                     {{ (user$ | async)?.name?.charAt(0) || 'E' }}
@@ -61,22 +61,36 @@
                     <div class="text-truncate tiny-text">Profili Düzenle</div>
                 </div>
             </a>
-
             <button (click)="logout()" class="btn btn-link text-decoration-none text-danger w-100 d-flex align-items-center gap-3 p-2 mt-2 rounded-3 hover-bg-danger">
                 <i class='bx bx-log-out fs-4'></i>
                 <span class="fw-bold" *ngIf="!isSidebarCollapsed">Çıkış Yap</span>
             </button>
         </div>
-
     </div>
 
     <div class="studio-content d-flex flex-column h-100">
         
-        <div class="studio-topbar bg-white border-bottom px-4 py-2 d-flex align-items-center justify-content-between shadow-sm d-lg-none">
-             <button class="btn btn-icon" (click)="toggleSidebar()">
-                <i class='bx bx-menu fs-4'></i>
-            </button>
-            <img src="assets/images/logos/t1-logo-text.png" height="24">
+        <div class="studio-topbar bg-white border-bottom px-4 py-2 d-flex align-items-center justify-content-between shadow-sm">
+            
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-icon d-lg-none" (click)="toggleSidebar()">
+                    <i class='bx bx-menu fs-4'></i>
+                </button>
+
+                <a routerLink="/" class="btn btn-outline-dark d-flex align-items-center gap-2 btn-sm rounded-pill px-3">
+                    <i class='bx bx-arrow-back'></i> 
+                    <span>Öğrenci Arayüzüne Dön</span>
+                </a>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-icon text-muted position-relative">
+                    <i class='bx bx-bell fs-5'></i>
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                </button>
+                <div class="vr h-50 mx-2"></div>
+                <span class="fw-bold text-dark small">Eğitmen Paneli</span>
+            </div>
         </div>
 
         <div class="flex-grow-1 overflow-auto bg-light p-4 position-relative">

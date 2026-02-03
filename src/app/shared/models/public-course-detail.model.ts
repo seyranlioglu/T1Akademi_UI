@@ -52,8 +52,10 @@ export interface PublicContent {
     id: number;
     title: string;
     isPreview: boolean;
-    durationMinutes: number;
+    durationMinutes: number; // Video süresi
+    pageCount: number;
     type: string;
+    filePath: string | null; // EKLENDİ: Video yolu için gerekli
 }
 
 export interface PublicReview {

@@ -254,4 +254,19 @@ export class TrainingApiService {
         map(res => res.data || res.body || res)
     );
   }
+
+  // 🔥 YENİ: Tekil Ekleme
+  addTrainingAttribute(payload: { trainingId: number, attributeType: number, value: string, order: number }): Observable<any> {
+      return this.http.post<any>(`${API_TRAINING_URL}/AddAttribute`, payload).pipe(
+          map(res => res.data || res.body || res)
+      );
+  }
+
+  // 🔥 YENİ: Tekil Silme
+  deleteTrainingAttribute(id: number): Observable<any> {
+      return this.http.delete<any>(`${API_TRAINING_URL}/DeleteAttribute/${id}`).pipe(
+          map(res => res.data || res.body || res)
+      );
+  }
 }
+

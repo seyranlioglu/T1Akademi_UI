@@ -1,30 +1,69 @@
-.what-you-will-learn-wrapper {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.16);
-
+/* Font boyutlarını kontrol altına al */
+.card-body {
+    font-size: 14px; 
 }
 
-.actions,
-.form-actions {
-  i:hover {
+h4.card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Sekme Tasarımı */
+.nav-tabs .nav-link {
+    color: #6c757d;
+    font-weight: 500;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 15px;
+    font-size: 14px;
+    
+    &:hover {
+        color: #0d6efd;
+        background: transparent;
+    }
+
+    &.active {
+        color: #0d6efd;
+        border-bottom: 2px solid #0d6efd;
+        background: transparent;
+    }
+}
+
+.cursor-pointer {
     cursor: pointer;
-  }
 }
 
-.actions {
-  visibility: hidden;
+/* Input ve Butonların devasa olmasını engelle */
+.input-group-sm > .form-control,
+.input-group-sm > .input-group-text,
+.input-group-sm > .btn {
+    font-size: 0.875rem !important; /* 14px */
+    padding: 0.375rem 0.75rem;
 }
 
-.what-you-will-learn-item {
-  background: transparent;
-  transition: background-color 0.3s;
-  border-radius: 4px;
+/* Eklenen öğelerin inputları gri ve disabled görünsün */
+input[readonly] {
+    background-color: #f8f9fa;
+    color: #212529;
 }
 
-.what-you-will-learn-item:hover {
-  background: #f5f5f5;
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
 
-  .actions {
-    visibility: visible;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-  }
+.badge {
+    font-size: 13px;
+    font-weight: 500;
+    
+    i {
+        font-size: 14px;
+        &:hover {
+            transform: scale(1.2);
+        }
+    }
 }

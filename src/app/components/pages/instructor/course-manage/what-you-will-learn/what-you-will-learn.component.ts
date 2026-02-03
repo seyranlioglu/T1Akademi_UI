@@ -1,106 +1,133 @@
-import { Component } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { TrainingApiService } from 'src/app/shared/api/training-api.service';
-import { loadCourse } from 'src/app/shared/store/course.actions';
-import { CourseState, selectSelectedCourse } from 'src/app/shared/store/course.reducer';
-import { Utils } from 'src/app/shared/utils/utils';
+import { TrainingAttributeDto } from 'src/app/shared/models/get-training.model';
+
+type TabType = 'learning' | 'requirement' | 'audience' | 'tag';
 
 @Component({
   selector: 'app-what-you-will-learn',
   templateUrl: './what-you-will-learn.component.html',
   styleUrls: ['./what-you-will-learn.component.scss']
 })
-export class WhatYouWillLearnComponent {
-  private unsubscribe: Subscription[] = [];
-  trainingId: null | number = null;
-  whatYouWillLearnList: any[] = [];
-  newWhatYouWillLearnItem = '';
-  isWhatYouWillLearnFormVisible = false;
+export class WhatYouWillLearnComponent implements OnInit {
+
+  trainingId!: number;
+  isLoading = false;
+  activeTab: TabType = 'learning';
+
+  // 4 Farklı Liste
+  learnings: TrainingAttributeDto[] = []; 
+  requirements: TrainingAttributeDto[] = [];
+  audiences: TrainingAttributeDto[] = [];
+  tags: TrainingAttributeDto[] = [];
+  
+  // Inputlar
+  inputs = {
+    learning: '',
+    requirement: '',
+    audience: '',
+    tag: ''
+  };
 
   constructor(
-    private store: Store<{ course: CourseState }>,
-    private utils: Utils,
-    public trainingApiService: TrainingApiService
+    private route: ActivatedRoute,
+    private trainingApi: TrainingApiService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
-    const storeSubs = this.store
-      .select(selectSelectedCourse)
-      .subscribe((val) => {
-        this.trainingId = val.id;
-        this.whatYouWillLearnList = val.whatYouWillLearns.map((item: any) => ({
-          ...item,
-          isEditing: false
-        }));
-
-      });
-
-    this.unsubscribe.push(storeSubs);
+    this.route.parent?.params.subscribe(params => {
+      if (params['id']) {
+        this.trainingId = +params['id'];
+        this.loadData();
+      }
+    });
   }
 
-  addWhatYouWillLearn(): void {
-    if (!this.newWhatYouWillLearnItem) return;
+  loadData() {
+    this.isLoading = true;
+    this.trainingApi.getTrainingById(this.trainingId).subscribe({
+      next: (res) => {
+        this.learnings = res.whatYouWillLearns || [];
+        this.requirements = res.requirements || [];
+        this.audiences = res.targetAudiences || [];
+        this.tags = res.tags || [];
+        this.isLoading = false;
+      },
+      error: () => {
+        this.toastr.error('Veriler yüklenemedi.');
+        this.isLoading = false;
+      }
+    });
+  }
 
-    const apiSubs = this.trainingApiService
-      .addWhatYouWillLearn({
-        isActive: true,
-        title: this.newWhatYouWillLearnItem,
-        abbreviation: null,
-        code: null,
-        description: null,
+  switchTab(tab: TabType) {
+    this.activeTab = tab;
+  }
+
+  // TEKİL EKLEME (Backend'e sadece yeni satırı gönderir)
+  add(type: TabType) {
+    const val = this.inputs[type].trim();
+    if (!val) return;
+
+    // Enum Tipi Belirle (Backend Enum: 1=Learning, 2=Req, 3=Audience, 4=Tag)
+    let enumType = 1;
+    let currentList: TrainingAttributeDto[] = [];
+
+    if (type === 'learning') { enumType = 1; currentList = this.learnings; }
+    else if (type === 'requirement') { enumType = 2; currentList = this.requirements; }
+    else if (type === 'audience') { enumType = 3; currentList = this.audiences; }
+    else if (type === 'tag') { enumType = 4; currentList = this.tags; }
+
+    const payload = {
         trainingId: this.trainingId,
-      })
-      .subscribe(() => {
-        this.newWhatYouWillLearnItem = '';
-        this.store.dispatch(loadCourse({ courseId: this.trainingId || undefined }));
-        this.toggleWhatYouWillLearnForm();
-      });
+        attributeType: enumType,
+        value: val,
+        order: currentList.length + 1
+    };
 
-    this.unsubscribe.push(apiSubs);
+    this.trainingApi.addTrainingAttribute(payload).subscribe({
+        next: (res) => {
+            // Backend'den dönen gerçek ID ile listeye ekle
+            const newItem: TrainingAttributeDto = { 
+                id: res.id, 
+                value: val, 
+                order: payload.order 
+            };
+            currentList.push(newItem);
+            
+            this.inputs[type] = ''; // Inputu temizle
+            this.toastr.success('Eklendi.');
+        },
+        error: (err) => {
+            console.error(err);
+            this.toastr.error('Ekleme başarısız.');
+        }
+    });
   }
 
-  updateWhatYouWillLearn(learningItem: any): void {
+  // TEKİL SİLME (Backend'e sadece ID gönderir)
+  remove(type: TabType, index: number, item: TrainingAttributeDto) {
+    if (!item.id) return; 
 
-    const { whatYouWillLearnId, whatYouWillLearnTitle } = learningItem;
-    if (!whatYouWillLearnTitle) return;
+    if(!confirm("Bu maddeyi silmek istediğinize emin misiniz?")) return;
 
-   
-    learningItem.isEditing = false;
-
-
-    const apiSubs = this.trainingApiService
-      .updateWhatYouWillLearn({
-        id:whatYouWillLearnId,
-        title:whatYouWillLearnTitle,
-        isActive: true,
-        abbreviation: null,
-        code: null,
-        description: null,
-        trainingId: this.trainingId,
-      })
-      .subscribe(() => {
-
-        this.store.dispatch(loadCourse({ courseId: this.trainingId || undefined }));
-      });
-
-    this.unsubscribe.push(apiSubs);
-  }
-
-  deleteWhatYouWillLearn(id: number): void {
-    const apiSubs = this.trainingApiService
-      .deleteWhatYouWillLearn(id)
-      .subscribe(() => {
-        this.store.dispatch(loadCourse({ courseId: this.trainingId || undefined }));
-      });
-
-    this.unsubscribe.push(apiSubs);
-  }
-
-  toggleWhatYouWillLearnForm(): void {
-    this.isWhatYouWillLearnFormVisible = !this.isWhatYouWillLearnFormVisible;
-  }
-  ngOnDestroy(): void {
-    this.unsubscribe.forEach((sb) => sb.unsubscribe());
+    this.trainingApi.deleteTrainingAttribute(item.id).subscribe({
+        next: () => {
+             // UI'dan kaldır
+             if (type === 'learning') this.learnings.splice(index, 1);
+             else if (type === 'requirement') this.requirements.splice(index, 1);
+             else if (type === 'audience') this.audiences.splice(index, 1);
+             else if (type === 'tag') this.tags.splice(index, 1);
+             
+             this.toastr.success('Silindi.');
+        },
+        error: (err) => {
+            console.error(err);
+            this.toastr.error('Silme işlemi başarısız.');
+        }
+    });
   }
 }
