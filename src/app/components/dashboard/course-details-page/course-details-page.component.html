@@ -26,7 +26,7 @@
                     </nav>
 
                     <h1 class="display-6 fw-bold mb-3">{{ course.title }}</h1>
-                    <p class="lead fs-6 mb-4">{{ course.description || 'Bu eğitimin henüz detaylı açıklaması girilmemiştir.' }}</p>
+                    <div class="lead fs-6 mb-4 text-white-50" [innerHTML]="course.description || 'Bu eğitimin henüz detaylı açıklaması girilmemiştir.'"></div>
 
                     <div class="d-flex flex-wrap gap-3 align-items-center text-sm mb-3">
                         <span class="badge bg-warning text-dark fw-bold" *ngIf="course.rating > 0">
@@ -66,6 +66,26 @@
                     </div>
                 </div>
 
+                <div class="mb-5" *ngIf="course.requirements?.length">
+                    <h4 class="fw-bold mb-3">Gereksinimler</h4>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item border-0 ps-0 d-flex gap-2" *ngFor="let req of course.requirements">
+                            <i class='bx bxs-circle text-secondary' style="font-size: 8px; margin-top: 8px;"></i>
+                            <span>{{ req }}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mb-5" *ngIf="course.targetAudience?.length">
+                    <h4 class="fw-bold mb-3">Bu Kurs Kimler İçin?</h4>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item border-0 ps-0 d-flex gap-2" *ngFor="let aud of course.targetAudience">
+                            <i class='bx bx-user text-primary'></i>
+                            <span>{{ aud }}</span>
+                        </li>
+                    </ul>
+                </div>
+
                 <div class="mb-5">
                     <h4 class="fw-bold mb-3">Kurs İçeriği</h4>
                     <div class="d-flex justify-content-between text-sm mb-2 text-muted">
@@ -86,6 +106,7 @@
                                             <div class="d-flex align-items-center gap-2">
                                                 <i class='bx bx-play-circle text-secondary fs-5'></i>
                                                 <span class="small">{{ content.title }}</span>
+                                                <span *ngIf="content.isPreview" class="badge bg-info text-dark" style="font-size: 10px;">Önizleme</span>
                                             </div>
                                             <span class="small text-muted">{{ content.durationMinutes }} dk</span>
                                         </li>
@@ -114,8 +135,17 @@
                                 <span><i class='bx bxs-group'></i> {{ course.instructorTotalStudents }} Öğrenci</span>
                                 <span><i class='bx bxs-videos'></i> {{ course.instructorTotalCourses }} Kurs</span>
                             </div>
-                            <p class="small text-muted">{{ course.instructorBio || 'Eğitmen biyografisi bulunmuyor.' }}</p>
+                            <p class="small text-muted" style="white-space: pre-line;">{{ course.instructorBio || 'Eğitmen biyografisi bulunmuyor.' }}</p>
                         </div>
+                    </div>
+                </div>
+
+                <div class="mb-5" *ngIf="course.tags?.length">
+                    <h4 class="fw-bold mb-3">Etiketler</h4>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark border px-3 py-2" *ngFor="let tag of course.tags">
+                            #{{ tag }}
+                        </span>
                     </div>
                 </div>
 

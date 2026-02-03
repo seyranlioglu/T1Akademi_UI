@@ -22,30 +22,35 @@ export interface TrainingListItem {
     title: string;
     description: string;
     headerImage: string;
+
     categoryName: string;
     instructorName: string;
     instructorImage: string;
-    levelName: string;
+
     amount: number;
     currentAmount: number;
     discountRate: number;
+
+    levelName: string;
     rating: number;
     reviewCount: number;
-    lessonCount: number;
     totalMinutes: number;
+    lessonCount: number;
+    
+    // 🔥 GÜNCELLENDİ: String listesi
+    whatYouWillLearn: string[]; 
+
     createdDate: Date;
+    
+    // UI Rozetleri
     isPrivate: boolean;
     isActive: boolean;
-    categoryId?: number;
-    parentCategoryId?: number;
-    priceTierId: number;
-
-    // --- EKLENEN YENİ ALANLAR (UI ve Logic İçin) ---
-    whatYouWillLearn?: string[]; // Hoverda çıkacak liste
-    isBestseller?: boolean;      // Rozet
-    isNew?: boolean;             // Rozet
-    isFavorite?: boolean;        // Kalp durumu
-    isAssigned?: boolean;        // Satın alındı mı?
+    isNew: boolean;
+    isBestseller: boolean;
+    
+    // Kullanıcı Durumu
+    isFavorite: boolean;
+    isAssigned: boolean;
 }
 
 export interface SearchTrainingRequest {

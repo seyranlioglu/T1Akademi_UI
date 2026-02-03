@@ -5,13 +5,14 @@ import { environment } from 'src/environments/environment';
 import { TrainingCard } from '../models/dashboard.model'; 
 import { SearchTrainingRequest, AddReviewDto } from '../models/training-list.model';
 import { PublicCourseDetail } from '../models/public-course-detail.model';
+import { GetTraining } from '../models/get-training.model';
 
 const API_TRAINING_URL = `${environment.apiUrl}/Training`;
 const API_DASHBOARD_URL = `${environment.apiUrl}/Dashboard`; 
 const API_TRAINING_CATEGORY_URL = `${environment.apiUrl}/TrainingCategory`;
 const API_TRAINING_CONTENT_URL = `${environment.apiUrl}/TrainingContent`;
 const API_TRAINING_SECTION_URL = `${environment.apiUrl}/TrainingSection`;
-const API_WHAT_YOU_WILL_LEARN_URL = `${environment.apiUrl}/WhatYouWillLearn`;
+// API_WHAT_YOU_WILL_LEARN_URL kaldırıldı
 
 @Injectable({
   providedIn: 'root',
@@ -20,9 +21,9 @@ export class TrainingApiService {
   constructor(private http: HttpClient) {}
 
   // ===========================================================================
-  // 🔥 YENİ: ÖNİZLEME TOKEN'I ALMA (Manage Component için)
+  // 🔥 YENİ: ÖNİZLEME TOKEN'I ALMA
   // ===========================================================================
-  getTrainingPreviewToken(trainingId: number): Observable<any> {
+  getTrainingPreviewToken(trainingId: number): Observable<string> {
     return this.http.get<any>(`${API_TRAINING_URL}/GetPreviewToken/${trainingId}`).pipe(
         map(res => res.data || res.body || res)
     );
@@ -60,7 +61,7 @@ export class TrainingApiService {
   // TRAINING CONTROLLER (Eğitim İşlemleri)
   // ===========================================================================
 
-getTrainingPublicDetail(id: number, previewToken?: string): Observable<PublicCourseDetail> {
+  getTrainingPublicDetail(id: number, previewToken?: string): Observable<PublicCourseDetail> {
     let params = new HttpParams();
     if (previewToken) {
       params = params.set('previewToken', previewToken);
@@ -106,7 +107,7 @@ getTrainingPublicDetail(id: number, previewToken?: string): Observable<PublicCou
   }
 
   getNavbarRecentTrainings(count: number = 5): Observable<any> {
-    const params = new HttpParams().set('count', count);
+    const params = new HttpParams().set('count', count.toString());
     return this.http.get<any>(`${API_TRAINING_URL}/GetNavbarRecentTrainings`, { params }).pipe(
         map(res => res.data || res.body || res)
     );
@@ -121,6 +122,19 @@ getTrainingPublicDetail(id: number, previewToken?: string): Observable<PublicCou
   addReview(data: AddReviewDto): Observable<any> {
     return this.http.post<any>(`${API_TRAINING_URL}/add-review`, data).pipe(
       map(res => res.body || res.data || res)
+    );
+  }
+
+  searchTrainings(term: string): Observable<any> {
+    const params = new HttpParams().set('query', term);
+    return this.http.get<any>(`${API_TRAINING_URL}/Search`, { params }).pipe(
+        map(res => res.data || res.body || res)
+    );
+  }
+  
+  getMyTrainings(): Observable<any[]> {
+    return this.http.get<any>(`${API_TRAINING_URL}/GetMyTrainings`).pipe(
+        map(res => res.data || res.body || res)
     );
   }
 
@@ -140,16 +154,19 @@ getTrainingPublicDetail(id: number, previewToken?: string): Observable<PublicCou
     return this.http.get<any>(`${API_TRAINING_URL}/GetList`);
   }
 
-  // 🔥 GÜNCELLENEN METOD: Token parametresi eklendi
-  getTrainingById(id: number, previewToken?: string): Observable<any> {
+  // Editör için Detay Getir
+  getTrainingById(id: number, previewToken?: string): Observable<GetTraining> {
     let params = new HttpParams().set('id', id.toString());
     
-    // Eğer token varsa parametreye ekle
     if (previewToken) {
         params = params.set('previewToken', previewToken);
     }
 
-    return this.http.get<any>(`${API_TRAINING_URL}/GetById`, { params });
+    // Backend Response yapısına göre map işlemi gerekebilir, 
+    // genelde direkt body döneriz ama senin yapında .data kontrolü standart.
+    return this.http.get<any>(`${API_TRAINING_URL}/GetById`, { params }).pipe(
+        map(res => res.data || res.body || res)
+    );
   }
 
   deleteTraining(id: number): Observable<any> {
@@ -195,7 +212,7 @@ getTrainingPublicDetail(id: number, previewToken?: string): Observable<PublicCou
   }
 
   deleteTrainingContent(id: number): Observable<any> {
-    return this.http.delete<any>(`${API_TRAINING_CONTENT_URL}/DeleteTrainingContent`, { body:  id  });
+    return this.http.delete<any>(`${API_TRAINING_CONTENT_URL}/DeleteTrainingContent`, { body: { id } });
   }
 
   // ... Section ...
@@ -216,29 +233,7 @@ getTrainingPublicDetail(id: number, previewToken?: string): Observable<PublicCou
   }
 
   deleteTrainingSection(id: number): Observable<any> {
-    return this.http.delete<any>(`${API_TRAINING_SECTION_URL}/DeleteTrainingSection`, { body:  id  });
-  }
-
-  // ... WhatYouWillLearn ...
-  addWhatYouWillLearn(payload: any): Observable<any> {
-    return this.http.post<any>(`${API_WHAT_YOU_WILL_LEARN_URL}/AddWhatYouWillLearn`, payload);
-  }
-  
-  updateWhatYouWillLearn(payload: any): Observable<any> {
-    return this.http.put<any>(`${API_WHAT_YOU_WILL_LEARN_URL}/UpdateWhatYouWillLearn`, payload);
-  }
-  
-  getWhatYouWillLearn(): Observable<any> {
-    return this.http.get<any[]>(`${API_WHAT_YOU_WILL_LEARN_URL}/GetList`);
-  }
-  
-  deleteWhatYouWillLearn(id: number): Observable<any> {
-    return this.http.delete<any>(`${API_WHAT_YOU_WILL_LEARN_URL}/DeleteWhatYouWillLearn`, { body:  id  });
-  }
-
-  searchTrainings(term: string): Observable<any> {
-    const params = new HttpParams().set('query', term);
-    return this.http.get<any>(`${API_TRAINING_URL}/Search`, { params });
+    return this.http.delete<any>(`${API_TRAINING_SECTION_URL}/DeleteTrainingSection`, { body: { id } });
   }
 
   getTierPricing(priceTierId: number): Observable<any> {
@@ -247,12 +242,16 @@ getTrainingPublicDetail(id: number, previewToken?: string): Observable<PublicCou
     );
   }
 
-  getInstructorTrainingList(): Observable<any> {
-    return this.http.get<any>(`${API_TRAINING_URL}/GetInstructorTrainings`);
+  getInstructorTrainingList(): Observable<any[]> {
+    return this.http.get<any>(`${API_TRAINING_URL}/GetInstructorTrainings`).pipe(
+        map(res => res.data || res.body || res)
+    );
   }
 
   // 🔥 YENİ: İçerik Sıralama (Reorder)
   reorderContent(payload: any): Observable<any> {
-    return this.http.put<any>(`${API_TRAINING_URL}/ReorderContent`, payload);
+    return this.http.put<any>(`${API_TRAINING_URL}/ReorderContent`, payload).pipe(
+        map(res => res.data || res.body || res)
+    );
   }
 }
