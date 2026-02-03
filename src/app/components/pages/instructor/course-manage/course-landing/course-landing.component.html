@@ -1,5 +1,19 @@
-<div class="course-landing-wrapper" [formGroup]="form">
+<div class="course-landing-wrapper position-relative" [formGroup]="form">
     
+    <div class="sticky-save-bar d-flex justify-content-between align-items-center mb-4 p-3 bg-white border rounded shadow-sm">
+        <div>
+            <h5 class="fw-bold m-0 text-dark">Eğitim Açılış Sayfası</h5>
+            <small class="text-muted">Eğitiminizin vitrin bilgilerini buradan düzenleyebilirsiniz.</small>
+        </div>
+        <button class="btn btn-dark px-4 fw-bold d-flex align-items-center gap-2" 
+                (click)="save()" 
+                [disabled]="isSaving">
+            <span *ngIf="isSaving" class="spinner-border spinner-border-sm"></span>
+            <i *ngIf="!isSaving" class='bx bx-save fs-5'></i>
+            {{ isSaving ? 'Kaydediliyor...' : 'Kaydet' }}
+        </button>
+    </div>
+
     <div class="form-group-custom">
         <label class="form-label">Kurs Başlığı</label>
         <input type="text" class="form-control" formControlName="title" placeholder="Örn: Sıfırdan İleri Seviye Angular Kursu">
@@ -58,7 +72,6 @@
     </div>
 
     <div class="row">
-        
         <div class="col-md-6 mb-4 mb-md-0">
             <label class="form-label">Kurs Görseli</label>
             <div class="upload-card">
@@ -79,42 +92,33 @@
             </div>
         </div>
 
-<div class="col-md-6">
-    <label class="form-label">Tanıtım Videosu</label>
-    <div class="upload-card">
-        <div class="preview-container">
-            
-            <video *ngIf="previewVideo && !isYoutube(previewVideo)" 
-                   [src]="previewVideo" 
-                   controls 
-                   class="w-100 h-100" 
-                   style="object-fit: contain;">
-            </video>
+        <div class="col-md-6">
+            <label class="form-label">Tanıtım Videosu</label>
+            <div class="upload-card">
+                <div class="preview-container">
+                    <video *ngIf="previewVideo && !isYoutube(previewVideo)" 
+                           [src]="previewVideo" controls class="w-100 h-100" style="object-fit: contain;">
+                    </video>
 
-            <iframe *ngIf="previewVideo && isYoutube(previewVideo)"
-                    [src]="getYoutubeEmbedUrl(previewVideo)"
-                    width="100%" 
-                    height="100%" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-            </iframe>
+                    <iframe *ngIf="previewVideo && isYoutube(previewVideo)"
+                            [src]="getYoutubeEmbedUrl(previewVideo)"
+                            width="100%" height="100%" frameborder="0" allowfullscreen>
+                    </iframe>
 
-            <div *ngIf="!previewVideo" class="empty-state">
-                <i class='bx bx-video-plus'></i>
-                <p>Henüz video seçilmedi</p>
+                    <div *ngIf="!previewVideo" class="empty-state">
+                        <i class='bx bx-video-plus'></i>
+                        <p>Henüz video seçilmedi</p>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-upload btn-video" (click)="openSelector('video')">
+                        <i class='bx bx-movie-play me-1'></i> Video Seç
+                    </button>
+                    <p class="upload-hint">Öğrenciler kayıt olmadan önce bu videoyu izleyebilir.</p>
+                </div>
+                <input type="hidden" formControlName="trailer">
             </div>
         </div>
-        <div>
-            <button type="button" class="btn btn-upload btn-video" (click)="openSelector('video')">
-                <i class='bx bx-movie-play me-1'></i> Video Seç
-            </button>
-            <p class="upload-hint">Öğrenciler kayıt olmadan önce bu videoyu izleyebilir.</p>
-        </div>
-        <input type="hidden" formControlName="trailer">
-    </div>
-</div>
-
     </div>
 
 </div>
@@ -129,7 +133,6 @@
                 <i class='bx bx-x fs-4'></i>
             </button>
         </div>
-        
         <app-content-library-selector 
             [fileType]="activeSelectorType" 
             [returnType]="'path'"

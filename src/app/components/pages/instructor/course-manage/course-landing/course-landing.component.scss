@@ -220,3 +220,15 @@ $card-radius: 12px;
         }
     }
 }
+
+.sticky-save-bar {
+    position: sticky;
+    top: 0; // Üstten 0 piksel boşlukla yapışsın
+    z-index: 100; // Formun üstünde kalsın
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(5px); // Arkası bulanık görünsün (Cam efekti)
+    border-bottom: 1px solid #dfe6e9;
+    
+    // Gölge efekti
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}

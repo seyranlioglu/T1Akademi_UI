@@ -1,10 +1,10 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Editor, Toolbar } from 'ngx-editor'; 
 import { GetTraining } from 'src/app/shared/models/get-training.model';
 import { MessageService } from 'primeng/api';
-// YENİ: Youtube Linklerini güvenli hale getirmek için
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { TrainingApiService } from 'src/app/shared/api/training-api.service'; // API Service Eklendi
 
 @Component({
   selector: 'app-course-landing',
@@ -12,10 +12,11 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   styleUrls: ['./course-landing.component.scss'],
   providers: [MessageService] 
 })
-export class CourseLandingComponent implements OnInit, OnDestroy {
+export class CourseLandingComponent implements OnInit, OnChanges, OnDestroy { // OnChanges Eklendi
 
   @Input() course: GetTraining | null = null;
   form!: FormGroup;
+  isSaving: boolean = false; // Kaydetme durumu
   
   editor!: Editor;
   toolbar: Toolbar = [
@@ -31,20 +32,28 @@ export class CourseLandingComponent implements OnInit, OnDestroy {
   previewImage: string | null = null;
   previewVideo: string | null = null;
 
-  // Selector Kontrolleri
   showSelector = false;
   activeSelectorType: 'image' | 'video' = 'image';
 
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private sanitizer: DomSanitizer // Inject ettik
+    private sanitizer: DomSanitizer,
+    private trainingApi: TrainingApiService // Servis inject edildi
   ) { }
 
   ngOnInit(): void {
     this.editor = new Editor();
     this.initForm();
+    // İlk yüklemede veri varsa doldur (Genelde boştur, OnChanges çalışır)
     if (this.course) this.updateFormValues();
+  }
+
+  // 🔥 YENİ: Veri sonradan gelirse (Async) burası yakalar ve formu doldurur
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['course'] && changes['course'].currentValue) {
+      this.updateFormValues();
+    }
   }
 
   ngOnDestroy(): void {
@@ -66,8 +75,10 @@ export class CourseLandingComponent implements OnInit, OnDestroy {
 
   updateFormValues() {
     if (!this.course) return;
+    
     this.form.patchValue({
       title: this.course.title,
+      // subtitle modelde yoksa description'dan veya boş geçebiliriz, şimdilik boş
       description: this.course.description,
       languageId: (this.course as any).trainingLanguageId || (this.course as any).languageId, 
       levelId: (this.course as any).trainingLevelId || (this.course as any).levelId,       
@@ -75,10 +86,46 @@ export class CourseLandingComponent implements OnInit, OnDestroy {
       headerImage: this.course.headerImage,
       trailer: (this.course as any).trailer || (this.course as any).previewVideoPath
     });
+
     this.previewImage = this.course.headerImage || null;
     this.previewVideo = (this.course as any).trailer || (this.course as any).previewVideoPath || null;
   }
 
+  // --- KAYDETME İŞLEMİ ---
+  save() {
+    if (this.form.invalid) {
+      this.messageService.add({ severity: 'warn', summary: 'Eksik Bilgiler', detail: 'Lütfen zorunlu alanları doldurunuz.' });
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    if (!this.course || !this.course.id) {
+      this.messageService.add({ severity: 'error', summary: 'Hata', detail: 'Eğitim ID bulunamadı.' });
+      return;
+    }
+
+    this.isSaving = true;
+    
+    // Backend'in beklediği DTO yapısını oluşturuyoruz
+    const updateDto = {
+      id: this.course.id,
+      ...this.form.value // Formdaki tüm alanları al
+    };
+
+    this.trainingApi.updateTraining(updateDto).subscribe({
+      next: (res) => {
+        this.messageService.add({ severity: 'success', summary: 'Başarılı', detail: 'Eğitim bilgileri güncellendi.' });
+        this.isSaving = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.messageService.add({ severity: 'error', summary: 'Hata', detail: 'Güncelleme sırasında bir sorun oluştu.' });
+        this.isSaving = false;
+      }
+    });
+  }
+
+  // --- Yardımcı Metodlar ---
   openSelector(type: 'image' | 'video') {
     this.activeSelectorType = type;
     this.showSelector = true;
@@ -101,13 +148,11 @@ export class CourseLandingComponent implements OnInit, OnDestroy {
     this.showSelector = false;
   }
 
-  // 🔥 YENİ: Youtube Kontrolü
   isYoutube(url: string | null): boolean {
     if (!url) return false;
     return url.includes('youtube.com') || url.includes('youtu.be');
   }
 
-  // 🔥 YENİ: Youtube Linkini Embed Formatına Çevir
   getYoutubeEmbedUrl(url: string | null): SafeResourceUrl {
     if (!url) return '';
     let videoId = '';
