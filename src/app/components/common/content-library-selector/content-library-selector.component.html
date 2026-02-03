@@ -32,11 +32,11 @@
             </div>
 
             <div class="col-6 col-md-4 col-lg-3" *ngFor="let item of paginatedContents">
-                <div class="file-card card h-100 border shadow-sm position-relative overflow-hidden cursor-pointer"
+                <div class="file-card card h-100 border shadow-sm position-relative cursor-pointer"
                      [class.selected-card]="selectedItem?.id === item.id"
                      (click)="selectItem(item)">
                     
-                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center overflow-hidden" style="height: 120px;">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center overflow-hidden position-relative" style="height: 120px;">
                         
                         <img *ngIf="['.jpg','.png','.jpeg','.webp','.gif'].includes(getExtension(item.filePath))" 
                              [src]="item.filePath" 
@@ -48,24 +48,57 @@
                              class="w-100 h-100" 
                              style="object-fit: cover;">
 
-                        <i *ngIf="!item.thumbnail && !(['.jpg','.png','.jpeg','.webp','.gif'].includes(getExtension(item.filePath)))" 
+                        <i *ngIf="!item.thumbnail && !(['.jpg','.png','.jpeg','.webp','.gif'].includes(getExtension(item.filePath))) && !isYoutube(item.filePath)" 
                            class='bx bxs-file-doc fs-1 text-secondary'></i>
+
+                        <div class="play-overlay" *ngIf="isYoutube(item.filePath)" style="background: rgba(255,255,255,0.8); padding: 10px; border-radius: 50%;">
+                            <i class='bx bxl-youtube text-danger' style="font-size: 3rem;"></i>
+                        </div>
 
                         <div class="play-overlay" *ngIf="['.mp4','.avi','.mov'].includes(getExtension(item.filePath))">
                             <i class='bx bx-play-circle text-white fs-1'></i>
                         </div>
+
+                        <div class="selected-overlay position-absolute w-100 h-100 top-0 start-0 d-flex align-items-center justify-content-center" 
+                             *ngIf="selectedItem?.id === item.id"
+                             style="background-color: rgba(204, 46, 89, 0.4);">
+                            <i class='bx bx-check-circle text-white fs-1'></i>
+                        </div>
                     </div>
 
-                    <div class="card-body p-2">
-                        <p class="card-text text-truncate small mb-0 fw-medium" [title]="item.title || item.fileName">
-                            {{ item.title || item.fileName }}
-                        </p>
-                        <small class="text-muted tiny-text">{{ item.createdDate | date:'dd.MM.yyyy' }}</small>
+                    <div class="card-body p-2 d-flex justify-content-between align-items-center">
+                        <div class="overflow-hidden me-2" style="flex: 1;">
+                            <p class="card-text text-truncate small mb-0 fw-medium text-dark" [title]="item.title || item.fileName">
+                                {{ item.title || item.fileName }}
+                            </p>
+                            <small class="text-muted tiny-text d-block">{{ item.createdDate | date:'dd.MM.yyyy' }}</small>
+                            <small *ngIf="item.videoDuration" class="text-primary tiny-text fw-bold d-block mt-1">
+                                <i class='bx bx-time-five'></i> {{ item.videoDuration }}
+                            </small>
+                            <small *ngIf="!item.videoDuration && item.documentFileSize" class="text-muted tiny-text d-block mt-1">
+                                {{ item.documentFileSize }} MB
+                            </small>
+                        </div>
+
+                        <div class="dropdown position-relative" (click)="$event.stopPropagation()">
+                            <button class="btn btn-sm btn-light text-secondary p-1 rounded-circle" 
+                                    type="button" 
+                                    (click)="toggleMenu($event, item.id)">
+                                <i class='bx bx-dots-vertical-rounded fs-5'></i>
+                            </button>
+                            
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0" 
+                                [class.show]="activeMenuId === item.id"
+                                style="position: absolute; right: 0; bottom: 100%; z-index: 1000;">
+                                <li>
+                                    <a class="dropdown-item small cursor-pointer" (click)="onPreviewClick($event, item)">
+                                        <i class='bx bx-show me-2'></i> Önizle
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
-                    <div class="selected-overlay" *ngIf="selectedItem?.id === item.id">
-                        <i class='bx bx-check-circle text-white fs-2'></i>
-                    </div>
                 </div>
             </div>
 
@@ -76,25 +109,27 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center border-top pt-3 mb-3" *ngIf="totalItems > 0">
-        <button class="btn btn-sm btn-outline-secondary" 
-                [disabled]="currentPage === 1" 
-                (click)="onPageChange(currentPage - 1)">
-            <i class='bx bx-chevron-left'></i>
-        </button>
-        
-        <span class="small text-muted fw-bold">Sayfa {{currentPage}} / {{ totalPages }}</span>
-        
-        <button class="btn btn-sm btn-outline-secondary" 
-                [disabled]="currentPage >= totalPages" 
-                (click)="onPageChange(currentPage + 1)">
-            <i class='bx bx-chevron-right'></i>
-        </button>
-    </div>
+    <div class="selector-footer bg-white pt-3 border-top mt-auto sticky-bottom">
+        <div class="d-flex justify-content-between align-items-center mb-3" *ngIf="totalItems > 0">
+            <button class="btn btn-sm btn-outline-secondary" 
+                    [disabled]="currentPage === 1" 
+                    (click)="onPageChange(currentPage - 1)">
+                <i class='bx bx-chevron-left'></i>
+            </button>
+            
+            <span class="small text-muted fw-bold">Sayfa {{currentPage}} / {{ totalPages }}</span>
+            
+            <button class="btn btn-sm btn-outline-secondary" 
+                    [disabled]="currentPage >= totalPages" 
+                    (click)="onPageChange(currentPage + 1)">
+                <i class='bx bx-chevron-right'></i>
+            </button>
+        </div>
 
-    <div class="d-flex justify-content-end gap-2">
-        <button class="btn btn-light" (click)="cancel()">İptal</button>
-        <button class="btn btn-primary px-4" [disabled]="!selectedItem" (click)="confirmSelection()">Seçimi Onayla</button>
+        <div class="d-flex justify-content-end gap-2">
+            <button class="btn btn-light" (click)="cancel()">İptal</button>
+            <button class="btn btn-primary px-4" [disabled]="!selectedItem" (click)="confirmSelection()">Seçimi Onayla</button>
+        </div>
     </div>
 
 </div>

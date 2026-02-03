@@ -113,7 +113,7 @@ import { ContentLibrarySelectorComponent } from './components/common/content-lib
 import { TooltipModule } from 'primeng/tooltip';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { BecomeInstructorComponent } from './components/pages/instructor/become-instructor/become-instructor.component'; // YENİ EKLENDİ
-
+import { NgxEditorModule } from 'ngx-editor';
 @NgModule({
     declarations: [
         AppComponent,
@@ -230,7 +230,8 @@ import { BecomeInstructorComponent } from './components/pages/instructor/become-
         DynamicDialogModule,
         DialogModule,
         TooltipModule,
-        NgxExtendedPdfViewerModule
+        NgxExtendedPdfViewerModule,
+        NgxEditorModule
     ],
     providers: [
         {

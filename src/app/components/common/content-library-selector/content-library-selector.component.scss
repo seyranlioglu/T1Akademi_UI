@@ -62,3 +62,80 @@
 .tiny-text {
     font-size: 0.7rem;
 }
+
+// Flexbox ile tam yükseklik kontrolü
+.selector-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%; // Modalın yüksekliğini doldurur
+    max-height: 100%;
+}
+
+// İçerik alanı scroll edilebilir, geri kalanı sabit
+.content-grid-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 5px; // Scrollbar için boşluk
+    min-height: 300px;
+}
+
+// Footer her zaman altta
+.selector-footer {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    background: #fff;
+    z-index: 10;
+}
+
+// Flexbox Container
+.selector-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 100%;
+    position: relative;
+}
+
+// İçerik Alanı (Kaydırılabilir)
+.content-grid-wrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 5px;
+    min-height: 300px;
+}
+
+// Footer (Sabit)
+.selector-footer {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    background-color: #fff;
+    z-index: 50; 
+    padding-bottom: 0;
+}
+
+// Menü Stilleri
+.dropdown-menu.show {
+    display: block !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+// Kart Stilleri
+.file-card {
+    transition: all 0.2s ease;
+    
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
+
+    &.selected-card {
+        border-color: #cc2e59 !important;
+        background-color: rgba(204, 46, 89, 0.02);
+    }
+}

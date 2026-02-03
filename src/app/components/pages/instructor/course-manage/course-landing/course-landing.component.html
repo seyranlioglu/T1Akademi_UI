@@ -1,78 +1,140 @@
-<div class="course-landing-wrapper card border-0 card h-100">
-  <h3 class="py-4 px-5 mb-0">Eğitim Açılış Sayfası</h3>
-  <hr>
+<div class="course-landing-wrapper" [formGroup]="form">
+    
+    <div class="form-group-custom">
+        <label class="form-label">Kurs Başlığı</label>
+        <input type="text" class="form-control" formControlName="title" placeholder="Örn: Sıfırdan İleri Seviye Angular Kursu">
+        <span class="char-count">{{ f['title'].value?.length || 0 }}/60</span>
+        <span class="error-text" *ngIf="f['title'].invalid && f['title'].touched">
+            * Başlık girilmesi zorunludur.
+        </span>
+    </div>
 
-  <div class="card-body d-flex flex-column gap-4 p-5">
-    <p>
-      Eğitim açılış sayfanız, T1Akademi'de başarınız için büyük önem taşır. Doğru hazırlandığında, Google gibi arama
-      motorlarında görünürlük kazanmanıza da yardımcı olabilir. Bu bölümü tamamlarken bir kişinin eğitiminize neden
-      katılmak isteyeceğini gösteren, ilgi çekici bir Eğitim Açılış Sayfası oluşturmaya dikkat edin.
-    </p>
-    <form [formGroup]="landingForm" class="d-flex flex-column gap-4" (ngSubmit)="updateTraining()"
-      (keydown.enter)="$event.preventDefault()">
-      <div>
-        <label class="fw-medium mb-2" for="title">Eğitim Başlığı</label>
-        <input type="text" class="form-control" formControlName="title"
-          placeholder="Eğitim başlığı (örnek: Proje Yönetimi Temelleri)">
-        <div *ngIf="landingForm.get('title')?.errors?.['required']" class="error-message p-1">
-          Doldurulması zorunlu alan
+    <div class="form-group-custom">
+        <label class="form-label">Alt Başlık (Kısa Açıklama)</label>
+        <input type="text" class="form-control" formControlName="subtitle" placeholder="Öğrencilerin kursunuzu neden alması gerektiğini özetleyin.">
+        <span class="char-count">{{ f['subtitle'].value?.length || 0 }}/120</span>
+    </div>
+
+    <div class="form-group-custom">
+        <label class="form-label">Kurs Açıklaması</label>
+        <div class="ngx-editor-container">
+            <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"></ngx-editor-menu>
+            <ngx-editor [editor]="editor" formControlName="description" [placeholder]="'Eğitim içeriğini, kazanımları ve detayları buraya yazın...'"></ngx-editor>
         </div>
-      </div>
-      <div>
-        <label class="fw-medium mb-2" for="subTitle">Eğitim Alt Başlığı</label>
-        <input type="text" class="form-control" formControlName="subTitle"
-          placeholder="Eğitim alt başlığı (örnek: Proje yönetimi becerilerinizi geliştirin)">
-      </div>
-      <div>
-        <label class="fw-medium mb-2" for="description">Eğitim Açıklaması</label>
-        <textarea class="form-control" formControlName="description"
-          placeholder="Eğitim açıklaması (örnek: Bu eğitim, proje yönetimi temellerini kapsar ve proje yöneticilerinin rollerini ve sorumluluklarını anlamalarına yardımcı olur.)"></textarea>
-      </div>
-      <div>
-        <label class="fw-medium mb-2">Temel Bilgiler</label>
-        <div class="d-flex gap-5">
-          <select formControlName="trainingLanguageId">
-            <option [ngValue]="null">- - Dil Seçin - -</option>
-            <option *ngFor="let lang of languageList" [ngValue]="lang.id"> {{lang.description}}</option>
-          </select>
-          <select formControlName="categoryId">
-            <option [ngValue]="null">- - Kategori Seçin - -</option>
-            <option *ngFor="let category of courseCategoryList" [ngValue]="category?.id">
-              {{category?.title}}
-            </option>
-          </select>
-          <select *ngIf="landingForm.get('categoryId')?.value" formControlName="subCategoryId">
-            <option [ngValue]="null">- - Alt Kategori Seçin - -</option>
-            <option *ngFor="let subCategory of courseSubCategoryList" [ngValue]="subCategory?.id">
-              {{subCategory?.title}}
-            </option>
-          </select>
+        <span class="error-text" *ngIf="f['description'].invalid && f['description'].touched">
+            * Açıklama girilmesi zorunludur.
+        </span>
+    </div>
+
+    <div class="row form-group-custom">
+        <div class="col-md-4">
+            <label class="form-label">Dil</label>
+            <select class="form-select" formControlName="languageId">
+                <option [ngValue]="null" disabled>Seçiniz</option>
+                <option value="1">Türkçe</option>
+                <option value="2">İngilizce</option>
+            </select>
         </div>
-      </div>
-      <div>
-        <label class="fw-medium mb-2" for="image">Eğitim Görseli</label>
-        <input type="file" class="form-control" (change)="onFileSelected($event)" accept="image/*">
+        <div class="col-md-4">
+            <label class="form-label">Seviye</label>
+            <select class="form-select" formControlName="levelId">
+                <option [ngValue]="null" disabled>Seçiniz</option>
+                <option value="1">Başlangıç</option>
+                <option value="2">Orta</option>
+                <option value="3">İleri</option>
+                <option value="4">Tüm Seviyeler</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Kategori</label>
+            <select class="form-select" formControlName="categoryId">
+                <option [ngValue]="null" disabled>Seçiniz</option>
+                <option value="1">Yazılım Geliştirme</option>
+                <option value="2">Tasarım</option>
+                <option value="3">İş Dünyası</option>
+                <option value="4">Pazarlama</option>
+            </select>
+        </div>
+    </div>
 
-      </div>
-      <div>
-        <label class="fw-medium mb-2" for="video">Tanıtım Videosu</label>
-        <input type="file" class="form-control" (change)="onVideoSelected($event)" accept="video/*">
-      </div>
-      <div>
-        <label class="fw-medium mb-2" for="welcomeMessage">Karşılama Mesajı</label>
-        <input type="text" class="form-control" formControlName="welcomeMessage">
-      </div>
-      <div>
-        <label class="fw-medium mb-2" for="congratulationMessage">Tebrik Mesajı</label>
-        <input type="text" class="form-control" formControlName="congratulationMessage">
-      </div>
+    <div class="row">
+        
+        <div class="col-md-6 mb-4 mb-md-0">
+            <label class="form-label">Kurs Görseli</label>
+            <div class="upload-card">
+                <div class="preview-container">
+                    <img *ngIf="previewImage" [src]="previewImage" alt="Kapak Resmi">
+                    <div *ngIf="!previewImage" class="empty-state">
+                        <i class='bx bx-image-add'></i>
+                        <p>Henüz görsel seçilmedi</p>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-upload btn-image" (click)="openSelector('image')">
+                        <i class='bx bx-upload me-1'></i> Kütüphaneden Seç
+                    </button>
+                    <p class="upload-hint">Önerilen: 1280x720 px, .jpg, .png</p>
+                </div>
+                <input type="hidden" formControlName="headerImage">
+            </div>
+        </div>
 
+<div class="col-md-6">
+    <label class="form-label">Tanıtım Videosu</label>
+    <div class="upload-card">
+        <div class="preview-container">
+            
+            <video *ngIf="previewVideo && !isYoutube(previewVideo)" 
+                   [src]="previewVideo" 
+                   controls 
+                   class="w-100 h-100" 
+                   style="object-fit: contain;">
+            </video>
 
-      <button type="submit" class="btn btn-primary" [disabled]="landingForm.invalid" style="width:fit-content">
-        Kaydet
-      </button>
+            <iframe *ngIf="previewVideo && isYoutube(previewVideo)"
+                    [src]="getYoutubeEmbedUrl(previewVideo)"
+                    width="100%" 
+                    height="100%" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+            </iframe>
 
-    </form>
+            <div *ngIf="!previewVideo" class="empty-state">
+                <i class='bx bx-video-plus'></i>
+                <p>Henüz video seçilmedi</p>
+            </div>
+        </div>
+        <div>
+            <button type="button" class="btn btn-upload btn-video" (click)="openSelector('video')">
+                <i class='bx bx-movie-play me-1'></i> Video Seç
+            </button>
+            <p class="upload-hint">Öğrenciler kayıt olmadan önce bu videoyu izleyebilir.</p>
+        </div>
+        <input type="hidden" formControlName="trailer">
+    </div>
+</div>
 
-  </div>
+    </div>
+
+</div>
+
+<div class="selector-overlay" *ngIf="showSelector">
+    <div class="selector-modal shadow-lg">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold m-0">
+                {{ activeSelectorType === 'image' ? 'Görsel Seç' : 'Video Seç' }}
+            </h5>
+            <button class="btn btn-sm btn-light" (click)="closeSelector()">
+                <i class='bx bx-x fs-4'></i>
+            </button>
+        </div>
+        
+        <app-content-library-selector 
+            [fileType]="activeSelectorType" 
+            [returnType]="'path'"
+            (onSelect)="onFileSelected($event)"
+            (onCancel)="closeSelector()">
+        </app-content-library-selector>
+    </div>
 </div>

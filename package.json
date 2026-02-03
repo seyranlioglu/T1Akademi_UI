@@ -32,6 +32,7 @@
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.8",
     "boxicons": "^2.1.4",
+    "ngx-editor": "^17.5.4",
     "ngx-extended-pdf-viewer": "^25.6.4",
     "ngx-owl-carousel-o": "^17.0.1",
     "ngx-scrolltop": "^7.0.0",
