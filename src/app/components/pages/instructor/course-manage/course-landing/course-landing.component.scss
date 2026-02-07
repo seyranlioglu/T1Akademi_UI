@@ -232,3 +232,34 @@ $card-radius: 12px;
     // Gölge efekti
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
+
+::ng-deep .ngx-editor-wrapper {
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+    min-height: 300px; // Ana kapsayıcı yüksekliği
+    display: flex;
+    flex-direction: column;
+
+    // Menü çubuğu
+    .ngx-editor-menu {
+        background-color: #f9f9f9;
+        border-bottom: 1px solid #dfe6e9;
+        padding: 0.5rem;
+    }
+
+    // Editör alanı
+    .NgxEditor {
+        flex-grow: 1;
+        
+        .NgxEditor__Content {
+            min-height: 250px !important; // İçerik alanı en az bu kadar olsun
+            padding: 1rem;
+            outline: none; // Mavi çerçeveyi kaldır
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #2d3436;
+        }
+    }
+}

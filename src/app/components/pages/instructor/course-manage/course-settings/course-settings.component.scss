@@ -1,0 +1,126 @@
+/* Ana Wrapper */
+.course-settings-wrapper {
+    position: relative;
+    padding-bottom: 60px; // Alt kısımda biraz boşluk bırakalım
+}
+
+/* Sticky Header - Sayfa aşağı kayınca üstte sabit kalır */
+.sticky-save-bar {
+    position: sticky;
+    top: 0;
+    z-index: 999; // Diğer elementlerin üstünde kalması için
+    background-color: #fff;
+    border-bottom: 1px solid #eee;
+    transition: all 0.3s ease;
+
+    h5 {
+        font-size: 1.1rem;
+        margin-bottom: 0.2rem;
+    }
+}
+
+/* Kart Tasarımları */
+.card {
+    border: 1px solid #f0f0f0;
+    border-radius: 8px;
+    background-color: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    /* Kart başlıkları */
+    h6 {
+        font-size: 1rem;
+        color: #333;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f8f9fa;
+    }
+
+    /* Hover efekti (Opsiyonel: üzerine gelince hafif kalkar) */
+    &:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+    }
+}
+
+/* Form Elemanları */
+.form-label {
+    color: #555;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-control {
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    border-color: #dee2e6;
+    border-radius: 6px;
+
+    &:focus {
+        border-color: #0d6efd; // Bootstrap primary rengi veya senin tema rengin
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    }
+}
+
+/* Textarea boyutlandırma ayarı */
+textarea.form-control {
+    resize: vertical; // Sadece aşağı doğru uzayabilsin, yana kaymasın
+    min-height: 120px;
+}
+
+/* Yüzde (%) işareti olan input grupları */
+.input-group-text {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #6c757d;
+}
+
+/* Özel Toggle Switch (Erişim & Gizlilik) */
+.form-check.form-switch {
+    padding-left: 2.5em;
+
+    .form-check-input {
+        width: 3em;  // Standarttan biraz daha geniş
+        height: 1.5em; // Standarttan biraz daha yüksek
+        cursor: pointer;
+        margin-left: -2.5em;
+        
+        &:checked {
+            background-color: #198754; // Yeşil (Aktif durumu)
+            border-color: #198754;
+        }
+        
+        &:focus {
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+        }
+    }
+
+    .form-check-label {
+        cursor: pointer;
+        padding-left: 10px;
+        padding-top: 2px;
+        font-size: 1rem;
+        user-select: none; // Metni seçmeyi engelle
+    }
+}
+
+/* Hata Mesajları */
+.text-danger {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Responsive Düzenlemeler */
+@media (max-width: 768px) {
+    .sticky-save-bar {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+        
+        button {
+            width: 100%; // Mobilde buton tam genişlik olsun
+        }
+    }
+    
+    .card {
+        margin-bottom: 20px;
+    }
+}

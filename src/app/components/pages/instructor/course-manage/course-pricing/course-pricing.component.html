@@ -1,26 +1,40 @@
-<div class="course-pricing-wrapper card border-0 card h-100">
-  <h3 class="py-4 px-5 mb-0">Fiyatlandırma</h3>
-  <hr>
+<div class="course-pricing-wrapper card border-0 card h-100" [formGroup]="form">
+    <h3 class="py-4 px-5 mb-0 fw-bold border-bottom">Fiyatlandırma</h3>
 
-  <div class="card-body d-flex flex-column gap-4 p-5">
-    <div class="d-flex flex-column gap-1">
-      <div class="fw-medium">Eğitiminiz için bir fiyat belirleyin</div>
-      <p>Lütfen eğitiminiz için fiyat kademesi seçin.</p>
+    <div class="card-body p-5">
+        
+        <div class="mb-4">
+            <h5 class="fw-bold text-dark">Eğitim Fiyatı</h5>
+            <p class="text-muted">Öğrencilerin bu eğitime erişmek için ödeyeceği tutarı belirleyin.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="mb-4">
+                    <label class="form-label fw-medium">Fiyat Kademesi (Tier)</label>
+                    <select class="form-select form-select-lg" formControlName="priceTierId">
+                        <option [ngValue]="null" disabled>Kademe Seçiniz</option>
+                        <option *ngFor="let tier of priceTiers" [value]="tier.id">
+                            {{ tier.title }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-check form-switch mb-4">
+                    <input class="form-check-input" type="checkbox" id="subFlex" formControlName="includedInSubscription">
+                    <label class="form-check-label" for="subFlex">
+                        Bu eğitim <strong>Premium Abonelik</strong> paketlerine dahil edilsin.
+                    </label>
+                </div>
+
+                <button class="btn btn-dark btn-lg px-5 mt-3 d-flex align-items-center gap-2" 
+                        (click)="savePricingTier()" 
+                        [disabled]="isSaving || form.invalid">
+                    <span *ngIf="isSaving" class="spinner-border spinner-border-sm"></span>
+                    Kaydet
+                </button>
+            </div>
+        </div>
+
     </div>
-
-    <div>
-      <label class="fw-medium mb-2">Fiyat Kademesi</label>
-
-      <select [(ngModel)]="selectedPricingTier">
-        <option [ngValue]="null">Seç</option>
-        <option [ngValue]="1"> Ücretsiz</option>
-        <option [ngValue]="2"> ₺249,99 (kademe 1) </option>
-        <option [ngValue]="3"> ₺269,99 (kademe 1) </option>
-      </select>
-
-      <button type="submit" class="btn btn-primary mt-5" [disabled]="!selectedPricingTier" (click)="savePricingTier()">
-        Kaydet
-      </button>
-    </div>
-  </div>
 </div>

@@ -1,0 +1,82 @@
+<div class="course-settings-wrapper position-relative" [formGroup]="form">
+
+    <div class="sticky-save-bar d-flex justify-content-between align-items-center mb-4 p-3 bg-white border rounded shadow-sm">
+        <div>
+            <h5 class="fw-bold m-0 text-dark">Eğitim Ayarları</h5>
+            <small class="text-muted">Sertifika kuralları, mesajlar ve gizlilik ayarları.</small>
+        </div>
+        <button class="btn btn-dark px-4 fw-bold d-flex align-items-center gap-2" 
+                (click)="save()" 
+                [disabled]="isSaving">
+            <span *ngIf="isSaving" class="spinner-border spinner-border-sm"></span>
+            <i *ngIf="!isSaving" class='bx bx-save fs-5'></i>
+            {{ isSaving ? 'Kaydediliyor...' : 'Kaydet' }}
+        </button>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card p-4 border-0 shadow-sm mb-4">
+                <h6 class="fw-bold mb-3 border-bottom pb-2">Sertifika Kuralları</h6>
+                
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Başarı Sertifikası Barajı (%)</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" formControlName="certificateOfAchievementRate" min="0" max="100">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <small class="text-muted">Öğrenci sınav/izleme oranında bu puana ulaşırsa başarı sertifikası alır.</small>
+                    <div *ngIf="f['certificateOfAchievementRate'].invalid && f['certificateOfAchievementRate'].touched" class="text-danger small mt-1">
+                        0-100 arası bir değer giriniz.
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Katılım Sertifikası Barajı (%)</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" formControlName="certificateOfParticipationRate" min="0" max="100">
+                        <span class="input-group-text">%</span>
+                    </div>
+                    <small class="text-muted">Öğrenci içeriğin bu kadarını tamamlarsa katılım sertifikası alır.</small>
+                </div>
+            </div>
+
+            <div class="card p-4 border-0 shadow-sm">
+                <h6 class="fw-bold mb-3 border-bottom pb-2">Erişim & Gizlilik</h6>
+                
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="privateSwitch" formControlName="isPrivate">
+                    <label class="form-check-label fw-bold" for="privateSwitch">Gizli (Özel) Eğitim</label>
+                </div>
+                <p class="small text-muted mt-2 mb-0">
+                    Eğer bu seçeneği işaretlerseniz, eğitim genel aramada çıkmaz. Sadece firmanıza dahil kullanıcılar görebilir.
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-4 border-0 shadow-sm h-100">
+                <h6 class="fw-bold mb-3 border-bottom pb-2">Öğrenci Mesajları</h6>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold">Hoşgeldin Mesajı</label>
+                    <textarea class="form-control" rows="4" formControlName="welcomeMessage" 
+                        placeholder="Öğrenci eğitime başladığında ona ne söylemek istersiniz?"></textarea>
+                    <div class="text-end text-muted small mt-1">
+                        {{ f['welcomeMessage'].value?.length || 0 }}/500
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">Tebrik (Bitirme) Mesajı</label>
+                    <textarea class="form-control" rows="4" formControlName="congratulationMessage" 
+                        placeholder="Öğrenci eğitimi tamamladığında görünecek mesaj."></textarea>
+                    <div class="text-end text-muted small mt-1">
+                        {{ f['congratulationMessage'].value?.length || 0 }}/500
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

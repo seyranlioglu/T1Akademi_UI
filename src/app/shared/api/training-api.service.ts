@@ -6,13 +6,13 @@ import { TrainingCard } from '../models/dashboard.model';
 import { SearchTrainingRequest, AddReviewDto } from '../models/training-list.model';
 import { PublicCourseDetail } from '../models/public-course-detail.model';
 import { GetTraining } from '../models/get-training.model';
+import { UpdateCourseSettingsDto } from '../models/update-course-settings.model';
 
 const API_TRAINING_URL = `${environment.apiUrl}/Training`;
 const API_DASHBOARD_URL = `${environment.apiUrl}/Dashboard`; 
 const API_TRAINING_CATEGORY_URL = `${environment.apiUrl}/TrainingCategory`;
 const API_TRAINING_CONTENT_URL = `${environment.apiUrl}/TrainingContent`;
 const API_TRAINING_SECTION_URL = `${environment.apiUrl}/TrainingSection`;
-// API_WHAT_YOU_WILL_LEARN_URL kaldırıldı
 
 @Injectable({
   providedIn: 'root',
@@ -21,8 +21,34 @@ export class TrainingApiService {
   constructor(private http: HttpClient) {}
 
   // ===========================================================================
-  // 🔥 YENİ: ÖNİZLEME TOKEN'I ALMA
+  // 🔥 PLAYER / İÇERİK OYNATMA METOTLARI (YENİ)
   // ===========================================================================
+
+  /**
+   * Kullanıcı için belirli bir içeriği (video, doküman) getirir.
+   * Yetki kontrolü, resume bilgisi ve kilit durumu dahildir.
+   */
+  getContentForPlayer(contentId: number): Observable<any> {
+    return this.http.get<any>(`${API_TRAINING_CONTENT_URL}/GetForPlayer/${contentId}`).pipe(
+        map(res => res.data || res.body || res)
+    );
+  }
+
+getContent(payload: { 
+      trainingId: number, 
+      currentContentId?: number, 
+      targetContentId?: number,
+      previewToken?: string | null // 🔥 YENİ PARAMETRE
+  }): Observable<any> {
+    return this.http.post<any>(`${API_TRAINING_CONTENT_URL}/GetNextContent`, payload).pipe(
+        map(res => res.data || res.body || res)
+    );
+  }
+
+  // ===========================================================================
+  // 🔥 ÖNİZLEME (PREVIEW) TOKEN
+  // ===========================================================================
+  
   getTrainingPreviewToken(trainingId: number): Observable<string> {
     return this.http.get<any>(`${API_TRAINING_URL}/GetPreviewToken/${trainingId}`).pipe(
         map(res => res.data || res.body || res)
@@ -139,7 +165,7 @@ export class TrainingApiService {
   }
 
   // ===========================================================================
-  // CRUD METOTLARI
+  // CRUD METOTLARI (Admin/Editör)
   // ===========================================================================
 
   addTraining(payload: any): Observable<any> {
@@ -154,7 +180,6 @@ export class TrainingApiService {
     return this.http.get<any>(`${API_TRAINING_URL}/GetList`);
   }
 
-  // Editör için Detay Getir
   getTrainingById(id: number, previewToken?: string): Observable<GetTraining> {
     let params = new HttpParams().set('id', id.toString());
     
@@ -162,8 +187,6 @@ export class TrainingApiService {
         params = params.set('previewToken', previewToken);
     }
 
-    // Backend Response yapısına göre map işlemi gerekebilir, 
-    // genelde direkt body döneriz ama senin yapında .data kontrolü standart.
     return this.http.get<any>(`${API_TRAINING_URL}/GetById`, { params }).pipe(
         map(res => res.data || res.body || res)
     );
@@ -194,7 +217,7 @@ export class TrainingApiService {
     return this.http.delete<any>(`${API_TRAINING_CATEGORY_URL}/DeleteTrainingCategory/${id}`);
   }
 
-  // ... Content ...
+  // ... Content (Admin CRUD) ...
   addTrainingContent(payload: any): Observable<any> {
     return this.http.post<any>(`${API_TRAINING_CONTENT_URL}/AddTrainingContent`, payload);
   }
@@ -248,25 +271,34 @@ export class TrainingApiService {
     );
   }
 
-  // 🔥 YENİ: İçerik Sıralama (Reorder)
   reorderContent(payload: any): Observable<any> {
     return this.http.put<any>(`${API_TRAINING_URL}/ReorderContent`, payload).pipe(
         map(res => res.data || res.body || res)
     );
   }
 
-  // 🔥 YENİ: Tekil Ekleme
   addTrainingAttribute(payload: { trainingId: number, attributeType: number, value: string, order: number }): Observable<any> {
       return this.http.post<any>(`${API_TRAINING_URL}/AddAttribute`, payload).pipe(
           map(res => res.data || res.body || res)
       );
   }
 
-  // 🔥 YENİ: Tekil Silme
   deleteTrainingAttribute(id: number): Observable<any> {
       return this.http.delete<any>(`${API_TRAINING_URL}/DeleteAttribute/${id}`).pipe(
           map(res => res.data || res.body || res)
       );
   }
-}
 
+  updateCourseLanding(data: any): Observable<any> {
+    return this.http.put<any>(`${API_TRAINING_URL}/update-landing`, data);
+  }
+
+  updateCoursePricing(data: any): Observable<any> {
+    return this.http.put<any>(`${API_TRAINING_URL}/update-pricing`, data);
+  }
+
+  updateCourseSettings(dto: UpdateCourseSettingsDto): Observable<any> {
+    return this.http.put<any>(`${API_TRAINING_URL}/update-course-settings`, dto);
+  }
+  
+}

@@ -69,6 +69,7 @@ import { ExamLibraryComponent } from './components/pages/instructor/course-manag
 import { ExamEditorComponent } from './components/pages/instructor/course-manage/curriculum/exam-editor/exam-editor.component';
 import { PerformanceComponent } from './components/pages/instructor/performance/performance.component';
 import { LibraryComponent } from './components/pages/instructor/library/library.component';
+import { CourseSettingsComponent } from './components/pages/instructor/course-manage/course-settings/course-settings.component';
 
 const routes: Routes = [
 
@@ -173,7 +174,8 @@ const routes: Routes = [
                     { path: 'course-landing', component: CourseLandingComponent },
                     { path: 'course-pricing', component: CoursePricingComponent },
                     { path: 'exam-library', component: ExamLibraryComponent },
-                    { path: 'exam-editor/:examId', component: ExamEditorComponent }
+                    { path: 'exam-editor/:examId', component: ExamEditorComponent },
+                    { path : 'course-settings', component: CourseSettingsComponent}
                 ]
             }
         ]

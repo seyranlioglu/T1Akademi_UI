@@ -114,6 +114,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { BecomeInstructorComponent } from './components/pages/instructor/become-instructor/become-instructor.component'; // YENİ EKLENDİ
 import { NgxEditorModule } from 'ngx-editor';
+import { CourseSettingsComponent } from './components/pages/instructor/course-manage/course-settings/course-settings.component';
 @NgModule({
     declarations: [
         AppComponent,
@@ -205,7 +206,8 @@ import { NgxEditorModule } from 'ngx-editor';
         SafeUrlPipe,
         ContentPreviewModalComponent,
         ContentLibrarySelectorComponent,
-        BecomeInstructorComponent // YENİ EKLENDİ
+        BecomeInstructorComponent, // YENİ EKLENDİ
+        CourseSettingsComponent // YENİ EKLENDİ 
         
     ],
     imports: [

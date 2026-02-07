@@ -2,7 +2,7 @@
     
     <div class="sticky-save-bar d-flex justify-content-between align-items-center mb-4 p-3 bg-white border rounded shadow-sm">
         <div>
-            <h5 class="fw-bold m-0 text-dark">Eğitim Açılış Sayfası</h5>
+            <h5 class="fw-bold m-0 text-dark">Eğitim Vitrini</h5>
             <small class="text-muted">Eğitiminizin vitrin bilgilerini buradan düzenleyebilirsiniz.</small>
         </div>
         <button class="btn btn-dark px-4 fw-bold d-flex align-items-center gap-2" 
@@ -15,108 +15,131 @@
     </div>
 
     <div class="form-group-custom">
-        <label class="form-label">Kurs Başlığı</label>
-        <input type="text" class="form-control" formControlName="title" placeholder="Örn: Sıfırdan İleri Seviye Angular Kursu">
+        <label class="form-label">Kurs Başlığı <span class="text-danger">*</span></label>
+        <input type="text" 
+               class="form-control" 
+               formControlName="title" 
+               [class.is-invalid]="f['title'].invalid && f['title'].touched"
+               placeholder="Örn: Sıfırdan İleri Seviye Angular Kursu">
         <span class="char-count">{{ f['title'].value?.length || 0 }}/60</span>
-        <span class="error-text" *ngIf="f['title'].invalid && f['title'].touched">
+        
+        <div *ngIf="f['title'].invalid && f['title'].touched" class="text-danger mt-1 small">
             * Başlık girilmesi zorunludur.
-        </span>
+        </div>
     </div>
 
     <div class="form-group-custom">
         <label class="form-label">Alt Başlık (Kısa Açıklama)</label>
-        <input type="text" class="form-control" formControlName="subtitle" placeholder="Öğrencilerin kursunuzu neden alması gerektiğini özetleyin.">
-        <span class="char-count">{{ f['subtitle'].value?.length || 0 }}/120</span>
+        <input type="text" class="form-control" formControlName="subTitle" placeholder="Öğrencilerin kursunuzu neden alması gerektiğini özetleyin.">
+        <span class="char-count">{{ f['subTitle'].value?.length || 0 }}/120</span>
     </div>
 
     <div class="form-group-custom">
-        <label class="form-label">Kurs Açıklaması</label>
-        <div class="ngx-editor-container">
+        <label class="form-label">Kurs Açıklaması <span class="text-danger">*</span></label>
+        <div class="ngx-editor-wrapper border rounded" [class.border-danger]="f['description'].invalid && f['description'].touched">
             <ngx-editor-menu [editor]="editor" [toolbar]="toolbar"></ngx-editor-menu>
             <ngx-editor [editor]="editor" formControlName="description" [placeholder]="'Eğitim içeriğini, kazanımları ve detayları buraya yazın...'"></ngx-editor>
         </div>
-        <span class="error-text" *ngIf="f['description'].invalid && f['description'].touched">
+        
+        <div *ngIf="f['description'].invalid && f['description'].touched" class="text-danger mt-1 small">
             * Açıklama girilmesi zorunludur.
-        </span>
+        </div>
     </div>
 
     <div class="row form-group-custom">
-        <div class="col-md-4">
-            <label class="form-label">Dil</label>
-            <select class="form-select" formControlName="languageId">
+        
+        <div class="col-md-3">
+            <label class="form-label">Dil <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="languageId" [class.is-invalid]="f['languageId'].invalid && f['languageId'].touched">
                 <option [ngValue]="null" disabled>Seçiniz</option>
-                <option value="1">Türkçe</option>
-                <option value="2">İngilizce</option>
+                <option *ngFor="let item of languages" [value]="item.id">{{ item.title }}</option>
+            </select>
+            <div *ngIf="f['languageId'].invalid && f['languageId'].touched" class="text-danger mt-1 small">
+                * Dil seçimi zorunludur.
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Seviye <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="levelId" [class.is-invalid]="f['levelId'].invalid && f['levelId'].touched">
+                <option [ngValue]="null" disabled>Seçiniz</option>
+                <option *ngFor="let item of levels" [value]="item.id">{{ item.title }}</option>
+            </select>
+            <div *ngIf="f['levelId'].invalid && f['levelId'].touched" class="text-danger mt-1 small">
+                * Seviye seçimi zorunludur.
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Ana Kategori</label>
+            <select class="form-select" 
+                    [ngModel]="selectedMainCategoryId" 
+                    [ngModelOptions]="{standalone: true}" 
+                    (ngModelChange)="onMainCategoryChange($event)">
+                <option [ngValue]="null" disabled>Seçiniz</option>
+                <option *ngFor="let main of mainCategories" [value]="main.id">{{ main.title }}</option>
             </select>
         </div>
-        <div class="col-md-4">
-            <label class="form-label">Seviye</label>
-            <select class="form-select" formControlName="levelId">
-                <option [ngValue]="null" disabled>Seçiniz</option>
-                <option value="1">Başlangıç</option>
-                <option value="2">Orta</option>
-                <option value="3">İleri</option>
-                <option value="4">Tüm Seviyeler</option>
+
+        <div class="col-md-3">
+            <label class="form-label">Alt Kategori <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="categoryId" [class.is-invalid]="f['categoryId'].invalid && f['categoryId'].touched">
+                <option [ngValue]="null" disabled>
+                    {{ subCategories.length > 0 ? 'Seçiniz' : 'Önce Ana Kategori' }}
+                </option>
+                <option *ngFor="let sub of subCategories" [value]="sub.id">{{ sub.title }}</option>
             </select>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label">Kategori</label>
-            <select class="form-select" formControlName="categoryId">
-                <option [ngValue]="null" disabled>Seçiniz</option>
-                <option value="1">Yazılım Geliştirme</option>
-                <option value="2">Tasarım</option>
-                <option value="3">İş Dünyası</option>
-                <option value="4">Pazarlama</option>
-            </select>
+            <div *ngIf="f['categoryId'].invalid && f['categoryId'].touched" class="text-danger mt-1 small">
+                * Kategori seçimi zorunludur.
+            </div>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row mt-4">
         <div class="col-md-6 mb-4 mb-md-0">
-            <label class="form-label">Kurs Görseli</label>
-            <div class="upload-card">
-                <div class="preview-container">
-                    <img *ngIf="previewImage" [src]="previewImage" alt="Kapak Resmi">
-                    <div *ngIf="!previewImage" class="empty-state">
-                        <i class='bx bx-image-add'></i>
-                        <p>Henüz görsel seçilmedi</p>
+            <label class="form-label fw-bold">Kurs Görseli</label>
+            <div class="upload-card card p-3 h-100">
+                <div class="preview-container mb-3 bg-light rounded d-flex align-items-center justify-content-center" style="height: 200px; overflow: hidden; position: relative;">
+                    <img *ngIf="previewImage" [src]="previewImage" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;" alt="Kapak Resmi">
+                    <div *ngIf="!previewImage" class="text-center text-muted">
+                        <i class='bx bx-image-add fs-1'></i>
+                        <p class="m-0">Henüz görsel seçilmedi</p>
                     </div>
                 </div>
-                <div>
-                    <button type="button" class="btn btn-upload btn-image" (click)="openSelector('image')">
-                        <i class='bx bx-upload me-1'></i> Kütüphaneden Seç
-                    </button>
-                    <p class="upload-hint">Önerilen: 1280x720 px, .jpg, .png</p>
-                </div>
-                <input type="hidden" formControlName="headerImage">
+                <button type="button" class="btn btn-outline-primary w-100 mt-auto" (click)="openSelector('image')">
+                    <i class='bx bx-upload me-1'></i> Kütüphaneden Seç
+                </button>
             </div>
         </div>
 
         <div class="col-md-6">
-            <label class="form-label">Tanıtım Videosu</label>
-            <div class="upload-card">
-                <div class="preview-container">
+            <label class="form-label fw-bold">Tanıtım Videosu</label>
+            <div class="upload-card card p-3 h-100">
+                <div class="preview-container mb-3 bg-light rounded d-flex align-items-center justify-content-center" style="height: 200px; overflow: hidden; position: relative;">
+                    
                     <video *ngIf="previewVideo && !isYoutube(previewVideo)" 
-                           [src]="previewVideo" controls class="w-100 h-100" style="object-fit: contain;">
+                           [src]="previewVideo" 
+                           controls 
+                           class="w-100 h-100" 
+                           style="object-fit: contain;">
                     </video>
-
-                    <iframe *ngIf="previewVideo && isYoutube(previewVideo)"
-                            [src]="getYoutubeEmbedUrl(previewVideo)"
-                            width="100%" height="100%" frameborder="0" allowfullscreen>
+                    
+                    <iframe *ngIf="previewVideo && isYoutube(previewVideo)" 
+                            [src]="getYoutubeEmbedUrl(previewVideo)" 
+                            width="100%" 
+                            height="100%" 
+                            frameborder="0" 
+                            allowfullscreen>
                     </iframe>
 
-                    <div *ngIf="!previewVideo" class="empty-state">
-                        <i class='bx bx-video-plus'></i>
-                        <p>Henüz video seçilmedi</p>
+                    <div *ngIf="!previewVideo" class="text-center text-muted">
+                        <i class='bx bx-video-plus fs-1'></i>
+                        <p class="m-0">Henüz video seçilmedi</p>
                     </div>
                 </div>
-                <div>
-                    <button type="button" class="btn btn-upload btn-video" (click)="openSelector('video')">
-                        <i class='bx bx-movie-play me-1'></i> Video Seç
-                    </button>
-                    <p class="upload-hint">Öğrenciler kayıt olmadan önce bu videoyu izleyebilir.</p>
-                </div>
-                <input type="hidden" formControlName="trailer">
+                <button type="button" class="btn btn-outline-primary w-100 mt-auto" (click)="openSelector('video')">
+                    <i class='bx bx-movie-play me-1'></i> Video Seç
+                </button>
             </div>
         </div>
     </div>
@@ -124,7 +147,7 @@
 </div>
 
 <div class="selector-overlay" *ngIf="showSelector">
-    <div class="selector-modal shadow-lg">
+    <div class="selector-modal shadow-lg p-4 bg-white rounded">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold m-0">
                 {{ activeSelectorType === 'image' ? 'Görsel Seç' : 'Video Seç' }}
