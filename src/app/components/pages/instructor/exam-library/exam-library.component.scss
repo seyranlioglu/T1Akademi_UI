@@ -1,0 +1,49 @@
+.exam-library-container {
+    font-family: 'Inter', sans-serif;
+}
+
+.table th {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.icon-box {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hover-link:hover {
+    color: var(--primaryColor, #0d6efd) !important;
+    text-decoration: underline;
+}
+
+.tiny-text {
+    font-size: 0.75rem;
+}
+
+.dropdown-item {
+    font-size: 0.9rem;
+    cursor: pointer;
+    
+    &:active, &.active {
+        background-color: var(--primaryColor, #0d6efd);
+        color: white !important;
+        
+        i { color: white !important; }
+        .badge { background-color: rgba(255,255,255,0.3) !important; }
+    }
+    
+    &:disabled {
+        color: #ccc;
+        cursor: not-allowed;
+        &:hover { background-color: transparent; }
+    }
+}

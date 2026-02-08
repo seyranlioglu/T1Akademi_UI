@@ -35,9 +35,6 @@ import { OverviewComponent } from './components/dashboard/overview/overview.comp
 import { CompanyEmployeesComponent } from './components/dashboard/company-employees/company-employees.component';
 
 // Public Pages
-import { HomeDemoOneComponent } from './components/pages/home-demo-one/home-demo-one.component';
-import { HomeDemoTwoComponent } from './components/pages/home-demo-two/home-demo-two.component';
-import { HomeDemoThreeComponent } from './components/pages/home-demo-three/home-demo-three.component';
 import { AboutPageComponent } from './components/pages/about-page/about-page.component';
 import { InstructorsPageComponent } from './components/pages/instructors-page/instructors-page.component';
 import { InstructorProfilePageComponent } from './components/pages/instructor-profile-page/instructor-profile-page.component';
@@ -55,7 +52,7 @@ import { FaqPageComponent } from './components/pages/faq-page/faq-page.component
 import { PrivacyPolicyPageComponent } from './components/pages/privacy-policy-page/privacy-policy-page.component';
 import { TermsConditionsPageComponent } from './components/pages/terms-conditions-page/terms-conditions-page.component';
 import { TestimonialsPageComponent } from './components/pages/testimonials-page/testimonials-page.component';
-import { BecomeInstructorComponent } from './components/pages/instructor/become-instructor/become-instructor.component'; // YENİ EKLENDİ
+import { BecomeInstructorComponent } from './components/pages/instructor/become-instructor/become-instructor.component';
 
 // Instructor Components (Eğitmen)
 import { InstructorComponent } from './components/pages/instructor/instructor.component';
@@ -65,15 +62,15 @@ import { CurriculumComponent } from './components/pages/instructor/course-manage
 import { WhatYouWillLearnComponent } from './components/pages/instructor/course-manage/what-you-will-learn/what-you-will-learn.component';
 import { CourseLandingComponent } from './components/pages/instructor/course-manage/course-landing/course-landing.component';
 import { CoursePricingComponent } from './components/pages/instructor/course-manage/course-pricing/course-pricing.component';
-import { ExamLibraryComponent } from './components/pages/instructor/course-manage/curriculum/exam-library/exam-library.component';
-import { ExamEditorComponent } from './components/pages/instructor/course-manage/curriculum/exam-editor/exam-editor.component';
 import { PerformanceComponent } from './components/pages/instructor/performance/performance.component';
 import { LibraryComponent } from './components/pages/instructor/library/library.component';
 import { CourseSettingsComponent } from './components/pages/instructor/course-manage/course-settings/course-settings.component';
+import { ExamBuilderComponent } from './components/pages/instructor/course-manage/curriculum/exam-builder/exam-builder.component';
+import { ExamLibraryComponent } from './components/pages/instructor/exam-library/exam-library.component';
 
 const routes: Routes = [
 
-        // 1. AUTH - TAMAMEN BAĞIMSIZ (Navbar/Sidebar YOK)
+    // 1. AUTH
     {
         path: 'auth',
         children: [
@@ -86,24 +83,22 @@ const routes: Routes = [
         ]
     },
 
-    // 2. PLAYER (BAĞIMSIZ - NAVBAR/SIDEBAR YOK)
+    // 2. PLAYER
     {
         path: 'course/:id/watch',
         component: PlayerLayoutComponent,
         canActivate: [AuthGuard, IdValidatorGuard],
     },
-    // =================================================================
-    // 1. ANA PLATFORM (Öğrenci Arayüzü - Navbar & Footer Var)
-    // =================================================================
+
+    // 3. MAIN PLATFORM
     {
         path: '',
-        component: MainLayoutComponent, // Bu layout içinde Navbar ve Footer var
+        component: MainLayoutComponent,
         children: [
-            // Public Sayfalar
             { path: '', component: OverviewComponent },
             { path: 'about', component: AboutPageComponent },
             { path: 'instructors', component: InstructorsPageComponent },
-            { path: 'become-instructor', component: BecomeInstructorComponent }, // YENİ ROTA
+            { path: 'become-instructor', component: BecomeInstructorComponent },
             { path: 'courses-grid', component: CoursesGridPageComponent },
             { path: 'courses-list', component: CoursesListPageComponent },
             { path: 'course/:id', component: CourseDetailsPageComponent },
@@ -120,9 +115,6 @@ const routes: Routes = [
             { path: 'privacy-policy', component: PrivacyPolicyPageComponent },
             { path: 'terms-conditions', component: TermsConditionsPageComponent },
             
-
-
-            // Öğrenci Paneli (Dashboard) - AuthGuard Korumalı
             {
                 path: 'dashboard',
                 component: DashboardComponent,
@@ -144,25 +136,29 @@ const routes: Routes = [
         ]
     },
 
-    // =================================================================
-    // 2. EĞİTMEN PANELİ (Instructor Studio - BAĞIMSIZ LAYOUT) 
-    // =================================================================
-    // Burası MainLayoutComponent'in DIŞINDA. Kendi Navbar/Sidebar'ı var.
+    // 4. INSTRUCTOR PANEL
     {
         path: 'instructor',
-        component: InstructorComponent, // <--- Kendi layout'unu (sidebar vb.) yönetir
+        component: InstructorComponent,
         canActivate: [InstructorGuard],
         children: [
-            // Panele girince varsayılan olarak Kurslar açılsın
             { path: '', redirectTo: 'courses', pathMatch: 'full' }, 
             
             { path: 'performance', component: PerformanceComponent },
             { path: 'courses', component: CoursesComponent },
             { path: 'instructor-profile', component: InstructorProfilePageComponent },
-            // YENİ: Kütüphane
             { path: 'library', component: LibraryComponent }, 
+            
+            // YENİ ROTA: Sınav Kütüphanesi
+            { path: 'exam-library', component: ExamLibraryComponent },
 
-            // Kurs Yönetim Alt Rotaları
+            // YENİ ROTA: Sınav Oluşturucu
+            { 
+                path: 'exam-builder/:id', 
+                component: ExamBuilderComponent,
+                canActivate: [IdValidatorGuard]
+            },
+
             {
                 path: 'course-manage/:id',
                 component: CourseManageComponent,
@@ -173,24 +169,18 @@ const routes: Routes = [
                     { path: 'curriculum', component: CurriculumComponent },
                     { path: 'course-landing', component: CourseLandingComponent },
                     { path: 'course-pricing', component: CoursePricingComponent },
-                    { path: 'exam-library', component: ExamLibraryComponent },
-                    { path: 'exam-editor/:examId', component: ExamEditorComponent },
                     { path : 'course-settings', component: CourseSettingsComponent}
                 ]
             }
         ]
     },
 
-    // =================================================================
-    // 3. PLAYER (Ders İzleme Ekranı - BAĞIMSIZ LAYOUT)
-    // =================================================================
     {
         path: 'course-player/:id',
         component: PlayerLayoutComponent,
         canActivate: [AuthGuard, IdValidatorGuard],
     },
 
-    // 404
     { path: '**', component: NotFoundComponent }
 ];
 

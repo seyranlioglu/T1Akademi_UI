@@ -82,8 +82,6 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { courseReducer } from './shared/store/course.reducer';
 import { CourseEffects } from './shared/store/course.effects';
-import { ExamEditorComponent } from './components/pages/instructor/course-manage/curriculum/exam-editor/exam-editor.component';
-import { ExamLibraryComponent } from './components/pages/instructor/course-manage/curriculum/exam-library/exam-library.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatTabsModule } from '@angular/material/tabs';
 import { WhatYouWillLearnComponent } from './components/pages/instructor/course-manage/what-you-will-learn/what-you-will-learn.component';
@@ -112,9 +110,12 @@ import { DialogModule } from 'primeng/dialog';
 import { ContentLibrarySelectorComponent } from './components/common/content-library-selector/content-library-selector.component';
 import { TooltipModule } from 'primeng/tooltip';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
-import { BecomeInstructorComponent } from './components/pages/instructor/become-instructor/become-instructor.component'; // YENİ EKLENDİ
+import { BecomeInstructorComponent } from './components/pages/instructor/become-instructor/become-instructor.component';
 import { NgxEditorModule } from 'ngx-editor';
 import { CourseSettingsComponent } from './components/pages/instructor/course-manage/course-settings/course-settings.component';
+import { ExamBuilderComponent } from './components/pages/instructor/course-manage/curriculum/exam-builder/exam-builder.component';
+import { ExamLibraryComponent } from './components/pages/instructor/exam-library/exam-library.component';
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -187,8 +188,6 @@ import { CourseSettingsComponent } from './components/pages/instructor/course-ma
         CourseContentComponent,
         DynamicDialogComponent,
         CourseSectionComponent,
-        ExamEditorComponent,
-        ExamLibraryComponent,
         WhatYouWillLearnComponent,
         CourseLandingComponent,
         CoursePricingComponent,
@@ -206,9 +205,10 @@ import { CourseSettingsComponent } from './components/pages/instructor/course-ma
         SafeUrlPipe,
         ContentPreviewModalComponent,
         ContentLibrarySelectorComponent,
-        BecomeInstructorComponent, // YENİ EKLENDİ
-        CourseSettingsComponent // YENİ EKLENDİ 
-        
+        BecomeInstructorComponent,
+        CourseSettingsComponent,
+        ExamBuilderComponent,
+        ExamLibraryComponent
     ],
     imports: [
         BrowserModule,

@@ -43,6 +43,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a routerLink="/instructor/exam-library" routerLinkActive="active" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 text-white-50">
+                        <i class='bx bx-task fs-4'></i>
+                        <span class="fw-medium" *ngIf="!isSidebarCollapsed">Sınav Kütüphanesi</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a routerLink="/instructor/library" routerLinkActive="active" class="nav-link d-flex align-items-center gap-3 px-3 py-3 rounded-3 text-white-50">
                         <i class='bx bx-folder fs-4'></i>
                         <span class="fw-medium" *ngIf="!isSidebarCollapsed">Kaynaklar</span>

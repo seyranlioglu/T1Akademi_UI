@@ -1,0 +1,145 @@
+<div class="exam-library-container p-4 bg-light min-vh-100">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold text-dark m-0">Sınav Kütüphanesi</h4>
+            <p class="text-muted small m-0">Oluşturduğunuz sınavları buradan yönetin.</p>
+        </div>
+        <button class="btn btn-primary shadow-sm" (click)="createNewExam()">
+            <i class='bx bx-plus me-1'></i> Yeni Sınav Oluştur
+        </button>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-3">
+            <div class="position-relative" style="max-width: 400px;">
+                <i class='bx bx-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted'></i>
+                <input type="text" 
+                       class="form-control ps-5" 
+                       placeholder="Sınav adı veya açıklama ara..." 
+                       [(ngModel)]="filterText" 
+                       (keyup)="applyFilter()">
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4 py-3 text-uppercase text-muted small fw-bold" style="width: 20%;">Sınav Başlığı</th>
+                        
+                        <th class="text-uppercase text-muted small fw-bold" style="width: 25%;">Açıklama</th>
+                        
+                        <th class="text-center text-uppercase text-muted small fw-bold">Konu</th>
+                        
+                        <th class="text-center text-uppercase text-muted small fw-bold">Soru</th>
+
+                        <th class="text-center text-uppercase text-muted small fw-bold">Katılımcı</th>
+
+                        <th class="text-center text-uppercase text-muted small fw-bold">Başarı</th>
+                        
+                        <th class="text-end pe-4 text-uppercase text-muted small fw-bold">İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let exam of filteredExams">
+                        
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box bg-primary bg-opacity-10 text-primary rounded p-2 me-3">
+                                    <i class='bx bx-task fs-5'></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold text-dark cursor-pointer hover-link" (click)="editExam(exam.examId)">
+                                        {{ exam.title }}
+                                    </h6>
+                                    <small class="tiny-text" [class.text-success]="exam.status === 'Yayında'" [class.text-warning]="exam.status === 'Taslak'">
+                                        {{ exam.status }}
+                                    </small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="text-muted small" [title]="exam.description">
+                                {{ (exam.description && exam.description.length > 40) 
+                                    ? (exam.description | slice:0:40) + '...' 
+                                    : (exam.description || '-') }}
+                            </span>
+                        </td>
+
+                        <td class="text-center">
+                            <span class="badge bg-light text-secondary border">{{ exam.topicCount }}</span>
+                        </td>
+
+                        <td class="text-center">
+                            <span class="badge bg-light text-secondary border">{{ exam.questionCount }}</span>
+                        </td>
+
+                        <td class="text-center">
+                            <div class="d-flex align-items-center justify-content-center gap-1 text-muted">
+                                <i class='bx bx-user'></i>
+                                <span class="fw-bold">{{ exam.studentCount }}</span>
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            <span class="badge" 
+                                  [ngClass]="{
+                                    'bg-success-subtle text-success': exam.successRate >= 70,
+                                    'bg-warning-subtle text-warning': exam.successRate >= 50 && exam.successRate < 70,
+                                    'bg-danger-subtle text-danger': exam.successRate < 50
+                                  }">
+                                %{{ exam.successRate }}
+                            </span>
+                        </td>
+
+                        <td class="text-end pe-4">
+                            <div class="dropdown" ngbDropdown placement="bottom-end">
+                                <button class="btn btn-icon btn-light btn-sm rounded-circle shadow-none" ngbDropdownToggle>
+                                    <i class='bx bx-dots-vertical-rounded fs-5'></i>
+                                </button>
+                                <ul class="dropdown-menu border-0 shadow" ngbDropdownMenu>
+                                    
+                                    <li>
+                                        <button class="dropdown-item py-2 d-flex align-items-center gap-2" (click)="editExam(exam.examId)">
+                                            <i class='bx bx-edit text-primary'></i> Düzenle
+                                        </button>
+                                    </li>
+
+                                    <li>
+                                        <button class="dropdown-item py-2 d-flex align-items-center gap-2" (click)="showUsages(exam)">
+                                            <i class='bx bx-link text-info'></i> Kullanım: {{ exam.trainingCount }}
+                                        </button>
+                                    </li>
+
+                                    <li><hr class="dropdown-divider"></li>
+
+                                    <li [title]="exam.isUsedInTraining ? 'Eğitimlerde kullanıldığı için silinemez' : ''">
+                                        <button class="dropdown-item py-2 d-flex align-items-center gap-2 text-danger" 
+                                                [disabled]="exam.isUsedInTraining"
+                                                (click)="deleteExam(exam)">
+                                            <i class='bx bx-trash'></i> Sil
+                                        </button>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div *ngIf="filteredExams.length === 0 && !isLoading" class="text-center py-5">
+                <i class='bx bx-search-alt fs-1 text-muted opacity-25 mb-3'></i>
+                <h6 class="text-muted">Kayıt bulunamadı.</h6>
+            </div>
+
+            <div *ngIf="isLoading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+            </div>
+        </div>
+    </div>
+</div>
