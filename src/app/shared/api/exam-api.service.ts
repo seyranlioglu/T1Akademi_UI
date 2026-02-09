@@ -99,4 +99,8 @@ export class ExamApiService {
     calculateExamResult(payload: any): Observable<any> {
         return this.http.post<any>(`${API_EXAM_URL}/CalculateExamResult`, payload);
     }
+
+    updateSeqNo(payload: any): Observable<any> {
+        return this.http.put<any>(`${API_EXAM_URL}/UpdateSeqNo`, payload);
+    }
 }

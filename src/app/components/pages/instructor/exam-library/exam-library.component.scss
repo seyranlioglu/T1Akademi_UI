@@ -47,3 +47,80 @@
         &:hover { background-color: transparent; }
     }
 }
+
+// =========================================================
+// 📱 EXAM LIBRARY RESPONSIVE (Max-Width: 768px)
+// =========================================================
+@media (max-width: 768px) {
+    
+    .exam-library-container {
+        padding: 1rem !important; // Kenar boşluklarını azalt
+    }
+
+    // 1. Üst Başlık ve "Yeni Sınav" Butonu
+    .d-flex.justify-content-between.align-items-center.mb-4 {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 1rem;
+
+        div { text-align: center; } // Başlığı ortala
+        
+        button { 
+            width: 100%; // Butonu tam genişlik yap
+            padding: 0.8rem;
+        }
+    }
+
+    // 2. Arama Kutusu
+    .card-body .position-relative {
+        max-width: 100% !important; // Tam genişlik
+    }
+
+    // 3. TABLO DÜZENLEMESİ (Gereksiz Kolonları Gizle)
+    .table {
+        thead {
+            // Başlıkları basitleştir
+            th:nth-child(2), // Açıklama
+            th:nth-child(3), // Konu Sayısı
+            th:nth-child(4)  // Soru Sayısı
+            {
+                display: none;
+            }
+            
+            // Kalan başlıkların genişliğini serbest bırak
+            th:first-child { width: auto !important; } 
+        }
+
+        tbody tr {
+            // Hücreleri gizle
+            td:nth-child(2), // Açıklama
+            td:nth-child(3), // Konu Sayısı
+            td:nth-child(4)  // Soru Sayısı
+            {
+                display: none;
+            }
+
+            // 4. Kalan Hücrelerin Düzeni
+            // Başlık Alanı
+            td:first-child {
+                padding-left: 0.5rem !important;
+                
+                .d-flex { 
+                    // İkonu gizleyip yer kazanabiliriz veya küçültebiliriz
+                    .icon-box { display: none; } 
+                }
+                
+                // Başlık metni
+                h6 { 
+                    font-size: 0.9rem; 
+                    white-space: normal; // Uzun başlıklar alt satıra geçsin
+                }
+            }
+
+            // İşlemler (Dropdown)
+            td:last-child {
+                padding-right: 0.5rem !important;
+            }
+        }
+    }
+}

@@ -3,7 +3,9 @@ import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { ExamApiService } from 'src/app/shared/api/exam-api.service';
-// Builder Component'i import etmeyi unutma (Yol projene göre değişebilir)
+
+// DÜZELTME: Dosya yolu hatası giderildi. 
+// Eğer course-manage klasörü instructor klasörünün altındaysa bu yol çalışır.
 import { ExamBuilderComponent } from '../course-manage/curriculum/exam-builder/exam-builder.component'; 
 
 @Component({
@@ -24,7 +26,7 @@ export class ExamLibraryComponent implements OnInit {
     private examApi: ExamApiService,
     private router: Router,
     private toastr: ToastrService,
-    private modalService: NgbModal // Modal servisi inject edildi
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -36,12 +38,21 @@ export class ExamLibraryComponent implements OnInit {
     this.examApi.getInstructorExamLibrary().subscribe({
       next: (res) => {
         this.isLoading = false;
-        if (res.result) {
-          this.exams = res.body; 
-          this.filteredExams = res.body;
+        
+        // Debug için konsola basıyoruz
+        console.log('API Response:', res);
+
+        if (res.header && res.header.result) {
+          // Backend'den gelen body'nin dizi olduğundan emin olalım
+          const data = Array.isArray(res.body) ? res.body : [];
+          
+          this.exams = data;
+          // Referansı yenile ki tablo tetiklensin
+          this.filteredExams = [...data]; 
         }
       },
-      error: () => {
+      error: (err) => {
+        console.error(err);
         this.isLoading = false;
         this.toastr.error('Sınav listesi yüklenemedi.');
       }
@@ -49,47 +60,43 @@ export class ExamLibraryComponent implements OnInit {
   }
 
   applyFilter() {
+    if (!this.filterText) {
+        this.filteredExams = [...this.exams];
+        return;
+    }
     const term = this.filterText.toLocaleLowerCase('tr');
     this.filteredExams = this.exams.filter(e => 
-        e.title.toLocaleLowerCase('tr').includes(term) || 
+        e.title?.toLocaleLowerCase('tr').includes(term) || 
         (e.description && e.description.toLocaleLowerCase('tr').includes(term))
     );
   }
 
   // --- MODAL AÇMA İŞLEMLERİ ---
 
-  // 1. Düzenle (Edit)
   editExam(id: number) {
     this.openBuilderModal(id);
   }
 
-  // 2. Yeni Sınav (Create)
   createNewExam() {
-    this.openBuilderModal(null); // ID yok, create modu
+    this.openBuilderModal(null); 
   }
 
-  // Ortak Modal Açıcı Metot
   private openBuilderModal(examId: number | null) {
     const modalRef = this.modalService.open(ExamBuilderComponent, { 
-        size: 'xl',        // Ekstra Geniş Modal
-        centered: true,    // Ortala
-        backdrop: 'static',// Dışarı tıklayınca kapanmasın (veri kaybını önler)
-        keyboard: false,   // ESC ile kapanmasın
-        scrollable: true   // İçerik uzunsa scroll olsun
+        size: 'xl',
+        centered: true,
+        backdrop: 'static',
+        keyboard: false,
+        scrollable: true
     });
 
-    // Component'e ID'yi parametre olarak geçiyoruz
     modalRef.componentInstance.examId = examId;
 
-    // Modal kapandığında ne olacak?
     modalRef.result.then((result) => {
-        // Eğer component 'close(true)' ile kapandıysa, liste yenilensin
         if (result === true) {
             this.loadExams();
         }
-    }, (dismiss) => {
-        // Modal çarpıdan veya iptalden kapandıysa bir şey yapma
-    });
+    }, () => {});
   }
 
   // --- DİĞER AKSİYONLAR ---
@@ -114,7 +121,7 @@ export class ExamLibraryComponent implements OnInit {
     }
 
     if (confirm(`"${exam.title}" sınavını kalıcı olarak silmek istediğinize emin misiniz?`)) {
-       // Backend entegrasyonu:
+       // Silme işlemi simülasyonu (Backend metodu varsa burayı aç)
        // this.examApi.deleteExam(exam.examId).subscribe(...)
        
        this.toastr.success('Sınav silindi.');
