@@ -15,7 +15,6 @@ import { ContentLibrarySelectorComponent } from 'src/app/components/common/conte
 })
 export class CourseSectionComponent {
   
-  // Gelen data: { trainingSectionId, trainingSectionTitle, trainingSectionRowNumber... }
   @Input() data: any;   
   @Input() index!: number; 
   @Output() contentDropped = new EventEmitter<any>();
@@ -37,7 +36,7 @@ export class CourseSectionComponent {
   };
 
   isSettingsDialogVisible = false;
-readonly CONTENT_TYPE_LECTURE_CODE = 'lec'; 
+  readonly CONTENT_TYPE_LECTURE_CODE = 'lec'; 
   readonly CONTENT_TYPE_EXAM_CODE = 'exm';
   ref: DynamicDialogRef | undefined;
 
@@ -64,7 +63,7 @@ readonly CONTENT_TYPE_LECTURE_CODE = 'lec';
     this.contentSettings = { mandatory: true, isPreview: false, allowSeeking: true, completedRate: 95, minReadTimeThreshold: 5 };
   }
 
-  // --- İÇERİK SEÇİMİ ---
+  // --- İÇERİK SEÇİMİ (KÜTÜPHANE) ---
   openLibrarySelector() {
     this.ref = this.dialogService.open(ContentLibrarySelectorComponent, {
       header: 'Kütüphaneden İçerik Seç',
@@ -83,8 +82,13 @@ readonly CONTENT_TYPE_LECTURE_CODE = 'lec';
     });
   }
 
-  openExamSelector() {
-    alert("Sınav seçici modülü hazırlanıyor...");
+  // --- SINAV SEÇİMİ (YENİ EKLENDİ) ---
+  onExamSelected(exam: any) {
+    this.selectedExamItem = exam;
+    // Eğer başlık henüz girilmemişse, sınavın başlığını otomatik doldur
+    if (!this.newContentTitle && exam) {
+        this.newContentTitle = exam.title;
+    }
   }
 
   // --- KAYDET ---
@@ -93,12 +97,17 @@ readonly CONTENT_TYPE_LECTURE_CODE = 'lec';
         this.toastr.warning('Lütfen ders başlığı giriniz.');
         return;
     }
+    
+    // Validasyonlar
     if (this.newContentType === 'material' && !this.selectedLibraryItem) {
         this.toastr.warning('Lütfen kütüphaneden bir içerik seçiniz.');
         return;
     }
+    if (this.newContentType === 'exam' && !this.selectedExamItem) {
+        this.toastr.warning('Lütfen bir sınav seçiniz.');
+        return;
+    }
 
-    // 🔥 DÜZELTME: trainingSectionId kullanımı
     const sectionId = this.data.trainingSectionId || this.data.id;
 
     const payload = {
@@ -106,8 +115,11 @@ readonly CONTENT_TYPE_LECTURE_CODE = 'lec';
       title: this.newContentTitle,
       isActive: true,
       contentTypeCode: this.newContentType === 'exam' ? this.CONTENT_TYPE_EXAM_CODE : this.CONTENT_TYPE_LECTURE_CODE,
+      
+      // ID Atamaları
       contentLibraryId: this.newContentType === 'material' ? this.selectedLibraryItem.id : null,
-      examId: this.newContentType === 'exam' ? this.selectedExamItem?.id : null,
+      examId: this.newContentType === 'exam' ? this.selectedExamItem.examId : null, // ExamSummary'den examId alıyoruz
+      
       mandatory: this.contentSettings.mandatory,
       isPreview: this.contentSettings.isPreview,
       allowSeeking: this.contentSettings.allowSeeking,
@@ -130,7 +142,6 @@ readonly CONTENT_TYPE_LECTURE_CODE = 'lec';
 
   // --- BÖLÜM İŞLEMLERİ ---
   deleteSection() {
-    // 🔥 DÜZELTME: trainingSectionId kullanımı
     const sectionId = this.data.trainingSectionId || this.data.id;
 
     if(confirm('Bu bölümü ve içindeki tüm dersleri silmek istediğinize emin misiniz?')) {
@@ -144,13 +155,9 @@ readonly CONTENT_TYPE_LECTURE_CODE = 'lec';
   updateSectionTitle() {
       this.sectionTitleEdit = false;
       
-      // 🔥 DÜZELTME: trainingSectionTitle kullanımı
-      // Data yapısı karmaşık olduğu için her iki ihtimali de (camelCase / PascalCase) kontrol edelim
       const currentTitle = this.data.trainingSectionTitle || this.data.title;
       const sectionId = this.data.trainingSectionId || this.data.id;
       const rowNumber = this.data.trainingSectionRowNumber ?? this.data.rowNumber ?? this.index;
-      // TrainingId genelde section içinde gelmeyebilir, parent'tan veya state'den alınmalı.
-      // Eğer data içinde yoksa null gönderiyoruz, backend umarım bunu handle ediyordur.
       const trainingId = this.data.trainingId; 
 
       if (!currentTitle || currentTitle.trim().length === 0) {
@@ -168,12 +175,8 @@ readonly CONTENT_TYPE_LECTURE_CODE = 'lec';
           langCode: 'tr'
       };
 
-      // console.log("Update Payload:", payload); // Debug için
-
       this.trainingService.updateTrainingSection(payload).subscribe({
-          next: () => {
-             // this.toastr.success('Başlık güncellendi');
-          },
+          next: () => { },
           error: (err) => {
               console.error("Başlık güncellenemedi", err);
               this.toastr.error('Güncelleme başarısız.');

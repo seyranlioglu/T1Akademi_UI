@@ -1,0 +1,48 @@
+.exam-selector-wrapper {
+    font-family: 'Inter', sans-serif;
+}
+
+// Input Group Özelleştirme
+.input-group {
+    transition: all 0.2s;
+    
+    &:focus-within {
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15) !important;
+        border-radius: 0.375rem;
+        
+        .input-group-text, .form-select, .btn {
+            border-color: var(--primaryColor, #0d6efd);
+        }
+    }
+}
+
+.input-group-text {
+    background-color: #fff;
+}
+
+.form-select {
+    &:focus {
+        box-shadow: none; // Input group hallediyor
+        border-color: #dee2e6;
+    }
+}
+
+// Özet Kart Stili
+.bg-light-primary {
+    background-color: #f0f9ff; // Çok açık mavi
+}
+
+.info-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.badge {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}

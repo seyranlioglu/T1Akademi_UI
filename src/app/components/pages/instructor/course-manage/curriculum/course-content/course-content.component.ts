@@ -1,12 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ToastrService } from 'ngx-toastr';
-import { Store } from '@ngrx/store'; // 🔥 Store Eklendi
+import { Store } from '@ngrx/store';
 
 import { TrainingApiService } from 'src/app/shared/api/training-api.service';
 import { ContentPreviewModalComponent } from 'src/app/components/common/modals/content-preview-modal/content-preview-modal.component';
 import { ContentLibrarySelectorComponent } from 'src/app/components/common/content-library-selector/content-library-selector.component';
-import { loadCourse } from 'src/app/shared/store/course.actions'; // 🔥 Action Eklendi
+import { loadCourse } from 'src/app/shared/store/course.actions';
 
 @Component({
   selector: 'app-course-content',
@@ -22,11 +22,14 @@ export class CourseContentComponent {
   isEditing: boolean = false;
   ref: DynamicDialogRef | undefined;
 
+  // Geçici Sınav Seçimi (Kaydet diyene kadar burada tutulur)
+  tempSelectedExamId: number | null = null;
+
   constructor(
     private dialogService: DialogService,
     private trainingService: TrainingApiService,
     private toastr: ToastrService,
-    private store: Store // 🔥 Store Inject Edildi
+    private store: Store
   ) {}
 
   // --- 1. İKON BELİRLEME ---
@@ -34,10 +37,7 @@ export class CourseContentComponent {
     if (!item) return 'bx-error text-muted';
     if (item.contentType?.code === 'exm') return 'bx-task text-warning';
     
-    // Veri kaynağını kontrol et (ContentLibrary veya DTO)
     const lib = item.contentLibrary || item.trainingContentLibraryDto || {};
-    
-    // Dosya adı önceliği: Library > DTO > Title
     const fileName = (lib.FileName || lib.fileName || lib.trainingContentLibraryFileName || item.title || '').toLowerCase();
     
     if (fileName.endsWith('.pdf')) return 'bxs-file-pdf text-danger';
@@ -47,43 +47,35 @@ export class CourseContentComponent {
     return 'bx-video text-primary'; 
   }
 
-  // --- 2. ÖNİZLEME (MODAL VERİ DÖNÜŞÜMÜ) ---
+  // --- 2. ÖNİZLEME ---
   openPreview() {
-    // 1. Veri Kaynağını Bul
+    // Eğer sınav ise önizleme mantığı farklı olabilir veya sınav detayına gidebilir.
+    // Şimdilik sadece dosya önizlemeyi koruyoruz.
+    if (this.data.contentType?.code === 'exm') {
+        this.toastr.info('Sınav önizlemesi için düzenleme modunu kullanabilirsiniz.');
+        return;
+    }
+
     const lib = this.data.contentLibrary || this.data.trainingContentLibraryDto || {};
     
-    // 2. Verileri Modal'ın beklediği düz formata (camelCase) çevir
     const modalData = {
-        // ID: Retry upload için gerekli
         id: lib.Id || lib.id || this.data.contentLibraryId,
-        
-        // Dosya Yolu: PascalCase veya camelCase gelebilir, hepsini kontrol et
         filePath: lib.FilePath || lib.filePath || lib.trainingContentLibraryFilePath || this.data.filePath,
-        
-        // Dosya Adı
         fileName: lib.FileName || lib.fileName || lib.trainingContentLibraryFileName || this.data.title || 'İçerik',
-        
-        // Başlık (Modal Header için genelde title kullanılır)
         title: this.data.title || lib.FileName,
-        
-        // Ekstra bilgiler (Modal içinde gösteriliyorsa)
         description: this.data.description,
         fileType: lib.FileType || lib.fileType,
         thumbnail: lib.Thumbnail || lib.thumbnail || lib.trainingContentLibraryThumbnail,
         videoDuration: lib.VideoDuration || lib.videoDuration || lib.trainingContentLibraryVideoDuration,
         documentFileSize: lib.DocumentFileSize || lib.documentFileSize || lib.trainingContentLibraryDocumentFileSize,
-        
-        // Orijinal veriyi de iliştir (ne olur ne olmaz)
         content: this.data 
     };
 
-    // 3. Dosya yolu kontrolü
     if (!modalData.filePath) {
         this.toastr.warning('Bu dersin dosya yolu bulunamadı.', 'Dosya Yok');
         return;
     }
 
-    // 4. Modalı Aç
     this.dialogService.open(ContentPreviewModalComponent, {
         header: modalData.title,
         width: '80%',
@@ -91,11 +83,11 @@ export class CourseContentComponent {
         baseZIndex: 10002,
         modal: true,
         dismissableMask: true,
-        data: modalData // 🔥 Düzeltilmiş ve hazırlanmış veriyi gönderiyoruz
+        data: modalData
     });
   }
 
-  // --- 3. İÇERİK DEĞİŞTİRME (KÜTÜPHANEDEN SEÇ) ---
+  // --- 3. DOSYA İÇERİK DEĞİŞTİRME ---
   changeContent() {
     this.ref = this.dialogService.open(ContentLibrarySelectorComponent, {
         header: 'Yeni İçerik Seç',
@@ -107,40 +99,58 @@ export class CourseContentComponent {
 
     this.ref.onClose.subscribe((selectedContent: any) => {
         if (selectedContent) {
-            // Seçilen yeni içeriği mevcut dataya geçici olarak yaz
-            this.data.newLibraryItem = selectedContent; // UI güncellemesi
-            this.data.contentLibraryId = selectedContent.id; // Backend'e gidecek ID
+            this.data.newLibraryItem = selectedContent; 
+            this.data.contentLibraryId = selectedContent.id; 
             this.toastr.info(`"${selectedContent.fileName}" seçildi. Kaydetmeyi unutmayın.`);
         }
     });
   }
 
+  // --- 4. SINAV SEÇİMİ (YENİ) ---
+  onExamSelected(exam: any) {
+      // ExamSelector'dan gelen objeyi yakala
+      if (exam && exam.examId) {
+          this.tempSelectedExamId = exam.examId;
+          // UI'da başlığı güncellemek istersen: this.data.title = exam.title; (Opsiyonel)
+      }
+  }
+
   toggleEdit() {
     this.isEditing = !this.isEditing;
-    // İptal edilirse geçici seçimi temizle
-    if (!this.isEditing && this.data.newLibraryItem) {
-        delete this.data.newLibraryItem;
+    // İptal edilirse geçici seçimleri temizle
+    if (!this.isEditing) {
+        if (this.data.newLibraryItem) delete this.data.newLibraryItem;
+        this.tempSelectedExamId = null;
     }
   }
 
-  // --- 4. GÜNCELLEME (SAVE) ---
+  // --- 5. GÜNCELLEME (SAVE) ---
   saveChanges() {
+    // İçerik tipine göre ID belirle
+    const isExam = this.data.contentType?.code === 'exm';
+    
+    // Eğer sınavsa ve yeni seçim yapıldıysa onu al, yoksa mevcut examId'yi koru
+    // Eğer dosya ise ve yeni seçim yapıldıysa onu al, yoksa mevcut contentLibraryId'yi koru
+    const targetContentId = isExam 
+        ? (this.tempSelectedExamId || this.data.examId) 
+        : (this.data.newLibraryItem ? this.data.newLibraryItem.id : (this.data.contentLibraryId || 0));
+
     const payload = {
         id: this.data.id,
         title: this.data.title,
-        description: this.data.description, // 🔥 Açıklama
+        description: this.data.description,
         trainingSectionId: this.data.trainingSectionId,
         
-        // İçerik değişikliği (Yeni varsa yeni ID, yoksa eski ID)
-        contentLibraryId: this.data.newLibraryItem ? this.data.newLibraryItem.id : (this.data.contentLibraryId || 0), 
+        // Backend DTO'su hangisini bekliyorsa onu doldur, diğerini null/0 gönder
+        contentLibraryId: isExam ? null : targetContentId,
+        examId: isExam ? targetContentId : null,
         
         // Ayarlar
         mandatory: this.data.mandatory,
         isPreview: this.data.isPreview,
-        allowSeeking: this.data.allowSeeking,   // 🔥 İleri Sarma
-        completedRate: this.data.completedRate, // 🔥 Tamamlanma Oranı
+        allowSeeking: this.data.allowSeeking,
+        completedRate: this.data.completedRate,
         minReadTimeThreshold: this.data.minReadTimeThreshold || 5,
-        
         isActive: true
     };
 
@@ -149,11 +159,10 @@ export class CourseContentComponent {
             this.toastr.success('Ders başarıyla güncellendi.');
             this.isEditing = false;
             
-            // Geçici veriyi temizle
+            // Geçici verileri temizle
             if(this.data.newLibraryItem) delete this.data.newLibraryItem;
+            this.tempSelectedExamId = null;
 
-            // 🔥 STORE GÜNCELLEMESİ: Tüm eğitimi backend'den taze çek
-            // Böylece liste, ikonlar, süreler vs. %100 güncel olur.
             this.store.dispatch(loadCourse({})); 
         },
         error: (err) => {
@@ -163,15 +172,14 @@ export class CourseContentComponent {
     });
   }
 
-  // --- 5. SİLME ---
+  // --- 6. SİLME ---
   deleteContent() {
     if(confirm('Bu içeriği silmek istediğinize emin misiniz?')) {
         this.trainingService.deleteTrainingContent(this.data.id).subscribe({
             next: () => {
                 this.toastr.success('İçerik silindi.');
-                // Silme işleminden sonra da Store'u tetiklemek en temizidir
                 this.store.dispatch(loadCourse({ 
-                    courseId: this.data.trainingId // Varsa gönder, yoksa effect store'dan bulur.
+                    courseId: this.data.trainingId 
                 }));
             },
             error: (err) => this.toastr.error('Silme hatası.')

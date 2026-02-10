@@ -81,18 +81,17 @@
                 </div>
 
                 <div *ngIf="newContentType === 'exam'">
-                    <div class="text-center p-4 border rounded bg-light">
-                        <i class='bx bx-task display-4 text-warning mb-2'></i>
-                        <h6>Sınav Modülü</h6>
-                        <button class="btn btn-warning btn-sm" (click)="openExamSelector()">Sınav Seç / Oluştur</button>
-                    </div>
+                    <app-exam-selector
+                        [label]="'Sınav Seçiniz'"
+                        (onExamSelect)="onExamSelected($event)">
+                    </app-exam-selector>
                 </div>
             </div>
 
             <div class="d-flex justify-content-end gap-2 p-3 border-top bg-light-subtle">
                 <button class="btn btn-light btn-sm" (click)="toggleNewContentForm()">İptal</button>
                 <button class="btn btn-dark btn-sm px-4" (click)="saveContent()" 
-                        [disabled]="!newContentTitle || (newContentType === 'material' && !selectedLibraryItem)">
+                        [disabled]="!newContentTitle || (newContentType === 'material' && !selectedLibraryItem) || (newContentType === 'exam' && !selectedExamItem)">
                     <i class='bx bx-save'></i> Kaydet
                 </button>
             </div>

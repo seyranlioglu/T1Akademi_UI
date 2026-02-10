@@ -166,6 +166,7 @@ export class ExamBuilderComponent implements OnInit {
     }
     this.activeTab = tab;
   }
+  
 
   loadExamData(examId: number, versionId: number | null = null) {
     this.isLoading = true;
@@ -509,7 +510,8 @@ export class ExamBuilderComponent implements OnInit {
   }
 
   close() {
-    this.activeModal.close(this.examId ? true : false);
+    // Sadece true/false değil, varsa examId'yi dönüyoruz
+    this.activeModal.close(this.examId); 
   }
 
   private convertMinutesToTime(totalMinutes: number): string {

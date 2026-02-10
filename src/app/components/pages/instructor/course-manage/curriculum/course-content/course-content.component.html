@@ -26,7 +26,7 @@
     </div>
 
     <div class="d-flex align-items-center gap-1">
-        <button class="btn btn-sm btn-icon btn-light text-primary" (click)="$event.stopPropagation(); openPreview()" title="Önizle">
+        <button *ngIf="data.contentType?.code !== 'exm'" class="btn btn-sm btn-icon btn-light text-primary" (click)="$event.stopPropagation(); openPreview()" title="Önizle">
             <i class='bx bx-show'></i>
         </button>
         <button class="btn btn-sm btn-icon btn-light text-danger" (click)="$event.stopPropagation(); deleteContent()" title="Sil">
@@ -50,40 +50,51 @@
         <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="data.description" placeholder="Öğrenciler için kısa bir açıklama..."></textarea>
     </div>
 
-    <div class="mb-3" *ngIf="data.contentType?.code !== 'exm'">
-        <label class="small fw-bold text-muted mb-1">Bağlı İçerik</label>
+    <div class="mb-3">
         
-        <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-white">
-            <div class="d-flex align-items-center gap-2 overflow-hidden flex-grow-1">
-                <i class='bx fs-4' [ngClass]="data.newLibraryItem ? 'bx-check-circle text-success' : getIconClass(data)"></i>
-                <div class="text-truncate small flex-grow-1">
-                    <div *ngIf="data.newLibraryItem">
-                        <span class="text-success fw-bold d-block">Yeni Seçim:</span>
-                        {{ data.newLibraryItem.fileName }}
-                    </div>
-                    <div *ngIf="!data.newLibraryItem">
-                        <span *ngIf="data.contentLibrary?.fileName || data.contentLibrary?.FileName" class="text-dark fw-bold">
-                            {{ data.contentLibrary?.fileName || data.contentLibrary?.FileName }}
-                        </span>
-                        <span *ngIf="!(data.contentLibrary?.fileName || data.contentLibrary?.FileName) && data.trainingContentLibraryDto?.trainingContentLibraryFileName">
-                            {{ data.trainingContentLibraryDto.trainingContentLibraryFileName }}
-                        </span>
-                        <span *ngIf="!data.contentLibrary && !data.trainingContentLibraryDto?.trainingContentLibraryFileName" class="text-danger fst-italic">
-                            <i class='bx bx-error-circle'></i> Dosya Bağlantısı Yok
-                        </span>
+        <ng-container *ngIf="data.contentType?.code !== 'exm'">
+            <label class="small fw-bold text-muted mb-1">Bağlı İçerik (Dosya)</label>
+            <div class="d-flex align-items-center justify-content-between p-2 border rounded bg-white">
+                <div class="d-flex align-items-center gap-2 overflow-hidden flex-grow-1">
+                    <i class='bx fs-4' [ngClass]="data.newLibraryItem ? 'bx-check-circle text-success' : getIconClass(data)"></i>
+                    <div class="text-truncate small flex-grow-1">
+                        <div *ngIf="data.newLibraryItem">
+                            <span class="text-success fw-bold d-block">Yeni Seçim:</span>
+                            {{ data.newLibraryItem.fileName }}
+                        </div>
+                        <div *ngIf="!data.newLibraryItem">
+                            <span *ngIf="data.contentLibrary?.fileName || data.contentLibrary?.FileName" class="text-dark fw-bold">
+                                {{ data.contentLibrary?.fileName || data.contentLibrary?.FileName }}
+                            </span>
+                            <span *ngIf="!(data.contentLibrary?.fileName || data.contentLibrary?.FileName) && data.trainingContentLibraryDto?.trainingContentLibraryFileName">
+                                {{ data.trainingContentLibraryDto.trainingContentLibraryFileName }}
+                            </span>
+                            <span *ngIf="!data.contentLibrary && !data.trainingContentLibraryDto?.trainingContentLibraryFileName" class="text-danger fst-italic">
+                                <i class='bx bx-error-circle'></i> Dosya Bağlantısı Yok
+                            </span>
+                        </div>
                     </div>
                 </div>
+                
+                <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-outline-secondary" (click)="openPreview()" title="İçeriği Gör">
+                        <i class='bx bx-show'></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-primary" (click)="changeContent()">
+                        <i class='bx bx-library'></i> Değiştir
+                    </button>
+                </div>
             </div>
-            
-            <div class="d-flex gap-1">
-                <button class="btn btn-sm btn-outline-secondary" (click)="openPreview()" title="İçeriği Gör">
-                    <i class='bx bx-show'></i>
-                </button>
-                <button class="btn btn-sm btn-outline-primary" (click)="changeContent()">
-                    <i class='bx bx-library'></i> Değiştir
-                </button>
-            </div>
-        </div>
+        </ng-container>
+
+        <ng-container *ngIf="data.contentType?.code === 'exm'">
+            <app-exam-selector 
+                [selectedExamId]="data.examId"
+                [label]="'Bağlı Sınav'"
+                (onExamSelect)="onExamSelected($event)">
+            </app-exam-selector>
+        </ng-container>
+
     </div>
     
     <div class="row g-3 mb-3">
@@ -99,7 +110,8 @@
                 <label class="form-check-label small cursor-pointer" for="previewCheck">Vitrin (Önizleme)</label>
             </div>
         </div>
-        <div class="col-md-6">
+        
+        <div class="col-md-6" *ngIf="data.contentType?.code !== 'exm'">
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="seekingCheck" [(ngModel)]="data.allowSeeking">
                 <label class="form-check-label small cursor-pointer" for="seekingCheck">İleri Sarma İzni</label>
@@ -107,7 +119,7 @@
         </div>
     </div>
 
-<div class="mb-3 pt-2 border-top">
+    <div class="mb-3 pt-2 border-top" *ngIf="data.contentType?.code !== 'exm'">
         <div class="d-flex justify-content-between align-items-center mb-1">
             <label class="small fw-bold text-muted m-0">Tamamlandı Kabul Oranı</label>
             <span class="badge bg-primary rounded-pill small">%{{ data.completedRate || 95 }}</span>

@@ -115,6 +115,7 @@ import { NgxEditorModule } from 'ngx-editor';
 import { CourseSettingsComponent } from './components/pages/instructor/course-manage/course-settings/course-settings.component';
 import { ExamBuilderComponent } from './components/pages/instructor/course-manage/curriculum/exam-builder/exam-builder.component';
 import { ExamLibraryComponent } from './components/pages/instructor/exam-library/exam-library.component';
+import { ExamSelectorComponent } from 'src/app/components/common/exam-selector/exam-selector.component';
 
 @NgModule({
     declarations: [
@@ -208,7 +209,8 @@ import { ExamLibraryComponent } from './components/pages/instructor/exam-library
         BecomeInstructorComponent,
         CourseSettingsComponent,
         ExamBuilderComponent,
-        ExamLibraryComponent
+        ExamLibraryComponent,
+        ExamSelectorComponent
     ],
     imports: [
         BrowserModule,
@@ -235,6 +237,9 @@ import { ExamLibraryComponent } from './components/pages/instructor/exam-library
         NgxExtendedPdfViewerModule,
         NgxEditorModule
     ],
+    exports: [
+    ExamSelectorComponent // Dışarıya aç (Burası önemli!)
+  ],
     providers: [
         {
             provide: HTTP_INTERCEPTORS,

@@ -103,4 +103,9 @@ export class ExamApiService {
     updateSeqNo(payload: any): Observable<any> {
         return this.http.put<any>(`${API_EXAM_URL}/UpdateSeqNo`, payload);
     }
+
+    getExamListForLookup(payload: any): Observable<any> {
+        return this.http.post<any>(`${API_EXAM_URL}/GetExamListForLookup`, payload);
+    }
+
 }

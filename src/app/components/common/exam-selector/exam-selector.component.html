@@ -1,0 +1,84 @@
+<div class="exam-selector-wrapper">
+    <label class="form-label fw-bold small text-secondary mb-1">
+        {{ label }} <span class="text-danger" *ngIf="!disabled">*</span>
+    </label>
+    
+    <div class="input-group shadow-sm">
+        <span class="input-group-text bg-white text-muted border-end-0">
+            <i class='bx bx-search-alt'></i>
+        </span>
+
+        <select class="form-select border-start-0" 
+                [value]="selectedExamId || ''" 
+                (change)="onChange($event)"
+                [disabled]="disabled || isLoading"
+                style="border-right: 0;">
+            
+            <option value="" disabled selected>
+                {{ isLoading ? 'Yükleniyor...' : 'Bir sınav seçiniz...' }}
+            </option>
+            <option *ngFor="let ex of exams" [value]="ex.examId">
+                {{ ex.title }} 
+            </option>
+        </select>
+
+        <button class="btn btn-outline-secondary border-start-0" 
+                type="button" 
+                (click)="openPreview()"
+                [disabled]="!selectedExamId"
+                title="Sınavı İncele / Düzenle">
+            <i class='bx bx-show fs-5'></i>
+        </button>
+
+        <button class="btn btn-primary d-flex align-items-center" 
+                type="button" 
+                (click)="openNewExamModal()"
+                [disabled]="disabled">
+            <i class='bx bx-plus'></i>
+            <span class="d-none d-sm-inline ms-1 fw-medium">Yeni</span>
+        </button>
+    </div>
+
+    <div class="selected-exam-info mt-2" *ngIf="selectedExam">
+        <div class="card border-0 bg-light-primary rounded-3">
+            <div class="card-body p-2 d-flex align-items-center justify-content-between">
+                
+                <div class="d-flex align-items-center gap-3">
+                    <div class="info-icon bg-white text-primary rounded-circle shadow-sm">
+                        <i class='bx bx-badge-check fs-4'></i>
+                    </div>
+                    <div>
+                        <h6 class="m-0 fw-bold text-dark" style="font-size: 0.9rem;">{{ selectedExam.title }}</h6>
+                        <div class="d-flex gap-3 mt-1">
+                            <span class="badge bg-white text-muted border fw-normal">
+                                <i class='bx bx-list-ul'></i> {{ selectedExam.topicCount || 0 }} Konu
+                            </span>
+                            <span class="badge bg-white text-muted border fw-normal">
+                                <i class='bx bx-help-circle'></i> {{ selectedExam.questionCount || 0 }} Soru
+                            </span>
+                            <span class="badge" 
+                                  [ngClass]="selectedExam.status === 'Yayında' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'">
+                                {{ selectedExam.status }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-sm btn-link text-decoration-none text-muted p-0" 
+                        (click)="openPreview()" 
+                        title="Detay">
+                    <i class='bx bx-chevron-right fs-4'></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-text mt-1 d-flex justify-content-between px-1">
+        <span class="text-muted small fst-italic" *ngIf="!selectedExam">
+            Sınavı eğitim içeriğine bağlamak için listeden seçiniz.
+        </span>
+        <span *ngIf="isLoading" class="text-primary small">
+            <i class='bx bx-loader-alt bx-spin'></i> Liste güncelleniyor...
+        </span>
+    </div>
+</div>
