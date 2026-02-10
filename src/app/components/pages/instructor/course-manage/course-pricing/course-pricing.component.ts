@@ -1,93 +1,179 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MessageService } from 'primeng/api';
+import { ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { Subject, takeUntil } from 'rxjs'; // 🔥 Memory Leak önlemi
+import { Store } from '@ngrx/store'; // 🔥 Store Eklendi
+
 import { TrainingApiService } from 'src/app/shared/api/training-api.service';
+import { PriceCampaignApiService } from 'src/app/shared/api/price-campaign-api.service';
+// Store Importları (Projenin yapısına göre)
+import { loadCourse } from 'src/app/shared/store/course.actions';
+import { selectSelectedCourse } from 'src/app/shared/store/course.reducer';
 
 @Component({
   selector: 'app-course-pricing',
   templateUrl: './course-pricing.component.html',
-  styleUrls: ['./course-pricing.component.scss'],
-  providers: [MessageService]
+  styleUrls: ['./course-pricing.component.scss']
 })
-export class CoursePricingComponent implements OnInit, OnChanges {
+export class CoursePricingComponent implements OnInit, OnDestroy {
 
   @Input() course: any | null = null;
+  
+  courseId!: number;
   form!: FormGroup;
   isSaving: boolean = false;
+  isLoadingTiers: boolean = false;
+  
+  private destroy$ = new Subject<void>(); // 🔥 Abonelikleri temizlemek için
 
-  // Statik veriler (Daha sonra API'den çekilebilir)
-  priceTiers = [
-    { id: 1, title: 'Ücretsiz', amount: 0 },
-    { id: 2, title: 'Tier 1 (₺249.99)', amount: 249.99 },
-    { id: 3, title: 'Tier 2 (₺499.99)', amount: 499.99 },
-    { id: 4, title: 'Tier 3 (₺799.99)', amount: 799.99 },
-  ];
+  priceTiers: any[] = [];
+  activeCampaigns: any[] = [];
 
   constructor(
     private fb: FormBuilder,
+    private route: ActivatedRoute,
     private trainingApi: TrainingApiService,
-    private messageService: MessageService
+    private priceCampaignApi: PriceCampaignApiService,
+    private toastr: ToastrService,
+    private store: Store // 🔥 Store Inject Edildi
   ) { }
 
   ngOnInit(): void {
     this.initForm();
-    if (this.course) this.updateFormValues();
+    this.loadData(); // Tier ve Kampanya listelerini çek
+
+    // 1. URL'den ID'yi Yakala
+    this.route.parent?.params.subscribe(params => {
+        if (params['id']) {
+            this.courseId = Number(params['id']);
+        }
+    });
+
+    // 2. STORE'DAN VERİYİ DİNLE (En Güncel Veri Buradadır)
+    this.store.select(selectSelectedCourse)
+      .pipe(takeUntil(this.destroy$)) // Component kapanınca dinlemeyi bırak
+      .subscribe(courseData => {
+        if (courseData) {
+          console.log("📥 Store'dan Güncel Veri Geldi:", courseData);
+          this.course = courseData; // Local değişkeni güncelle
+          
+          if (!this.courseId && courseData.id) {
+             this.courseId = courseData.id;
+          }
+          
+          this.updateFormValues(); // Formu doldur
+        }
+      });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['course'] && changes['course'].currentValue) {
-      this.updateFormValues();
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   initForm() {
     this.form = this.fb.group({
       priceTierId: [null, [Validators.required]],
-      discountRate: [0], // İndirim oranı opsiyonel
-      includedInSubscription: [true] // Aboneliğe dahil mi?
+      includedInSubscription: [true]
+    });
+  }
+
+  loadData() {
+    this.isLoadingTiers = true;
+
+    // Fiyat Kademelerini Getir
+    this.priceCampaignApi.getAllPriceTiers(true).subscribe({
+      next: (res: any) => {
+        if (res.header?.result) {
+          const rawData = res.body || []; 
+          this.priceTiers = rawData.map((tier: any) => {
+            const baseDetail = tier.details?.find((d: any) => d.minLicenceCount <= 1);
+            const priceLabel = baseDetail ? `${baseDetail.amount} ${tier.currency}` : 'Fiyat Belirlenmedi';
+            return {
+              ...tier,
+              displayLabel: `${tier.title} - ${priceLabel}`,
+              baseAmount: baseDetail ? baseDetail.amount : 0,
+              sortedDetails: (tier.details || []).sort((a: any, b: any) => a.minLicenceCount - b.minLicenceCount)
+            };
+          });
+          
+          // 🔥 Tier listesi yüklendiğinde, eğer formda bir değer varsa (Store'dan gelen),
+          // dropdown'ın doğru görünmesi için tetikleyebiliriz.
+          this.updateFormValues(); 
+        }
+        this.isLoadingTiers = false;
+      },
+      error: () => {
+        this.toastr.error('Fiyat listesi yüklenirken hata oluştu.');
+        this.isLoadingTiers = false;
+      }
+    });
+
+    // Kampanyaları Getir
+    this.priceCampaignApi.getAvailableCampaigns().subscribe({
+      next: (res: any) => {
+        if (res.header?.result) {
+          this.activeCampaigns = res.body || [];
+        }
+      }
     });
   }
 
   updateFormValues() {
-    if (!this.course) return;
+    // Hem course verisi hem de form hazır olmalı
+    if (!this.course || !this.form) return;
 
     this.form.patchValue({
       priceTierId: this.course.priceTierId || null,
-      discountRate: this.course.discountRate || 0,
       includedInSubscription: this.course.includedInSubscription ?? true
-    });
+    }, { emitEvent: false }); // Sonsuz döngüye girmesin diye event yaymayı durdur
+  }
+
+  get selectedTierInfo() {
+    const selectedId = Number(this.form.get('priceTierId')?.value);
+    return this.priceTiers.find(t => t.id === selectedId);
   }
 
   savePricingTier() {
     if (this.form.invalid) {
-      this.messageService.add({ severity: 'warn', summary: 'Uyarı', detail: 'Lütfen bir fiyat kademesi seçiniz.' });
+      this.toastr.warning('Lütfen bir fiyat kademesi seçiniz.', 'Eksik Bilgi');
+      this.form.markAllAsTouched();
       return;
     }
 
-    if (!this.course?.id) return;
+    if (!this.courseId) {
+        this.toastr.error('Eğitim ID bulunamadı. Sayfayı yenileyiniz.', 'Hata');
+        return;
+    }
 
     this.isSaving = true;
 
-    // Backend: UpdateCoursePricingDto yapısı
     const dto = {
-      id: this.course.id,
-      priceTierId: Number(this.form.value.priceTierId),
-      discountRate: this.form.value.discountRate,
-      includedInSubscription: this.form.value.includedInSubscription,
-      amount: null // Tier seçildiği için amount'u backend tier'dan alacak
+      Id: this.courseId,
+      PriceTierId: Number(this.form.value.priceTierId),
+      Amount: null, 
+      DiscountRate: null, 
+      IncludedInSubscription: this.form.value.includedInSubscription
     };
 
     this.trainingApi.updateCoursePricing(dto).subscribe({
       next: (res) => {
-        if (res.result) {
-          this.messageService.add({ severity: 'success', summary: 'Başarılı', detail: 'Fiyatlandırma güncellendi.' });
+        if (res.header ? res.header.result : res.result) {
+          this.toastr.success('Fiyatlandırma bilgileri güncellendi.', 'Başarılı');
+          
+          // 🔥 KRİTİK NOKTA: İşlem başarılı olunca Store'u güncelle!
+          // Backend'den en güncel veriyi çekip tüm uygulamaya yayıyoruz.
+          this.store.dispatch(loadCourse({ courseId: this.courseId })); 
+          
         } else {
-          this.messageService.add({ severity: 'error', summary: 'Hata', detail: res.message });
+          this.toastr.error(res.header?.msg || res.message || 'İşlem başarısız.', 'Hata');
         }
         this.isSaving = false;
       },
       error: (err) => {
-        this.messageService.add({ severity: 'error', summary: 'Hata', detail: 'Sunucu hatası oluştu.' });
+        console.error("API Hatası:", err);
+        this.toastr.error('Sunucu hatası oluştu.', 'Hata');
         this.isSaving = false;
       }
     });

@@ -1,9 +1,8 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output, Optional } from '@angular/core'; // Optional eklendi
 import { ToastrService } from 'ngx-toastr';
 import { ContentLibraryApiService } from 'src/app/shared/api/content-library-api.service';
 import { GlobalUploadService } from 'src/app/shared/services/global-upload.service';
-import { DialogService } from 'primeng/dynamicdialog';
-// ContentPreviewModalComponent yolunu kontrol et (senin projendeki path)
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog'; // DynamicDialogRef eklendi
 import { ContentPreviewModalComponent } from 'src/app/components/common/modals/content-preview-modal/content-preview-modal.component';
 
 @Component({
@@ -14,32 +13,31 @@ import { ContentPreviewModalComponent } from 'src/app/components/common/modals/c
 })
 export class ContentLibrarySelectorComponent implements OnInit {
 
+  // ... (Değişkenler aynı kalsın) ...
   @Input() fileType: 'all' | 'image' | 'video' | 'document' = 'all';
-  @Input() returnType: 'id' | 'path' = 'id';
+  @Input() returnType: 'id' | 'path' | 'object' = 'id'; // 'object' seçeneği eklendi (tüm nesneyi dönmek isteyebiliriz)
   @Output() onSelect = new EventEmitter<any>();
   @Output() onCancel = new EventEmitter<void>();
 
+  // ... (Diğer değişkenler aynı) ...
   allContents: any[] = [];
   filteredContents: any[] = [];
   paginatedContents: any[] = [];
-
   selectedItem: any = null;
   isLoading = false;
   searchText: string = '';
-
   currentPage: number = 1;
   pageSize: number = 11;
   totalItems: number = 0;
   totalPages: number = 1;
-
-  // 🔥 YENİ: Menü kontrolü
   activeMenuId: number | null = null;
 
   constructor(
     private contentLibraryApi: ContentLibraryApiService,
     private toastr: ToastrService,
     private globalUploadService: GlobalUploadService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    @Optional() public ref: DynamicDialogRef // 🔥 EKLENDİ: Dialog kontrolü için
   ) { }
 
   ngOnInit(): void {
@@ -49,6 +47,7 @@ export class ContentLibrarySelectorComponent implements OnInit {
     });
   }
 
+  // ... (loadContents, applyFilters, pagination vb. aynı kalsın) ...
   loadContents() {
     this.isLoading = true;
     this.contentLibraryApi.getList().subscribe({
@@ -80,16 +79,11 @@ export class ContentLibrarySelectorComponent implements OnInit {
     if (this.fileType !== 'all') {
       temp = temp.filter(item => {
         const ext = this.getExtension(item.filePath);
-        
         if (this.fileType === 'image') return ['.jpg', '.jpeg', '.png', '.gif', '.webp'].includes(ext);
-        
-        // 🔥 GÜNCELLENDİ: Video filtresine Youtube'u da dahil ettik
         if (this.fileType === 'video') {
             return ['.mp4', '.mov', '.avi', '.mkv', '.webm'].includes(ext) || this.isYoutube(item.filePath);
         }
-        
         if (this.fileType === 'document') return ['.pdf', '.doc', '.docx', '.xls', '.xlsx'].includes(ext);
-        
         return true;
       });
     }
@@ -104,10 +98,8 @@ export class ContentLibrarySelectorComponent implements OnInit {
 
     this.filteredContents = temp;
     this.totalItems = this.filteredContents.length;
-    
     this.totalPages = Math.ceil(this.totalItems / this.pageSize);
     if (this.totalPages < 1) this.totalPages = 1;
-
     this.updatePagination();
   }
 
@@ -142,21 +134,43 @@ export class ContentLibrarySelectorComponent implements OnInit {
     this.selectedItem = item;
   }
 
+  // 🔥 GÜNCELLENEN METOD: Hem Event Emit hem Dialog Close
   confirmSelection() {
     if (this.selectedItem) {
-      const valueToEmit = this.returnType === 'path' ? this.selectedItem.filePath : this.selectedItem.id;
+      let valueToEmit: any;
+
+      if (this.returnType === 'path') {
+          valueToEmit = this.selectedItem.filePath;
+      } else if (this.returnType === 'object') {
+          valueToEmit = this.selectedItem; // Tüm objeyi dön
+      } else {
+          valueToEmit = this.selectedItem.id; // Varsayılan ID
+      }
+
+      // 1. Output ile dışarı ver (Template kullanımı için)
       this.onSelect.emit(valueToEmit);
+
+      // 2. Dialog ile açılmışsa dialogu kapat ve veriyi dön (DynamicDialog kullanımı için)
+      if (this.ref) {
+          // CourseSectionComponent tüm objeyi bekliyor olabilir, garanti olsun diye
+          // eğer returnType 'object' değilse bile dialog'da genellikle obje dönmek daha güvenlidir.
+          // Ama senin CourseSection kodunda `selectedContent.id` ve `selectedContent.title` kullanılıyor.
+          // Bu yüzden burada tüm objeyi (selectedItem) dönmek zorundayız.
+          this.ref.close(this.selectedItem); 
+      }
     }
   }
 
   cancel() {
     this.onCancel.emit();
+    if (this.ref) {
+        this.ref.close(null);
+    }
   }
 
-  // --- MENÜ İŞLEMLERİ (YENİ) ---
-
+  // ... (Menü işlemleri aynı kalsın) ...
   toggleMenu(event: Event, itemId: number) {
-    event.stopPropagation(); // Kart seçilmesini engelle
+    event.stopPropagation();
     if (this.activeMenuId === itemId) {
       this.activeMenuId = null;
     } else {
@@ -164,7 +178,6 @@ export class ContentLibrarySelectorComponent implements OnInit {
     }
   }
 
-  // Ekrana boş tıklayınca menüyü kapat
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     this.activeMenuId = null;
@@ -173,8 +186,6 @@ export class ContentLibrarySelectorComponent implements OnInit {
   onPreviewClick(event: Event, item: any) {
     event.stopPropagation();
     this.activeMenuId = null;
-    
-    // Preview Modalını Aç
     this.dialogService.open(ContentPreviewModalComponent, {
         header: 'İçerik Önizleme',
         width: '90%',

@@ -1,38 +1,121 @@
-<div class="course-pricing-wrapper card border-0 card h-100" [formGroup]="form">
-    <h3 class="py-4 px-5 mb-0 fw-bold border-bottom">Fiyatlandırma</h3>
+<div class="course-pricing-wrapper card border-0 h-100 shadow-sm" [formGroup]="form">
+    
+    <div class="card-header bg-white border-bottom py-3 px-4">
+        <h6 class="fw-bold text-dark m-0 d-flex align-items-center gap-2">
+            <i class='bx bx-purchase-tag-alt text-primary'></i> Fiyatlandırma ve Gelir Modeli
+        </h6>
+    </div>
 
-    <div class="card-body p-5">
+    <div class="card-body p-4">
         
-        <div class="mb-4">
-            <h5 class="fw-bold text-dark">Eğitim Fiyatı</h5>
-            <p class="text-muted">Öğrencilerin bu eğitime erişmek için ödeyeceği tutarı belirleyin.</p>
-        </div>
-
-        <div class="row">
-            <div class="col-md-8">
+        <div class="row g-4">
+            <div class="col-lg-8 border-end-lg">
+                
                 <div class="mb-4">
-                    <label class="form-label fw-medium">Fiyat Kademesi (Tier)</label>
-                    <select class="form-select form-select-lg" formControlName="priceTierId">
-                        <option [ngValue]="null" disabled>Kademe Seçiniz</option>
-                        <option *ngFor="let tier of priceTiers" [value]="tier.id">
-                            {{ tier.title }}
-                        </option>
-                    </select>
+                    <label class="form-label fw-bold text-dark small mb-1">Fiyat Kademesi (Tier)</label>
+                    <div class="input-group input-group-sm">
+                        <select class="form-select" formControlName="priceTierId">
+                            <option [ngValue]="null" disabled>Lütfen bir kademe seçiniz...</option>
+                            <option *ngFor="let tier of priceTiers" [ngValue]="tier.id">
+                                {{ tier.displayLabel }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-text tiny-text text-muted">Eğitiminizin baz fiyatını belirleyen kategoriyi seçiniz.</div>
                 </div>
 
-                <div class="form-check form-switch mb-4">
-                    <input class="form-check-input" type="checkbox" id="subFlex" formControlName="includedInSubscription">
-                    <label class="form-check-label" for="subFlex">
-                        Bu eğitim <strong>Premium Abonelik</strong> paketlerine dahil edilsin.
+                <div *ngIf="selectedTierInfo" class="mb-4 animate-fade-in">
+                    <div class="p-3 bg-light-subtle rounded border">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <strong class="text-dark small">{{ selectedTierInfo.title }} Detayları</strong>
+                            <span class="badge bg-white text-dark border">{{ selectedTierInfo.currency }}</span>
+                        </div>
+                        
+                        <div class="table-responsive bg-white border rounded">
+                            <table class="table table-sm table-borderless mb-0 tiny-text">
+                                <thead class="bg-light border-bottom">
+                                    <tr>
+                                        <th class="ps-3 py-2 text-muted fw-normal">Lisans Adedi</th>
+                                        <th class="pe-3 py-2 text-end text-muted fw-normal">Birim Fiyat</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let detail of selectedTierInfo.sortedDetails" class="border-bottom-dashed">
+                                        <td class="ps-3 py-2 text-dark">
+                                            <i class='bx bx-user text-muted me-1'></i>
+                                            {{ detail.minLicenceCount }} 
+                                            <span *ngIf="detail.maxLicenceCount < 9999">- {{ detail.maxLicenceCount }}</span>
+                                            <span *ngIf="detail.maxLicenceCount >= 9999">+</span>
+                                            Kişi
+                                        </td>
+                                        <td class="pe-3 py-2 text-end fw-bold text-primary">
+                                            {{ detail.amount | number:'1.2-2' }} {{ selectedTierInfo.currency }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-2 text-muted fst-italic tiny-text">
+                            <i class='bx bx-info-circle'></i> Kurumsal (B2B) satışlarda adet arttıkça birim fiyat yukarıdaki tabloya göre güncellenir.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <div class="form-check form-switch d-flex align-items-start gap-2 ps-0">
+                        <input class="form-check-input ms-0 mt-1" type="checkbox" id="subFlex" formControlName="includedInSubscription">
+                        <div>
+                            <label class="form-check-label fw-bold text-dark small cursor-pointer" for="subFlex">
+                                Premium Aboneliğe Dahil Et
+                            </label>
+                            <p class="text-muted tiny-text m-0">
+                                İşaretlenirse, eğitiminiz abonelik havuzuna eklenir ve izlenme dakikası üzerinden gelir elde edersiniz.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-3 mt-4 pt-3 border-top">
+                    <button class="btn btn-dark btn-sm px-4 d-flex align-items-center gap-2" 
+                            (click)="savePricingTier()" 
+                            [disabled]="isSaving || form.invalid">
+                        <span *ngIf="isSaving" class="spinner-border spinner-border-sm" style="width: 0.8rem; height: 0.8rem;"></span>
+                        <i *ngIf="!isSaving" class='bx bx-save'></i>
+                        Değişiklikleri Kaydet
+                    </button>
+                    <span *ngIf="isSaving" class="text-muted tiny-text animate-pulse">İşleminiz yapılıyor...</span>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                
+                <div class="info-box mb-4 p-3 rounded bg-blue-subtle border-blue">
+                    <h6 class="fw-bold text-blue small mb-2 d-flex align-items-center gap-1">
+                        <i class='bx bx-bulb'></i> Bilgilendirme
+                    </h6>
+                    <p class="tiny-text text-dark m-0 opacity-75">
+                        Platform standartlarını korumak amacıyla serbest fiyat girişi kapatılmıştır. İçeriğinizin kalitesine ve kapsamına en uygun "Tier" seviyesini seçerek gelir modelinizi oluşturabilirsiniz.
+                    </p>
+                </div>
+
+                <div *ngIf="activeCampaigns.length > 0">
+                    <label class="fw-bold text-dark small mb-2 d-flex align-items-center gap-1">
+                        <i class='bx bx-gift text-warning'></i> Mevcut Fırsatlar
                     </label>
+                    <div class="d-flex flex-column gap-2">
+                        <div *ngFor="let camp of activeCampaigns" class="campaign-card p-2 rounded border bg-white d-flex align-items-center gap-2">
+                            <div class="badge-box bg-warning-subtle text-warning rounded p-2 d-flex align-items-center justify-content-center">
+                                <span class="fw-bold small">%{{ camp.discountValue }}</span>
+                            </div>
+                            <div class="flex-grow-1 lh-1">
+                                <div class="fw-bold text-dark small mb-1">{{ camp.title }}</div>
+                                <div class="tiny-text text-muted">{{ camp.startDate | date:'dd.MM' }} - {{ camp.endDate | date:'dd.MM.yyyy' }}</div>
+                            </div>
+                            <i class='bx bx-check-circle text-success fs-5' *ngIf="camp.isJoined" title="Katıldınız"></i>
+                        </div>
+                    </div>
                 </div>
 
-                <button class="btn btn-dark btn-lg px-5 mt-3 d-flex align-items-center gap-2" 
-                        (click)="savePricingTier()" 
-                        [disabled]="isSaving || form.invalid">
-                    <span *ngIf="isSaving" class="spinner-border spinner-border-sm"></span>
-                    Kaydet
-                </button>
             </div>
         </div>
 
