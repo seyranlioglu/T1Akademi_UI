@@ -1,0 +1,32 @@
+<div class="sidebar-container">
+    <div class="sidebar-header">
+        <h6 class="text-uppercase text-muted small fw-bold m-0">Soru Listesi</h6>
+    </div>
+
+    <div class="topics-wrapper">
+        <div *ngFor="let topic of topicMap" class="topic-group mb-3">
+            <div class="topic-title px-3 py-2 bg-light border-bottom border-top">
+                <small class="fw-bold text-dark">{{ topic.title }}</small>
+            </div>
+            
+            <div class="questions-grid p-2">
+                <button *ngFor="let q of topic.questions" 
+                        class="btn btn-question"
+                        [class.active]="q.seq === currentSeq"
+                        [class.answered]="q.isAnswered"
+                        (click)="onSelect(q.seq)">
+                    {{ q.seq }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar-footer p-3 border-top">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="indicator active"></span> <small>Şu anki</small>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="indicator answered"></span> <small>Cevaplanmış</small>
+        </div>
+    </div>
+</div>

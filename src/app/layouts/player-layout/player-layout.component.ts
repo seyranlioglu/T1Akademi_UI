@@ -24,7 +24,6 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
   isPreviewMode: boolean = false;
 
   course: GetTraining | null = null;
-  // Backend'den gelen detaylı içerik yapısı farklı olduğu için 'any' veya uygun interface kullanıyoruz
   currentContent: any | null = null; 
   
   // Yükleme Durumları
@@ -41,6 +40,10 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
   openSections: { [key: number]: boolean } = {};
   activeTab: string = 'overview';
   viewType: 'video' | 'youtube' | 'image' | 'pdf' | 'exam' | 'unknown' = 'unknown';
+
+  // 🔥 SINAV MODAL KONTROLÜ
+  isExamRunnerVisible: boolean = false;
+  activeExamId: number = 0;
 
   // PDF Modalı
   isPdfModalOpen: boolean = false;
@@ -156,13 +159,16 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
           this.toastr.warning('Önceki dersleri tamamlamalısınız.', 'Kilitli İçerik');
           return;
       }
-      if (this.currentContent?.id === content.id) return;
+      
+      // Eğer tıklanan içerik zaten açıksa ve sınav değilse işlem yapma
+      // (Sınav ise her tıklamada açmak isteyebiliriz, belki kapattı yanlışlıkla)
+      if (this.currentContent?.id === content.id && this.viewType !== 'exam') return;
 
       this.loadAndPlayContent(content.id, 'Manual');
   }
 
   // ===========================================================================
-  // 🔥 OYNATMA MOTORU (GÜNCELLENDİ)
+  // 🔥 OYNATMA MOTORU
   // ===========================================================================
   loadAndPlayContent(targetId?: number, triggerType: string = 'Manual') {
       
@@ -173,6 +179,7 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
 
       this.isContentLoading = true;
       this.pdfSrc = null; 
+      this.isExamRunnerVisible = false; // Sınav modalını kapat (eğer açıksa)
 
       const payload = {
           trainingId: this.courseId,
@@ -194,16 +201,19 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
                   return;
               }
 
-              // Gelen data yapısı: { header: {...}, body: { content: {...} } } olabilir
-              // veya direkt content objesi olabilir. Backend'den dönen JSON'a göre:
-              // "body": { "content": { ... } }
               const playableContent = res.body?.content || res.data?.content || res.content || res;
 
               if (playableContent) {
                   this.currentContent = playableContent;
                   this.updateSidebarActiveState(playableContent.id);
-                  this.detectViewType();
-                  this.setupPlayerAfterFetch();
+                  this.detectViewType(); // Türü belirle (Video, PDF, Sınav)
+                  
+                  // 🔥 SINAV KONTROLÜ
+                  if (this.viewType === 'exam') {
+                      this.startExamSession(playableContent);
+                  } else {
+                      this.setupPlayerAfterFetch();
+                  }
               }
           },
           error: (err: any) => {
@@ -231,6 +241,39 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
           this.startHeartbeat();
       }
   }
+
+  // ===========================================================================
+  // 🔥 SINAV İŞLEMLERİ
+  // ===========================================================================
+  startExamSession(content: any) {
+      // Content'in içinde examId olmalı. Backend DTO'sunda "examId" alanı var mı kontrol et.
+      if (content.examId) {
+          this.activeExamId = content.examId;
+          this.isExamRunnerVisible = true;
+          // Sınav başladığında loglama yapabiliriz ("Started")
+          this.logProgress('StartExam'); 
+      } else {
+          this.toastr.error("Sınav verisi eksik.");
+      }
+  }
+
+    onExamClosed(event: any) {
+        const isFinished = event as boolean; // Tip güvenliği için cast edelim
+        
+        this.isExamRunnerVisible = false;
+        this.activeExamId = 0;
+
+        if (isFinished) {
+            this.logProgress('Complete');
+            if (this.currentContent) { // Null check
+                this.updateSidebarStatus(this.currentContent.id, true);
+            }
+            this.toastr.success('Sınav tamamlandı. Sonraki derse geçiliyor...');
+            setTimeout(() => this.loadAndPlayContent(undefined, 'AutoNext'), 1500);
+        } else {
+            this.toastr.info("Sınavdan çıkıldı.");
+        }
+    }
 
   // ===========================================================================
   // 3. LOGLAMA
@@ -335,7 +378,6 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
   // ===========================================================================
   
   getFileUrl(): string {
-    // JSON'da filePath root seviyesinde dönüyor.
     return this.currentContent?.filePath || 
            this.currentContent?.trainingContentLibraryDto?.trainingContentLibraryFilePath || 
            '';
@@ -344,16 +386,19 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
   detectViewType() {
     if (!this.currentContent) { this.viewType = 'unknown'; return; }
     
-    const url = this.getFileUrl().toLowerCase();
-    
-    // ContentType nesne mi string mi? (Backend 'lecture' dönmüş)
-    let typeTitle = '';
-    if (typeof this.currentContent.contentType === 'string') {
-        typeTitle = this.currentContent.contentType.toLowerCase();
-    } else if (this.currentContent.contentType?.title) {
-        typeTitle = this.currentContent.contentType.title.toLowerCase();
+    // 🔥 SINAV TESPİTİ
+    // Backend 'contentType.code' = 'exm' veya title='exam' dönebilir.
+    // Önceki kodlarında 'exm' kullanmıştık.
+    const typeCode = this.currentContent.contentType?.code?.toLowerCase() || '';
+    const typeTitle = this.currentContent.contentType?.title?.toLowerCase() || '';
+
+    if (typeCode === 'exm' || typeTitle === 'exam' || this.currentContent.examId) {
+        this.viewType = 'exam';
+        return;
     }
 
+    const url = this.getFileUrl().toLowerCase();
+    
     // 1. YouTube
     if (typeTitle === 'youtube' || url.includes('youtube.com') || url.includes('youtu.be')) {
         this.viewType = 'youtube';
@@ -362,7 +407,7 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
     else if (url.endsWith('.pdf') || typeTitle === 'document') {
         this.viewType = 'pdf';
     }
-    // 3. Video (Lecture, Video veya uzantı)
+    // 3. Video
     else if (typeTitle === 'lecture' || typeTitle === 'video' || url.match(/\.(mp4|webm|ogg|mov)$/)) {
         this.viewType = 'video';
     }
@@ -371,7 +416,6 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
         this.viewType = 'image';
     }
     else {
-        // Son çare: uzantı kontrolü
         if (url.includes('.mp4')) this.viewType = 'video';
         else this.viewType = 'unknown';
     }
@@ -398,18 +442,15 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
   }
 
   updateSidebarActiveState(activeId: number) {
-      // currentContent.id HTML binding'i ile hallediliyor
+      // UI Binding kullanıyor
   }
 
   getDuration(content: any): string { return content.time || ''; }
   getIconClass(content: any): string {
-      // Sidebar listesindeki content (TrainingContentDto) ile oynatılan content (GetContentForPlayerDto)
-      // farklı yapıdalar. Sidebar için ContentTypeDto.Title kontrolü yapalım.
-      let type = '';
-      if(content.contentType && content.contentType.title) {
-          type = content.contentType.title.toLowerCase();
-      }
+      let type = content.contentType?.title?.toLowerCase() || '';
       
+      // İkonlar
+      if (type === 'exam' || content.contentType?.code === 'exm') return 'bx-task text-warning'; // Sınav ikonu
       if(type==='video' || type==='lecture') return 'bx-video';
       if(type==='youtube') return 'bx-play-circle';
       if(type.includes('pdf') || type.includes('doc')) return 'bxs-file-pdf';
@@ -421,12 +462,10 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
     
     let foundCurrent = false;
     
-    // Tüm section ve contentleri sırayla gez
     for (const section of this.course.trainingSections) {
         if (!section.trainingContents) continue;
         for (const content of section.trainingContents) {
             if (foundCurrent) {
-                // Eğer mevcut içeriği bulduysak, bu içerik bir sonrakidir!
                 return content.title;
             }
             if (content.id === this.currentContent.id) {
@@ -434,37 +473,22 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
             }
         }
     }
-    return null; // Son dersse null döner
-}
+    return null; 
+  }
   
   toggleSidebar() { this.isSidebarOpen = !this.isSidebarOpen; }
   toggleSection(id: number | undefined) { if(id !== undefined) this.openSections[id] = !this.openSections[id]; }
   setActiveTab(tab: string) { this.activeTab = tab; }
-formatTotalDuration(totalMinutes: any): string {
-    // Eğer değer yoksa veya 0 ve daha küçükse 0 dk dön
+  formatTotalDuration(totalMinutes: any): string {
     if (!totalMinutes || totalMinutes <= 0) return '0 dk';
-
-    // 🔥 DEĞİŞİKLİK BURADA: Math.floor yerine Math.ceil kullandık.
-    // Bu sayede 1.1 dakika bile olsa 2 dakikaya yuvarlar.
     const minutes = Math.ceil(totalMinutes);
-    
-    // Saat hesaplarken tam sayı bölmesi yapmalıyız, o yüzden burası floor kalmalı
     const hours = Math.floor(minutes / 60);
-    
-    // Kalan dakikayı mod alarak buluyoruz
     const remainingMinutes = minutes % 60;
 
-    if (hours === 0) {
-        // 1 saatten azsa sadece dakika
-        return `${minutes} dk`;
-    } else if (remainingMinutes === 0) {
-        // Tam saatsa sadece saat (Örn: 60 dk -> 1 saat)
-        return `${hours} saat`;
-    } else {
-        // Hem saat hem dakika (Örn: 65 dk -> 1 saat 5 dk)
-        return `${hours} saat ${remainingMinutes} dk`;
-    }
-}
+    if (hours === 0) return `${minutes} dk`;
+    else if (remainingMinutes === 0) return `${hours} saat`;
+    else return `${hours} saat ${remainingMinutes} dk`;
+  }
 
   // PDF Helpers
   openPdfModal() { this.isPdfModalOpen = true; this.setupTimer(10); this.startTimer(); }

@@ -29,7 +29,7 @@
 
             <div class="player-main flex-grow-1 d-flex flex-column">
                 
-                <div class="viewer-container" [ngClass]="{'auto-height': viewType === 'pdf' || viewType === 'image'}">
+                <div class="viewer-container" [ngClass]="{'auto-height': viewType === 'pdf' || viewType === 'image' || viewType === 'exam'}">
                     
                     <div *ngIf="isContentLoading" class="text-white text-center">
                         <div class="spinner-border text-light mb-3" style="width: 3rem; height: 3rem;"></div>
@@ -37,14 +37,17 @@
                     </div>
 
                     <ng-container *ngIf="!isContentLoading && currentContent; else noContent">
+                        
                         <div *ngIf="viewType === 'youtube'" class="w-100 h-100">
                             <iframe [src]="getYoutubeEmbedUrl(currentContent)" class="w-100 h-100 border-0" allowfullscreen></iframe>
                         </div>
+                        
                         <div *ngIf="viewType === 'video'" class="w-100 h-100">
                             <video #videoPlayer [src]="getFileUrl()" controls controlsList="nodownload" class="w-100 h-100" autoplay
                                    (loadedmetadata)="onVideoLoadedMetadata()" (play)="onVideoPlay()" (pause)="onVideoPause()" (ended)="onVideoEnded()" (seeked)="onVideoSeeked()">
                             </video>
                         </div>
+                        
                         <div *ngIf="viewType === 'pdf'" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-4">
                             <div class="pdf-card text-center p-5 bg-white rounded-4 shadow-lg border-0">
                                 <div class="pdf-icon-box mb-4 mx-auto shadow-sm"><i class='bx bxs-file-pdf text-danger'></i></div>
@@ -52,9 +55,19 @@
                                 <button class="btn btn-danger btn-lg rounded-pill px-5 shadow" (click)="openPdfModal()">Tam Ekran Oku</button>
                             </div>
                         </div>
+                        
                         <div *ngIf="viewType === 'image'" class="w-100 h-100 d-flex align-items-center justify-content-center bg-dark">
                             <img [src]="getFileUrl()" style="max-height: 100%; max-width: 100%; object-fit: contain;">
                         </div>
+
+                        <div *ngIf="viewType === 'exam'" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 bg-white">
+                            <div class="text-center">
+                                <i class='bx bx-task display-1 text-primary mb-3'></i>
+                                <h3>Sınav Yükleniyor...</h3>
+                                <p class="text-muted">Lütfen bekleyiniz, sınav ekranı hazırlanıyor.</p>
+                            </div>
+                        </div>
+
                     </ng-container>
 
                     <ng-template #noContent>
@@ -62,7 +75,7 @@
                     </ng-template>
 
                     <div class="next-lesson-overlay" 
-                         *ngIf="currentContent && !isContentLoading && getNextLessonTitle()"
+                         *ngIf="currentContent && !isContentLoading && getNextLessonTitle() && viewType !== 'exam'"
                          (click)="loadAndPlayContent(undefined, 'AutoNext')">
                         <div class="next-label-container">
                             <span class="next-sub">Sonraki Ders</span>
@@ -88,144 +101,12 @@
                     </div>
 
                     <div class="tab-content p-4">
-                        
                         <div *ngIf="activeTab === 'overview'" class="fade-in udemy-layout">
-                            
                             <h2 class="fw-bold text-dark mb-2">{{ course.title }}</h2>
                             <p class="lead fs-6 mb-4 text-dark">{{ course.subTitle }}</p>
-
-                            <div class="d-flex flex-wrap gap-5 mb-4 align-items-start small-stats">
-                                <div>
-                                    <div class="stat-big d-flex align-items-center gap-1">
-                                        {{ course.rating || '0.0' }} <i class='bx bxs-star text-warning'></i>
-                                    </div>
-                                    <div class="stat-sub text-decoration-underline">{{ course.reviewCount || 0 }} puan</div>
-                                </div>
-                                <div>
-                                    <div class="stat-big">{{ course.studentCount || 0 }}</div>
-                                    <div class="stat-sub">Öğrenci</div>
-                                </div>
-                                <div>
-                                    <div class="stat-big">{{ formatTotalDuration(course.totalDurationMinutes) }}</div>
-                                    <div class="stat-sub">Toplam</div>
-                                </div>
-                            </div>
-
-                            <hr class="separator">
-
-                            <div class="mb-4">
-                                <h6 class="fw-bold mb-3">Sayıya göre</h6>
-                                <div class="row small text-secondary g-3">
-                                    <div class="col-md-4">Yetkinlik düzeyi: <span class="text-dark">Başlangıç Düzeyi</span></div>
-                                    <div class="col-md-4">Öğrenci: <span class="text-dark">{{ course.studentCount || 0 }}</span></div>
-                                    <div class="col-md-4">Dil: <span class="text-dark">Türkçe</span></div>
-                                    <div class="col-md-4">Altyazılar: <span class="text-dark">Hayır</span></div>
-                                    <div class="col-md-4">Dersler: <span class="text-dark">{{ course.totalLectureCount || 0 }}</span></div>
-                                    <div class="col-md-4">Video: <span class="text-dark">Toplam {{ formatTotalDuration(course.totalDurationMinutes) }}</span></div>
-                                </div>
-                            </div>
-
-                            <hr class="separator">
-
-                            <div class="mb-4">
-                                <h6 class="fw-bold mb-2">Sertifikalar</h6>
-                                <p class="small text-muted mb-3">Bir kursun tamamını tamamlayarak Udemy sertifikası alın</p>
-                                <button class="btn btn-outline-dark btn-sm fw-bold">Eğitim Sertifikası</button>
-                            </div>
-
-                            <hr class="separator">
-
-                            <div class="mb-4">
-                                <h6 class="fw-bold mb-2">Özellikler</h6>
-                                <p class="small text-muted">iOS ve Android uygulamalarında mevcuttur</p>
-                            </div>
-
-                            <hr class="separator">
-
-                            <div class="mb-4">
-                                <h6 class="fw-bold mb-3">Açıklama</h6>
-                                <div [innerHTML]="course.description" class="description-text"></div>
-                            </div>
-
-                            <div class="mb-4" *ngIf="course.whatYouWillLearns?.length">
-                                <h6 class="fw-bold mb-3">Öğrenecekleriniz</h6>
-                                <ul class="list-unstyled ps-0">
-                                    <li *ngFor="let item of course.whatYouWillLearns" class="d-flex gap-2 mb-2 align-items-start">
-                                        <i class='bx bx-check text-secondary fs-5'></i>
-                                        <span class="small text-secondary">{{ item.value }}</span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="mb-4" *ngIf="course.requirements?.length">
-                                <h6 class="fw-bold mb-3">Kurs gereksinimleri veya ön koşulları var mı?</h6>
-                                <ul class="list-unstyled ps-0">
-                                    <li *ngFor="let req of course.requirements" class="d-flex gap-2 mb-2 align-items-center">
-                                        <i class='bx bxs-circle tiny-bullet'></i>
-                                        <span class="small text-secondary">{{ req.value }}</span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="mb-4" *ngIf="course.targetAudiences?.length">
-                                <h6 class="fw-bold mb-3">Bu kurs kimler için uygun:</h6>
-                                <ul class="list-unstyled ps-0">
-                                    <li *ngFor="let aud of course.targetAudiences" class="d-flex gap-2 mb-2 align-items-center">
-                                        <i class='bx bxs-circle tiny-bullet'></i>
-                                        <span class="small text-secondary">{{ aud.value }}</span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <hr class="separator">
-
-                            <div class="mb-4">
-                                <h6 class="fw-bold mb-3">Eğitmen</h6>
-                                <div class="d-flex gap-3 align-items-center mb-3">
-                                    <img [src]="course.instructorPicturePath || 'assets/images/defaults/defaultuser.png'" 
-                                         class="rounded-circle border" width="64" height="64" style="object-fit: cover;">
-                                    <div>
-                                        <div class="fw-bold text-primary">{{ course.instructorName }}</div>
-                                        <div class="small text-muted">{{ course.instructorTitle }}</div>
-                                    </div>
-                                </div>
-                                <div class="description-text small" [innerHTML]="course.instructorDescription"></div>
-                            </div>
-
+                            <div class="description-text small" [innerHTML]="course.instructorDescription"></div>
                         </div>
-
-                        <div *ngIf="activeTab === 'qa'" class="fade-in"><div class="alert alert-light border">Soru Cevap özelliği yakında eklenecek.</div></div>
-                        <div *ngIf="activeTab === 'notes'" class="fade-in"><div class="alert alert-light border">Notlar özelliği yakında eklenecek.</div></div>
-                        <div *ngIf="activeTab === 'announcements'" class="fade-in"><div class="alert alert-light border">Henüz bir duyuru yok.</div></div>
-                        <div *ngIf="activeTab === 'tools'" class="fade-in"><div class="alert alert-light border">Öğrenim araçları bulunmuyor.</div></div>
-
-                        <div *ngIf="activeTab === 'reviews'" class="fade-in">
-                            <h6 class="fw-bold mb-4">Öğrenci Geri Bildirimi</h6>
-                            <div class="review-list">
-                                <div class="review-item border-top pt-4 pb-4" *ngFor="let review of course.trainingReviews">
-                                    <div class="d-flex gap-3">
-                                        <div class="avatar-circle bg-dark text-white d-flex align-items-center justify-content-center fw-bold rounded-circle flex-shrink-0" style="width: 40px; height: 40px;">
-                                            {{ review.user?.name?.charAt(0) || 'U' }}
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold text-dark mb-1">{{ review.user?.name || 'Kullanıcı' }}</div>
-                                            <div class="d-flex align-items-center gap-2 mb-2">
-                                                <div class="d-flex text-warning small">
-                                                    <ng-container *ngFor="let star of [1,2,3,4,5]"><i class='bx' [ngClass]="star <= review.rating ? 'bxs-star' : 'bx-star'"></i></ng-container>
-                                                </div>
-                                                <span class="text-muted tiny-text">{{ review.createdDate | date:'dd MMM yyyy' }}</span>
-                                            </div>
-                                            <p class="text-secondary small mb-0">{{ review.comment }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="alert alert-light border text-center py-4" *ngIf="!course.trainingReviews?.length">
-                                    <p class="mb-0 text-muted">Bu kurs için henüz değerlendirme yapılmamış.</p>
-                                </div>
-                            </div>
                         </div>
-
-                    </div>
                 </div>
             </div>
 
@@ -292,3 +173,10 @@
         <button class="btn btn-light btn-sm" (click)="nextPdfPage()" [disabled]="currentPdfPage >= totalPdfPages">Sonraki</button>
     </div>
 </div>
+
+<app-exam-runner
+    *ngIf="isExamRunnerVisible"
+    [examId]="activeExamId"
+    [mode]="isPreviewMode ? 'preview' : 'student'"
+    (closeExam)="onExamClosed($event)">
+</app-exam-runner>

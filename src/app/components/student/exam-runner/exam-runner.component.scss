@@ -1,0 +1,102 @@
+.exam-runner-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #f5f7fa;
+    z-index: 9999; /* Her şeyin üstünde */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none; /* Metin seçimi engelleme */
+}
+
+/* LOADING */
+.loading-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+/* HEADER */
+.exam-header {
+    height: 60px;
+    background: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    flex-shrink: 0;
+
+    .left-section h5 { font-weight: 600; color: #333; max-width: 300px; }
+    
+    .center-section .timer-box {
+        background: #2c3e50;
+        color: #fff;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-family: monospace;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        &.critical {
+            background: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+    }
+}
+
+/* BODY LAYOUT */
+.exam-body {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.exam-sidebar {
+    width: 280px;
+    background: #fff;
+    border-right: 1px solid #e0e0e0;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.exam-content {
+    flex: 1;
+    background: #f8f9fa;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Animasyon */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Placeholder (Geçici) */
+.placeholder-sidebar, .placeholder-content {
+    border: 2px dashed #ccc;
+    margin: 10px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}

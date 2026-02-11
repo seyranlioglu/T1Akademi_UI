@@ -1,0 +1,52 @@
+<div class="exam-runner-wrapper" [class.loading]="isLoading">
+    
+    <div class="loading-overlay" *ngIf="isLoading">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-3 text-white">Sınav Ortamı Hazırlanıyor...</p>
+    </div>
+
+    <div class="exam-container" *ngIf="!isLoading && examContext">
+        
+        <header class="exam-header">
+            <div class="left-section">
+                <h5 class="m-0 text-truncate">{{ examContext.title }}</h5>
+                <span class="badge bg-warning text-dark ms-2" *ngIf="mode === 'preview'">ÖNİZLEME MODU</span>
+            </div>
+
+            <div class="center-section">
+                <div class="timer-box" [class.critical]="timeLeft < 300">
+                    <i class='bx bx-time-five'></i>
+                    <span>{{ timerDisplay }}</span>
+                </div>
+            </div>
+
+            <div class="right-section">
+                <button class="btn btn-danger btn-sm d-flex align-items-center gap-2" (click)="finishExam()">
+                    <i class='bx bx-power-off'></i> Sınavı Bitir
+                </button>
+            </div>
+        </header>
+
+        <div class="exam-body">
+            
+            <aside class="exam-sidebar">
+                <app-exam-sidebar 
+                    [examData]="examContext" 
+                    [currentSeq]="currentQuestionSeq" 
+                    (selectQuestion)="onQuestionChanged($event)">
+                </app-exam-sidebar>
+            </aside>
+
+            <main class="exam-content">
+                <app-exam-question 
+                    [userExamId]="examContext.userExamId" 
+                    [currentSeq]="currentQuestionSeq"
+                    [mode]="mode"
+                    (next)="onQuestionChanged(currentQuestionSeq + 1)"
+                    (prev)="onQuestionChanged(currentQuestionSeq - 1)">
+                </app-exam-question>
+            </main>
+
+        </div>
+    </div>
+</div>

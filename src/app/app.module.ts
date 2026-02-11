@@ -116,6 +116,9 @@ import { CourseSettingsComponent } from './components/pages/instructor/course-ma
 import { ExamBuilderComponent } from './components/pages/instructor/course-manage/curriculum/exam-builder/exam-builder.component';
 import { ExamLibraryComponent } from './components/pages/instructor/exam-library/exam-library.component';
 import { ExamSelectorComponent } from 'src/app/components/common/exam-selector/exam-selector.component';
+import { ExamRunnerComponent } from './components/student/exam-runner/exam-runner.component'; 
+import { ExamSidebarComponent } from './components/student/exam-runner/exam-sidebar/exam-sidebar.component';
+import { ExamQuestionComponent } from './components/student/exam-runner/exam-question/exam-question.component'; 
 
 @NgModule({
     declarations: [
@@ -210,7 +213,10 @@ import { ExamSelectorComponent } from 'src/app/components/common/exam-selector/e
         CourseSettingsComponent,
         ExamBuilderComponent,
         ExamLibraryComponent,
-        ExamSelectorComponent
+        ExamSelectorComponent,
+        ExamRunnerComponent,
+        ExamSidebarComponent,  
+        ExamQuestionComponent  
     ],
     imports: [
         BrowserModule,
