@@ -3,15 +3,15 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 @Component({
   selector: 'app-exam-sidebar',
   templateUrl: './exam-sidebar.component.html',
-  styleUrls: ['./exam-sidebar.component.scss']
+  styleUrls: ['./exam-sidebar.component.scss'],
+  standalone: false
 })
 export class ExamSidebarComponent implements OnInit, OnChanges {
 
-  @Input() examData: any; // Runner'dan gelen examContext
-  @Input() currentSeq: number = 1; // Aktif soru sırası
+  @Input() examData: any; 
+  @Input() currentSeq: number = 1;
   @Output() selectQuestion = new EventEmitter<number>();
 
-  // UI İçin Hazırlanmış Liste
   topicMap: any[] = [];
 
   constructor() { }
@@ -26,31 +26,57 @@ export class ExamSidebarComponent implements OnInit, OnChanges {
     }
   }
 
-  // Backend'den detaylı soru haritası gelene kadar simülasyon yapıyoruz.
-  // Şu an elimizde TotalQuestionCount var.
   buildMap() {
     if (!this.examData) return;
 
     this.topicMap = [];
-    const total = this.examData.totalQuestionCount || 0;
-    const topicNames = this.examData.topicsNames || ['Genel'];
+    
+    // Eğer backend 'ExamTopics' listesini dönüyorsa (PrePrepare veya Preview'da)
+    if (this.examData.examTopics && this.examData.examTopics.length > 0) {
+        
+        let globalSeq = 1;
 
-    // Basit dağılım (Gerçek senaryoda backend her konuya kaç soru düştüğünü dönmeli)
-    // Şimdilik tüm soruları ilk başlığa veya tek bir listeye gömelim.
-    
-    let currentQ = 1;
-    
-    // Eğer konu isimleri varsa ama sayı dağılımı yoksa, hepsini tek başlıkta gösterelim
-    // İleride backend'den "Topic A: [1,2,3], Topic B: [4,5]" gibi veri gelirse burayı güncelleriz.
-    const questions = [];
-    for (let i = 1; i <= total; i++) {
-      questions.push({ seq: i, isAnswered: false }); // isAnswered durumunu ileride yöneteceğiz
+        this.examData.examTopics.forEach((topic: any) => {
+            const questions = [];
+            
+            // Konuya ait soru sayısı kadar döngü
+            // Eğer backend topic.questionCount dönüyorsa onu kullan, yoksa manuel dağıt
+            const count = topic.questionCount || topic.questions?.length || 0;
+
+            for (let i = 0; i < count; i++) {
+                questions.push({ 
+                    seq: globalSeq, 
+                    isAnswered: false // Başlangıçta boş, runner'dan güncelleyeceğiz
+                });
+                globalSeq++;
+            }
+
+            this.topicMap.push({
+                title: topic.title || 'Genel Konu',
+                questions: questions
+            });
+        });
+
+    } else {
+        // Fallback: Eski düz liste mantığı
+        const total = this.examData.totalQuestionCount || 0;
+        const questions = [];
+        for (let i = 1; i <= total; i++) {
+            questions.push({ seq: i, isAnswered: false });
+        }
+        this.topicMap.push({ title: 'Sınav Soruları', questions: questions });
     }
+  }
 
-    this.topicMap.push({
-      title: 'Sınav Soruları',
-      questions: questions
-    });
+  // 🔥 Parent (Runner) bu metodu çağırarak Sidebar'ı güncelleyecek
+  public setQuestionAnswered(seq: number) {
+      for (const topic of this.topicMap) {
+          const q = topic.questions.find((x: any) => x.seq === seq);
+          if (q) {
+              q.isAnswered = true;
+              break;
+          }
+      }
   }
 
   onSelect(seq: number) {

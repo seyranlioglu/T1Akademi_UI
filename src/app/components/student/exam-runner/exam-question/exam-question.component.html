@@ -1,43 +1,92 @@
-<div class="question-wrapper h-100 d-flex flex-column" *ngIf="!isLoading && questionData">
-    
-    <div class="question-card card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-            <h5 class="question-number text-primary mb-3">Soru {{ currentSeq }}</h5>
-            <div class="question-text fs-5 text-dark" [innerHTML]="questionData.questionText"></div>
-        </div>
-    </div>
+<div *ngIf="isLoading" class="h-100 d-flex align-items-center justify-content-center">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
+</div>
 
-    <div class="options-list d-flex flex-column gap-3">
-        <div *ngFor="let opt of questionData.options" 
-             class="option-item card border-0 shadow-sm cursor-pointer"
-             [class.selected]="selectedOptionId === opt.id"
-             (click)="onOptionSelect(opt.id)">
-            
-            <div class="card-body py-3 px-4 d-flex align-items-center gap-3">
-                <div class="radio-circle">
-                    <div class="inner-dot" *ngIf="selectedOptionId === opt.id"></div>
-                </div>
-                <span class="option-text text-secondary fw-medium">{{ opt.optionText }}</span>
+<div class="exam-main-wrapper d-flex flex-column h-100 bg-white" *ngIf="!isLoading && questionData">
+
+    <div class="topic-header-section px-4 py-3 border-bottom bg-light">
+        <div class="d-flex align-items-center gap-3">
+            <div class="topic-icon-box shadow-sm bg-white p-1 rounded-circle" *ngIf="topicImgPath">
+                <img [src]="topicImgPath" alt="Konu" class="rounded-circle" width="48" height="48" style="object-fit: cover;">
+            </div>
+            <div class="topic-icon-box shadow-sm bg-white p-1 rounded-circle d-flex align-items-center justify-content-center text-primary" 
+                 *ngIf="!topicImgPath" style="width: 48px; height: 48px; font-size: 1.5rem;">
+                <i class='bx bx-book-bookmark'></i>
+            </div>
+
+            <div class="d-flex flex-column">
+                <small class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">KONU BAŞLIĞI</small>
+                <h5 class="m-0 fw-bold text-dark">{{ topicTitle || 'Genel Sınav Sorusu' }}</h5>
+            </div>
+
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <span class="badge bg-primary rounded-pill px-3 py-2 fs-6 shadow-sm">
+                    Soru <span class="fw-bold">{{ currentSeq }}</span>
+                </span>
             </div>
         </div>
     </div>
 
-    <div class="mt-auto pt-4 d-flex justify-content-between">
-        <button class="btn btn-outline-secondary px-4" (click)="prev.emit()" [disabled]="currentSeq === 1">
-            <i class='bx bx-chevron-left'></i> Önceki
-        </button>
+    <div class="question-content-area flex-grow-1 overflow-auto px-4 px-md-5 py-4">
         
-        <div class="save-status text-muted tiny-text" *ngIf="isSaving">
-            <span class="spinner-border spinner-border-sm"></span> Kaydediliyor...
+        <div class="container-fluid" style="max-width: 1400px;"> <div class="question-text-block mb-5">
+                <div class="d-flex gap-3">
+                    <div class="q-indicator flex-shrink-0 text-primary fw-bold fs-4">Q.</div>
+                    <div class="question-body fs-5 text-dark lh-lg" [innerHTML]="questionData.questionText"></div>
+                </div>
+            </div>
+
+            <hr class="my-4 text-muted opacity-25">
+
+            <div class="options-block">
+                        <div class="row g-2"> <div class="col-12" *ngFor="let opt of questionData.options">
+                                
+                                <label class="option-row d-flex align-items-center p-2 rounded-3 border cursor-pointer w-100"
+                                    [class.selected-option]="selectedOptionId === opt.id"
+                                    [class.correct-preview]="mode === 'preview' && opt.isCorrect"
+                                    (click)="onOptionSelect(opt.id)">
+                                    
+                                    <div class="custom-radio-box flex-shrink-0 me-2 ms-1">
+                                        <div class="radio-outer" style="width: 18px; height: 18px;">
+                                            <div class="radio-inner" style="width: 10px; height: 10px;"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="option-text flex-grow-1 fs-6 text-secondary" style="line-height: 1.4;">
+                                        {{ opt.optionText }}
+                                    </div>
+
+                                    <i class='bx bx-check-circle text-success fs-4 ms-2' *ngIf="mode === 'preview' && opt.isCorrect"></i>
+                                </label>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <div class="exam-footer-actions px-4 py-3 border-top bg-white d-flex align-items-center justify-content-between">
+        
+        <button class="btn btn-outline-secondary px-4 py-2 d-flex align-items-center gap-2" 
+                (click)="prev.emit()" [disabled]="currentSeq === 1">
+            <i class='bx bx-left-arrow-alt fs-5'></i> <span>Önceki</span>
+        </button>
+
+        <div class="text-muted small fst-italic" *ngIf="isSaving">
+            <span class="spinner-grow spinner-grow-sm text-primary align-middle" role="status"></span> 
+            <span class="ms-1 align-middle">Cevap kaydediliyor...</span>
         </div>
 
-        <button class="btn btn-primary px-4" (click)="next.emit()">
-            Sonraki <i class='bx bx-chevron-right'></i>
-        </button>
+        <div>
+            <button *ngIf="!isLastQuestion" class="btn btn-primary px-5 py-2 fw-bold d-flex align-items-center gap-2 shadow-sm" (click)="next.emit()">
+                <span>Sonraki</span> <i class='bx bx-right-arrow-alt fs-5'></i>
+            </button>
+
+            <button *ngIf="isLastQuestion" class="btn btn-success px-5 py-2 fw-bold d-flex align-items-center gap-2 shadow" (click)="finish.emit()">
+                <span>SINAVI BİTİR</span> <i class='bx bx-check-double fs-5'></i>
+            </button>
+        </div>
+
     </div>
 
-</div>
-
-<div *ngIf="isLoading" class="h-100 d-flex align-items-center justify-content-center">
-    <div class="spinner-border text-primary"></div>
 </div>

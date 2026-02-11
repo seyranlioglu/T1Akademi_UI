@@ -301,4 +301,7 @@ getContent(payload: {
     return this.http.put<any>(`${API_TRAINING_URL}/update-course-settings`, dto);
   }
   
+  submitForReview(trainingId: number): Observable<any> {
+    return this.http.post<any>(`${API_TRAINING_URL}/SubmitForReview/${trainingId}`, {});
+  }
 }

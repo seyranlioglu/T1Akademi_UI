@@ -16,11 +16,14 @@ export class CourseManageComponent implements OnInit {
     courseId!: number;
     isLoadingCustomerPreview = false;
     isLoadingStudentPreview = false;
+    
+    // Gönderim işlemi için loading durumu
+    isSubmitting: boolean = false;
 
     constructor(
         private route: ActivatedRoute,
         public router: Router,
-        public trainingApiService: TrainingApiService, // createPreviewToken burada olmalı
+        public trainingApiService: TrainingApiService, 
         private store: Store<{ course: CourseState }>,
         private toastr: ToastrService
     ) {}
@@ -45,7 +48,7 @@ export class CourseManageComponent implements OnInit {
         });
     }
 
-    // 🔥 1. MÜŞTERİ GİBİ İZLE (Vitrin Sayfası - Token İle)
+    // 1. MÜŞTERİ GİBİ İZLE (Vitrin Sayfası - Token İle)
     previewAsCustomer() {
         if (!this.courseId) return;
 
@@ -72,7 +75,7 @@ export class CourseManageComponent implements OnInit {
         });
     }
 
-    // 🔥 2. ÖĞRENCİ GİBİ İZLE (Player - Token İle)
+    // 2. ÖĞRENCİ GİBİ İZLE (Player - Token İle)
     previewAsStudent() {
         if (!this.courseId) return;
 
@@ -95,6 +98,38 @@ export class CourseManageComponent implements OnInit {
                 console.error("Token hatası:", err);
                 this.isLoadingStudentPreview = false;
                 this.toastr.error("Önizleme başlatılamadı. Yetkiniz olmayabilir.", "Hata");
+            }
+        });
+    }
+
+    // İNCELEMEYE GÖNDER METODU
+    submitCourseForReview() {
+        if(!this.courseId) return;
+
+        // Kullanıcıdan son bir onay alalım
+        if(!confirm('Eğitiminizi incelemeye göndermek üzeresiniz. Emin misiniz?')) return;
+
+        this.isSubmitting = true;
+
+        this.trainingApiService.submitForReview(this.courseId).subscribe({
+            next: (res) => {
+                this.isSubmitting = false;
+                
+                if(res.header.result) {
+                    // Başarılı
+                    this.toastr.success(res.body.message || 'Eğitim başarıyla gönderildi.');
+                    // Listeye geri dönelim
+                    this.router.navigate(['/instructor/courses']); 
+                } else {
+                    // Validasyon Hatası (Örn: Kategori yok, Fiyat yok vb.)
+                    // Backend'den gelen detaylı mesajı gösteriyoruz.
+                    this.toastr.warning(res.header.msg || 'İşlem başarısız.', 'Eksik Bilgi');
+                }
+            },
+            error: (err) => {
+                this.isSubmitting = false;
+                this.toastr.error('Sunucu hatası oluştu. Lütfen tekrar deneyin.');
+                console.error(err);
             }
         });
     }

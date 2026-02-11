@@ -1,6 +1,7 @@
 <div class="course-manage-wrapper d-flex pt-4">
 
     <div class="side-nav col-lg-3 d-none d-lg-block">
+        
         <div class="mb-3 px-2">
             <a routerLink="/instructor/courses" class="text-muted text-decoration-none small d-flex align-items-center gap-2 back-link">
                 <i class='bx bx-arrow-back'></i> Kurslarıma Dön
@@ -8,6 +9,7 @@
         </div>
 
         <ul class="menu-sections">
+            
             <li class="menu-section">
                 <div class="section-title">Kursunuzu planlayın</div>
                 <ul class="menu-items">
@@ -57,9 +59,18 @@
             </li>
         </ul>
 
-        <button class="default-btn mt-4 w-100 shadow-sm" type="button">
-            <i class='bx bx-send me-2'></i> İnceleme için Gönder
+        <button class="default-btn mt-4 w-100 shadow-sm d-flex align-items-center justify-content-center gap-2" 
+                type="button" 
+                (click)="submitCourseForReview()" 
+                [disabled]="isSubmitting">
+            
+            <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            
+            <i *ngIf="!isSubmitting" class='bx bx-send'></i> 
+            
+            <span>{{ isSubmitting ? 'Gönderiliyor...' : 'İnceleme için Gönder' }}</span>
         </button>
+
     </div>
 
     <div class="col-lg-9 col-md-12 col-sm-12 ps-lg-4">

@@ -1,46 +1,104 @@
-.question-text {
-    line-height: 1.6;
-    user-select: none; // Kopyalamayı engelle
+/* --- WRAPPER YAPISI --- */
+.exam-main-wrapper {
+    width: 100%;
+    overflow: hidden; /* Dışarı taşmayı engelle */
 }
 
-.option-item {
-    transition: all 0.2s ease;
-    border: 2px solid transparent !important;
-    
-    &:hover {
-        transform: translateX(5px);
-        background-color: #f8f9fa;
-    }
+/* --- HEADER BÖLÜMÜ --- */
+.topic-header-section {
+    background-color: #f8f9fa; /* Hafif gri zemin */
+}
 
-    &.selected {
-        border-color: #3498db !important;
-        background-color: #ebf5fb;
+/* --- SORU ALANI --- */
+.question-text-block {
+    .q-indicator {
+        font-family: 'Times New Roman', serif;
+        opacity: 0.5;
+    }
+    
+    .question-body {
+        font-weight: 500;
+        color: #212529;
         
-        .radio-circle {
-            border-color: #3498db;
+        /* Resimler taşmasın */
+        ::ng-deep img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 15px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
     }
 }
 
-.radio-circle {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+/* --- ŞIKLAR --- */
+.option-row {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:hover {
+        background-color: #f1f3f5;
+        border-color: #ced4da;
+        transform: translateX(5px); /* Hafif sağa kayma efekti */
+    }
 
-    .inner-dot {
-        width: 10px;
-        height: 10px;
-        background-color: #3498db;
-        border-radius: 50%;
+    /* SEÇİLİ ŞIK STİLİ */
+    &.selected-option {
+        background-color: #e7f1ff; /* Açık mavi */
+        border-color: #0d6efd;
+        box-shadow: 0 2px 8px rgba(13, 110, 253, 0.15);
+
+        .radio-outer {
+            border-color: #0d6efd;
+            .radio-inner { transform: scale(1); }
+        }
+
+        .option-text {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+    }
+
+    /* PREVIEW DOĞRU CEVAP STİLİ */
+    &.correct-preview {
+        background-color: #d1e7dd !important;
+        border-color: #198754 !important;
+        .option-text { color: #0f5132 !important; }
     }
 }
 
-.tiny-text {
-    font-size: 0.8rem;
-    font-style: italic;
+/* --- ÖZEL RADYO BUTON --- */
+.custom-radio-box {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .radio-outer {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #adb5bd;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color 0.2s;
+        
+        .radio-inner {
+            width: 10px;
+            height: 10px;
+            background-color: #0d6efd;
+            border-radius: 50%;
+            transform: scale(0); /* Başlangıçta gizli */
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    }
 }
+
+/* --- SCROLLBAR --- */
+.question-content-area::-webkit-scrollbar { width: 8px; }
+.question-content-area::-webkit-scrollbar-track { background: #f1f1f1; }
+.question-content-area::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+.question-content-area::-webkit-scrollbar-thumb:hover { background: #aaa; }

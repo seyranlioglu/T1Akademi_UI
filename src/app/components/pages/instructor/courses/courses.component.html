@@ -112,7 +112,10 @@
                           [ngClass]="{
                             'bg-success': item.statusName === 'Yayında',
                             'bg-warning': item.statusName === 'Hazırlanıyor',
-                            'bg-secondary': item.statusName === 'Taslak'
+                            'bg-secondary': item.statusName === 'Taslak',
+                            'bg-danger': item.statusName === 'Güncelleme Gerekli',
+                            'bg-info': item.statusName === 'Onay Bekliyor',
+                            'bg-dark': item.statusName === 'Yayından Kaldırıldı'
                           }">
                         {{ item.statusName || 'Taslak' }}
                     </span>

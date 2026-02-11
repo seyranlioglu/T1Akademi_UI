@@ -14,18 +14,26 @@ export class ExamQuestionComponent implements OnInit, OnChanges {
   @Input() currentSeq: number = 1;
   @Input() mode: 'student' | 'preview' = 'student';
   
-  // 🔥 YENİ INPUTLAR
+  // Yeni Parametreler
   @Input() previewToken: string | null = null;
   @Input() examId?: number; 
   @Input() targetQuestionId?: number;
 
+  // Çıktılar (Events)
   @Output() next = new EventEmitter<void>();
   @Output() prev = new EventEmitter<void>();
+  @Output() finish = new EventEmitter<void>(); 
+  @Output() answerSaved = new EventEmitter<void>(); // 🔥 Sidebar güncellemesi için
 
   isLoading: boolean = false;
   questionData: any = null;
   selectedOptionId: number | null = null;
   isSaving: boolean = false;
+  
+  // UI Verileri
+  topicTitle: string = '';
+  topicImgPath: string = '';
+  isLastQuestion: boolean = false;
 
   constructor(
     private examApi: ExamApiService,
@@ -49,10 +57,9 @@ export class ExamQuestionComponent implements OnInit, OnChanges {
     this.questionData = null;
     this.selectedOptionId = null;
 
-    // 🔥 PAYLOAD GÜNCELLEMESİ
     const payload = { 
         userExamId: this.userExamId || 0,
-        currentQuestionSeqNum: this.currentSeq - 1, // 0-based index
+        currentQuestionSeqNum: this.currentSeq - 1, 
         targetQuestionId: this.targetQuestionId,
         previewToken: this.previewToken,
         examId: this.examId 
@@ -64,13 +71,17 @@ export class ExamQuestionComponent implements OnInit, OnChanges {
           
           if (res.body.isCompleted) {
              this.toastr.info(res.body.examEndMessage || 'Sorular bitti.');
+             this.finish.emit(); // Otomatik bitir tetiklemesi
              this.isLoading = false;
              return;
           }
 
           this.questionData = res.body.currentQuestion;
+          this.topicTitle = res.body.topicTitle;
+          this.topicImgPath = res.body.topicImgPath;
+          this.isLastQuestion = res.body.isLastQuestion;
           
-          // 🔥 CEVAP BINDING: Öğrencinin önceki cevabını seçili getir
+          // Önceki cevabı set et
           if (this.questionData.selectedOptionId && this.questionData.selectedOptionId > 0) {
               this.selectedOptionId = this.questionData.selectedOptionId;
           }
@@ -91,9 +102,7 @@ export class ExamQuestionComponent implements OnInit, OnChanges {
   onOptionSelect(optionId: number) {
     this.selectedOptionId = optionId;
 
-    if (this.mode === 'preview') {
-      return; // Preview'da kaydetme yok
-    }
+    if (this.mode === 'preview') return;
 
     this.isSaving = true;
 
@@ -106,6 +115,7 @@ export class ExamQuestionComponent implements OnInit, OnChanges {
     this.examApi.submitAnswer(payload).subscribe({
       next: (res) => {
         this.isSaving = false;
+        this.answerSaved.emit(); // 🔥 Parent'a haber ver: "Sidebar'ı güncelle"
       },
       error: () => {
         this.isSaving = false;
