@@ -14,7 +14,11 @@ export class ExamQuestionComponent implements OnInit, OnChanges {
   @Input() currentSeq: number = 1;
   @Input() mode: 'student' | 'preview' = 'student';
   
-  // Navigasyon butonları için parent'a sinyal
+  // 🔥 YENİ INPUTLAR
+  @Input() previewToken: string | null = null;
+  @Input() examId?: number; 
+  @Input() targetQuestionId?: number;
+
   @Output() next = new EventEmitter<void>();
   @Output() prev = new EventEmitter<void>();
 
@@ -29,14 +33,12 @@ export class ExamQuestionComponent implements OnInit, OnChanges {
   ) { }
 
   ngOnInit(): void {
-    // İlk açılışta yükle
-    if (this.userExamId || this.mode === 'preview') {
+    if (this.userExamId || (this.mode === 'preview' && this.examId)) {
       this.loadQuestion();
     }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Sıra değiştiğinde (Sidebar'dan veya İleri/Geri ile)
     if (changes['currentSeq'] && !changes['currentSeq'].firstChange) {
       this.loadQuestion();
     }
@@ -47,28 +49,33 @@ export class ExamQuestionComponent implements OnInit, OnChanges {
     this.questionData = null;
     this.selectedOptionId = null;
 
-    // Backend'de "Sıradaki Soru" mantığı var.
-    // Ancak rastgele erişim için backend'e 'currentSeq' göndererek o sıradaki soruyu istemeliyiz.
-    // Şimdilik 'GetNextQuestion' metodunu 'GetQuestionBySeq' gibi kullanıyoruz (Backend desteği varsayımıyla).
-    // Eğer backend sadece "next" destekliyorsa, burası için backend'e ufak bir revize gerekebilir.
-    
+    // 🔥 PAYLOAD GÜNCELLEMESİ
     const payload = { 
-        userExamId: this.userExamId, 
-        currentQuestionSeqNum: this.currentSeq - 1 // Backend > gönderdiğimizden büyük olanı getiriyor olabilir, mantığı kontrol et
+        userExamId: this.userExamId || 0,
+        currentQuestionSeqNum: this.currentSeq - 1, // 0-based index
+        targetQuestionId: this.targetQuestionId,
+        previewToken: this.previewToken,
+        examId: this.examId 
     };
 
-    // NOT: Backend metodunu direkt kullanıyoruz, Preview için mock data dönebiliriz.
-    // Preview modunda API çağrısı farklı olabilir veya frontend'de array'den çekebiliriz.
-    // Şimdilik student modu üzerinden gidelim.
-    
     this.examApi.getNextQuestion(payload).subscribe({
       next: (res) => {
         if (res.header.result) {
-          this.questionData = res.body.currentQuestion;
-          this.isLoading = false;
           
-          // Eğer daha önce cevaplanmışsa, backend'den gelen datada selectedOptionId olmalı.
-          // Mevcut DTO'da yoksa bunu eklememiz gerekecek.
+          if (res.body.isCompleted) {
+             this.toastr.info(res.body.examEndMessage || 'Sorular bitti.');
+             this.isLoading = false;
+             return;
+          }
+
+          this.questionData = res.body.currentQuestion;
+          
+          // 🔥 CEVAP BINDING: Öğrencinin önceki cevabını seçili getir
+          if (this.questionData.selectedOptionId && this.questionData.selectedOptionId > 0) {
+              this.selectedOptionId = this.questionData.selectedOptionId;
+          }
+
+          this.isLoading = false;
         } else {
           this.toastr.error('Soru yüklenemedi.');
           this.isLoading = false;
@@ -82,15 +89,14 @@ export class ExamQuestionComponent implements OnInit, OnChanges {
   }
 
   onOptionSelect(optionId: number) {
+    this.selectedOptionId = optionId;
+
     if (this.mode === 'preview') {
-      this.selectedOptionId = optionId;
-      return;
+      return; // Preview'da kaydetme yok
     }
 
-    this.selectedOptionId = optionId;
     this.isSaving = true;
 
-    // Auto-Save
     const payload = {
       userExamId: this.userExamId,
       questionId: this.questionData.id,
@@ -100,11 +106,10 @@ export class ExamQuestionComponent implements OnInit, OnChanges {
     this.examApi.submitAnswer(payload).subscribe({
       next: (res) => {
         this.isSaving = false;
-        // Sidebar'daki durumu güncellemek için parent'a haber verebiliriz
       },
       error: () => {
         this.isSaving = false;
-        this.toastr.warning('Cevap kaydedilemedi, tekrar deneyin.');
+        this.toastr.warning('Cevap kaydedilemedi.');
       }
     });
   }

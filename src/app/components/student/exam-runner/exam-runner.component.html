@@ -42,6 +42,10 @@
                     [userExamId]="examContext.userExamId" 
                     [currentSeq]="currentQuestionSeq"
                     [mode]="mode"
+                    
+                    [previewToken]="previewToken"  
+                    [examId]="examId"              
+                    
                     (next)="onQuestionChanged(currentQuestionSeq + 1)"
                     (prev)="onQuestionChanged(currentQuestionSeq - 1)">
                 </app-exam-question>

@@ -100,13 +100,22 @@ export class ExamApiService {
     return this.http.put<any>(`${API_EXAM_URL}/GetExamByIdWithStudent`, payload);
   }
 
-  // Sıradaki Soruyu Getir (Mevcut yapıda varsa)
-  getNextQuestion(payload: any): Observable<any> {
+getNextQuestion(payload: { 
+      userExamId: number, 
+      currentQuestionSeqNum: number, 
+      targetQuestionId?: number, 
+      previewToken?: string | null,
+      examId?: number 
+  }): Observable<any> {
     return this.http.post<any>(`${API_EXAM_URL}/GetNextQuestion`, payload);
   }
 
-  // Sınavı Bitir ve Sonucu Hesapla
-  calculateExamResult(payload: any): Observable<any> {
+
+  calculateExamResult(payload: { 
+      userExamId: number, 
+      previewToken?: string | null,
+      examId?: number 
+  }): Observable<any> {
     return this.http.post<any>(`${API_EXAM_URL}/CalculateExamResult`, payload);
   }
 

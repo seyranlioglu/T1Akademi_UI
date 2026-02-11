@@ -3,8 +3,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 @Component({
   selector: 'app-exam-sidebar',
   templateUrl: './exam-sidebar.component.html',
-  styleUrls: ['./exam-sidebar.component.scss'],
-  standalone: false
+  styleUrls: ['./exam-sidebar.component.scss']
 })
 export class ExamSidebarComponent implements OnInit, OnChanges {
 

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Subject, takeUntil, timer } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
+import { ActivatedRoute } from '@angular/router';
 import { ExamApiService } from 'src/app/shared/api/exam-api.service';
 import { ExamSecurityService } from 'src/app/shared/services/exam-security.service';
 
@@ -8,16 +9,16 @@ import { ExamSecurityService } from 'src/app/shared/services/exam-security.servi
   selector: 'app-exam-runner',
   templateUrl: './exam-runner.component.html',
   styleUrls: ['./exam-runner.component.scss'],
-    standalone: false
+  standalone: false 
 })
 export class ExamRunnerComponent implements OnInit, OnDestroy {
 
-  // 🔥 URL yerine Input ile alıyoruz
   @Input() examId!: number;
   @Input() mode: 'student' | 'preview' = 'student';
-  
-  // 🔥 Sınav bitince veya çıkış yapılınca Parent'a haber veriyoruz
-  @Output() closeExam = new EventEmitter<boolean>(); // true: sınav bitti (reload gerekebilir), false: iptal
+  @Output() closeExam = new EventEmitter<boolean>();
+
+  // 🔥 Token Yönetimi
+  previewToken: string | null = null;
 
   isLoading: boolean = true;
   examContext: any = null;
@@ -31,18 +32,28 @@ export class ExamRunnerComponent implements OnInit, OnDestroy {
   constructor(
     private examApi: ExamApiService,
     private securityService: ExamSecurityService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
-    if (this.examId) {
-      this.initializeExam();
-    } else {
-      this.toastr.error("Sınav ID'si bulunamadı.");
-      this.closeExam.emit(false);
-    }
+    // 1. URL Query Params kontrolü (Token için)
+    this.route.queryParams.subscribe(params => {
+        this.previewToken = params['previewToken'] || null;
+        
+        if (this.previewToken) {
+            this.mode = 'preview';
+        }
 
-    // Güvenlik eventlerini dinle
+        if (this.examId) {
+            this.initializeExam();
+        } else {
+            this.toastr.error("Sınav ID'si bulunamadı.");
+            this.closeExam.emit(false);
+        }
+    });
+
+    // 2. Güvenlik
     this.securityService.onViolation.subscribe(msg => this.toastr.warning(msg));
     this.securityService.onTerminate.subscribe(() => {
         this.toastr.error('Sınav sonlandırıldı.');
@@ -52,11 +63,14 @@ export class ExamRunnerComponent implements OnInit, OnDestroy {
 
   initializeExam() {
     this.isLoading = true;
+
     if (this.mode === 'preview') {
       this.examApi.previewExam(this.examId).subscribe({
         next: (res) => {
-            if(res.header.result) this.setupExamEnvironment(res.body);
-            else this.handleError("Veri alınamadı");
+            if(res.header.result) {
+                this.setupExamEnvironment(res.body);
+                this.toastr.info('Önizleme modu aktif.');
+            } else this.handleError("Veri alınamadı");
         },
         error: () => this.handleError("Hata oluştu")
       });
@@ -66,7 +80,7 @@ export class ExamRunnerComponent implements OnInit, OnDestroy {
         next: (res) => {
             if(res.header.result) {
                 this.setupExamEnvironment(res.body);
-                this.securityService.startSecurity(); // Güvenliği başlat
+                this.securityService.startSecurity();
             } else this.handleError(res.header.msg);
         },
         error: () => this.handleError("Sunucu hatası")
@@ -77,7 +91,6 @@ export class ExamRunnerComponent implements OnInit, OnDestroy {
   setupExamEnvironment(data: any) {
     this.examContext = data;
     this.totalQuestions = data.totalQuestionCount;
-    // Backend'den TimeSpan string "00:30:00" geldiğini varsayıyoruz
     if (data.examTime) this.startTimer(data.examTime);
     this.isLoading = false;
   }
@@ -110,26 +123,39 @@ export class ExamRunnerComponent implements OnInit, OnDestroy {
     this.finishExam(true);
   }
 
+  onQuestionChanged(seqNumber: number) {
+    if (seqNumber < 1 || seqNumber > this.totalQuestions) return;
+    this.currentQuestionSeq = seqNumber;
+  }
+
   finishExam(autoSubmit: boolean = false) {
     if (!autoSubmit && !confirm('Sınavı bitirmek istiyor musunuz?')) return;
 
-    if (this.mode === 'preview') {
-        this.exitRunner(true);
-        return;
-    }
+    // 🔥 GÜNCELLENDİ: Payload'a Token ve ExamId ekledik
+    const payload = { 
+        userExamId: this.examContext?.userExamId || 0,
+        previewToken: this.previewToken,
+        examId: this.mode === 'preview' ? this.examId : undefined 
+    };
 
-    const payload = { userExamId: this.examContext.userExamId };
     this.examApi.calculateExamResult(payload).subscribe({
-        next: () => {
-            this.toastr.success('Sınav tamamlandı.');
-            this.exitRunner(true); // true: Başarılı bitiş
-        }
+        next: (res) => {
+            if (res.header.result) {
+                if (res.body?.message) this.toastr.info(res.body.message);
+                else this.toastr.success('Sınav tamamlandı.');
+                
+                this.exitRunner(true);
+            } else {
+                this.toastr.error('Sonuç hesaplanamadı.');
+            }
+        },
+        error: () => this.toastr.error('Sunucu hatası.')
     });
   }
 
   exitRunner(isFinished: boolean) {
     this.securityService.stopSecurity();
-    this.closeExam.emit(isFinished); // Parent'a "Ben kapandım" de.
+    this.closeExam.emit(isFinished);
   }
 
   handleError(msg: string) {

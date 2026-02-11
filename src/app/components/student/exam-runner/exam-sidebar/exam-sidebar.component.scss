@@ -1,69 +1,40 @@
 .sidebar-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+    // HTML'deki h-100 ve flex-column yeterli
 }
 
-.sidebar-header {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
+.questions-list {
+    // Kaydırma çubuğu stilleri
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-thumb { background-color: #ddd; border-radius: 3px; }
 }
 
-.topics-wrapper {
-    flex: 1;
-    overflow-y: auto;
-}
-
-.questions-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr); // Yan yana 5 kutu
-    gap: 8px;
-}
-
-.btn-question {
-    width: 36px;
-    height: 36px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background: #fff;
-    color: #555;
-    font-size: 0.9rem;
-    font-weight: 500;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.list-group-item {
     transition: all 0.2s;
+    cursor: pointer;
 
     &:hover {
-        background: #f0f0f0;
-        border-color: #ccc;
+        background-color: #f8f9fa;
     }
 
-    &.active {
-        background: #3498db; // Mavi
-        color: #fff;
-        border-color: #3498db;
-        box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
+    &.active-question {
+        background-color: #e9f2fd; // Açık mavi arka plan
+        color: #0d6efd;
+
+        .status-icon {
+            background-color: #0d6efd !important; // Mavi ikon
+        }
     }
 
-    &.answered {
-        background: #2ecc71; // Yeşil (Cevaplanmış ama aktif değilse)
-        color: #fff;
-        border-color: #2ecc71;
-        
-        &.active {
-            background: #3498db; // Aktifse yine mavi kalsın
+    // Cevaplanmış ama aktif değilse
+    &.answered-question:not(.active-question) {
+        .status-icon {
+            background-color: #198754 !important; // Yeşil ikon
         }
     }
 }
 
-.sidebar-footer {
-    background: #f9f9f9;
-}
-
-.indicator {
-    width: 12px; height: 12px; border-radius: 3px; display: inline-block;
-    &.active { background: #3498db; }
-    &.answered { background: #2ecc71; }
+.status-icon {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    font-size: 1.1rem;
 }
