@@ -1,0 +1,46 @@
+.approval-wrapper {
+    background-color: #f5f7fb;
+    min-height: calc(100vh - 80px);
+}
+
+.ls-1 { letter-spacing: 1px; }
+
+/* Sol Menü */
+.icon-box {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.list-group-item {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+
+    &:hover:not(:disabled) {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+
+    &.active-tab {
+        background-color: #eef2ff !important;
+        color: #4f46e5;
+        border-left-color: #4f46e5;
+        .icon-box { background-color: #4f46e5 !important; color: #fff !important; }
+    }
+}
+
+/* Kartlar */
+.course-img-box {
+    img { border: 1px solid #e9ecef; }
+}
+
+.hover-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.08) !important;
+    }
+}

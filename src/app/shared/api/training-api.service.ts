@@ -304,4 +304,8 @@ getContent(payload: {
   submitForReview(trainingId: number): Observable<any> {
     return this.http.post<any>(`${API_TRAINING_URL}/SubmitForReview/${trainingId}`, {});
   }
+
+  getPendingTrainings(): Observable<any> {
+    return this.http.get<any>(`${API_TRAINING_URL}/GetPendingTrainings`);
+  }
 }

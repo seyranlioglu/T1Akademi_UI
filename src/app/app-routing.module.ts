@@ -67,6 +67,7 @@ import { LibraryComponent } from './components/pages/instructor/library/library.
 import { CourseSettingsComponent } from './components/pages/instructor/course-manage/course-settings/course-settings.component';
 import { ExamBuilderComponent } from './components/pages/instructor/course-manage/curriculum/exam-builder/exam-builder.component';
 import { ExamLibraryComponent } from './components/pages/instructor/exam-library/exam-library.component';
+import { TrainingApprovalComponent } from './components/admin/training-approval/training-approval.component';
 
 const routes: Routes = [
 
@@ -105,6 +106,7 @@ const routes: Routes = [
             { path: 'events', component: EventsPageComponent },
             { path: 'event-details', component: EventDetailsPageComponent },
             { path: 'success-stories', component: SuccessStoriesPageComponent },
+            { path: 'admin/training-approval', component: TrainingApprovalComponent },
             { path: 'blog-grid', component: BlogGridPageComponent },
             { path: 'blog-right-sidebar', component: BlogRightSidebarPageComponent },
             { path: 'blog-details', component: BlogDetailsPageComponent },
