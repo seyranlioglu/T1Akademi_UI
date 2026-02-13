@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
+import { TrainingApiService } from 'src/app/shared/api/training-api.service';
 import { TrainingProcessService } from 'src/app/shared/api/training-process.service';
 
-// Bootstrap modal'ı manuel tetiklemek için (Opsiyonel, data-bs-toggle ile de yapılabilir)
 declare var bootstrap: any;
 
 @Component({
@@ -14,17 +14,22 @@ export class TrainingApprovalComponent implements OnInit {
 
   activeTab: string = 'trainings';
   isLoading: boolean = false;
-  
-  // Listeyi tutacak dizi
   pendingRequests: any[] = [];
 
-  // Reddetme işlemi için geçici değişkenler
-  selectedRequestId: number | null = null;
-  rejectNote: string = '';
+  // Modal ve İnceleme Verileri
+  selectedRequest: any = null;
+  selectedTrainingDetail: any = null; // Admin incelemesi için full detay
+  
+  // Aksiyon Değişkenleri
+  modalAction: 'approve' | 'reject' | 'revision' = 'approve';
+  modalTitle: string = '';
+  modalPlaceholder: string = '';
+  adminNote: string = '';
   isProcessing: boolean = false;
 
   constructor(
     private processService: TrainingProcessService,
+    private trainingService: TrainingApiService, // Detay çekmek için
     private toastr: ToastrService
   ) { }
 
@@ -32,17 +37,15 @@ export class TrainingApprovalComponent implements OnInit {
     this.loadData();
   }
 
-  changeTab(tabName: string) {
-    this.activeTab = tabName;
-    this.loadData(); // İleride farklı endpointler çağırılabilir
-  }
-
   loadData() {
     this.isLoading = true;
+    // ProcessService muhtemelen raw response dönüyor (header/body), burası doğru kalabilir.
+    // Eğer ProcessService de pipe/map kullanıyorsa burayı da düzeltmemiz gerekebilir.
+    // Şimdilik hata burayı işaret etmediği için dokunmuyorum.
     this.processService.getPendingRequests().subscribe({
       next: (res) => {
         this.isLoading = false;
-        if (res.header.result) {
+        if (res && res.header && res.header.result) {
           this.pendingRequests = res.body;
         } else {
           this.pendingRequests = [];
@@ -50,21 +53,104 @@ export class TrainingApprovalComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
-        this.toastr.error('Talepler yüklenirken hata oluştu.');
+        this.toastr.error('Veriler yüklenirken hata oluştu.');
       }
     });
   }
 
-  // ✅ HIZLI ONAY
-  approveRequest(requestId: number) {
-    if (!confirm('Bu eğitimi yayınlamak istediğinize emin misiniz?')) return;
+  // 🔍 1. İNCELEME MODALINI AÇ (Detayları Getir)
+  openReviewModal(request: any) {
+    this.selectedRequest = request;
+    this.selectedTrainingDetail = null;
+    
+    // DÜZELTME: TrainingService zaten 'body'yi ayıklayıp dönüyor.
+    // 'res' direkt olarak eğitim verisidir (GetTrainingDto).
+    this.trainingService.getTrainingById(request.trainingId).subscribe({
+      next: (res: any) => {
+        if(res) {
+          this.selectedTrainingDetail = res;
+          
+          // Modalı Aç
+          const modalEl = document.getElementById('reviewModal');
+          if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+          }
+        }
+      },
+      error: () => {
+        this.toastr.error("Eğitim detayları yüklenemedi.");
+      }
+    });
+  }
+
+  // 🛑 2. AKSİYON MODALINI AÇ (Ret veya Revizyon için)
+  openActionModal(action: 'approve' | 'reject' | 'revision') {
+    this.modalAction = action;
+    this.adminNote = '';
+
+    if (action === 'reject') {
+      this.modalTitle = 'Talebi Reddet';
+      this.modalPlaceholder = 'Lütfen ret sebebini belirtin (Örn: Politika ihlali, yetersiz içerik)...';
+    } else if (action === 'revision') {
+      this.modalTitle = 'Revizyon İste';
+      this.modalPlaceholder = 'Hangi kısımların düzeltilmesi gerektiğini detaylıca yazın (Örn: Ses kalitesi düşük, kapak resmi hatalı)...';
+    } else {
+      // Onay ise direkt modalı aç (Not opsiyonel olabilir)
+      this.modalTitle = 'Eğitimi Onayla';
+      this.modalPlaceholder = 'Eğitmene iletmek istediğiniz bir not var mı? (Opsiyonel)';
+    }
+
+    const actionModalEl = document.getElementById('actionModal');
+    if (actionModalEl) {
+        const modal = new bootstrap.Modal(actionModalEl);
+        modal.show();
+    }
+  }
+
+  // 📝 3. KARARI GÖNDER
+  submitDecision() {
+    if (!this.selectedRequest) return;
+
+    // Ret veya Revizyon ise not zorunlu
+    if ((this.modalAction === 'reject' || this.modalAction === 'revision') && !this.adminNote.trim()) {
+      this.toastr.warning('Lütfen bir açıklama girin.');
+      return;
+    }
 
     this.isProcessing = true;
-    this.processService.respondToRequest(requestId, true).subscribe({
+
+    // Enum Mapping: Approve=1, Reject=2, Revision=3
+    let decisionId = 1;
+    if (this.modalAction === 'reject') decisionId = 2;
+    if (this.modalAction === 'revision') decisionId = 3;
+    
+    const dto = {
+      requestId: this.selectedRequest.id,
+      decision: decisionId,
+      adminNote: this.adminNote
+    };
+
+    this.processService.respondToRequest(dto).subscribe({
       next: (res) => {
         this.isProcessing = false;
+        // ProcessService muhtemelen raw response dönüyor
         if (res.header.result) {
-          this.toastr.success('Eğitim onaylandı ve yayına alındı.');
+          this.toastr.success(res.body.message || 'İşlem başarıyla tamamlandı.');
+          
+          // Modalları kapat
+          const actionModalEl = document.getElementById('actionModal');
+          if (actionModalEl) {
+            const actionModal = bootstrap.Modal.getInstance(actionModalEl);
+            if (actionModal) actionModal.hide();
+          }
+
+          const reviewModalEl = document.getElementById('reviewModal');
+          if (reviewModalEl) {
+            const reviewModal = bootstrap.Modal.getInstance(reviewModalEl);
+            if (reviewModal) reviewModal.hide();
+          }
+
           this.loadData(); // Listeyi yenile
         } else {
           this.toastr.warning(res.header.message);
@@ -77,40 +163,12 @@ export class TrainingApprovalComponent implements OnInit {
     });
   }
 
-  // ❌ REDDETME MODALINI AÇ
-  openRejectModal(requestId: number) {
-    this.selectedRequestId = requestId;
-    this.rejectNote = '';
-    // HTML tarafında data-bs-toggle kullanacağız, manuel kod gerekmez
-  }
-
-  // ❌ REDDETME İŞLEMİNİ TAMAMLA
-  confirmRejection() {
-    if (!this.selectedRequestId) return;
-    if (!this.rejectNote.trim()) {
-      this.toastr.warning('Lütfen bir ret sebebi belirtin.');
-      return;
+  // Helper: Video Oynat (Mock)
+  playVideo(content: any) {
+    if(content.trainingContentLibraryDto?.trainingContentLibraryFilePath) {
+        window.open(content.trainingContentLibraryDto.trainingContentLibraryFilePath, '_blank');
+    } else {
+        this.toastr.info("Video dosyası bulunamadı veya henüz işleniyor.");
     }
-
-    this.isProcessing = true;
-    this.processService.respondToRequest(this.selectedRequestId, false, this.rejectNote).subscribe({
-      next: (res) => {
-        this.isProcessing = false;
-        if (res.header.result) {
-          this.toastr.info('Talep reddedildi ve eğitmene bildirildi.');
-          
-          // Modalı Kapat (Bootstrap native)
-          const modalEl = document.getElementById('rejectModal');
-          const modal = bootstrap.Modal.getInstance(modalEl);
-          modal.hide();
-
-          this.loadData();
-        }
-      },
-      error: (err) => {
-        this.isProcessing = false;
-        this.toastr.error('Hata oluştu.');
-      }
-    });
   }
 }

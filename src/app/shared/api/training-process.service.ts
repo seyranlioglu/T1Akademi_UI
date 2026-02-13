@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -17,17 +17,9 @@ export class TrainingProcessService {
     return this.http.get<any>(`${this.apiUrl}/GetPendingRequests`);
   }
 
-  // 2. Talebe Yanıt Ver (Onay veya Ret)
-  // Backend parametreleri query string olarak bekliyor (C# kodunda [FromBody] yok)
-  respondToRequest(requestId: number, isApproved: boolean, adminNote: string = ''): Observable<any> {
-    let params = new HttpParams()
-      .set('requestId', requestId)
-      .set('isApproved', isApproved);
-
-    if (adminNote) {
-      params = params.set('adminNote', adminNote);
-    }
-
-    return this.http.post<any>(`${this.apiUrl}/respond`, {}, { params: params });
+  // 2. Talebe Yanıt Ver (Onay / Ret / Revizyon)
+  // Backend artık DTO bekliyor (Body içinde)
+  respondToRequest(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/respond`, data);
   }
 }
