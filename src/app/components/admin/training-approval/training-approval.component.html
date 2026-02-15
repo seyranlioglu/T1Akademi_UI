@@ -1,9 +1,8 @@
 <div class="approval-wrapper pt-4 pb-5">
     <div class="container-fluid px-4">
         <div class="row">
-            
             <div class="col-lg-3 mb-4">
-                <div class="card border-0 shadow-sm rounded-3">
+               <div class="card border-0 shadow-sm rounded-3">
                     <div class="card-body p-0">
                         <div class="list-group list-group-flush rounded-3">
                             <div class="p-3 bg-light border-bottom">
@@ -24,18 +23,6 @@
             </div>
 
             <div class="col-lg-9">
-                <div class="d-flex align-items-center justify-content-between mb-4">
-                    <h4 class="fw-bold m-0 text-dark">Onay Bekleyen İşlemler</h4>
-                    <button class="btn btn-outline-secondary btn-sm" (click)="loadData()">
-                        <i class='bx bx-refresh'></i> Yenile
-                    </button>
-                </div>
-
-                <div *ngIf="isLoading" class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <p class="text-muted mt-2">Yükleniyor...</p>
-                </div>
-
                 <div *ngIf="!isLoading">
                     <div class="row g-3">
                         <div class="col-12" *ngFor="let item of pendingRequests">
@@ -56,30 +43,34 @@
                                                 </span>
                                                 <small class="text-muted"><i class='bx bx-time'></i> {{ item.createdDate | date:'dd.MM.yyyy HH:mm' }}</small>
                                             </div>
-                                            
                                             <h6 class="fw-bold text-dark mb-1">{{ item.trainingTitle }}</h6>
-                                            
                                             <div class="d-flex align-items-center gap-2">
                                                 <i class='bx bx-user-circle text-muted'></i>
                                                 <span class="text-muted small">Talep Eden: <strong>{{ item.requesterFullName }}</strong></span>
                                             </div>
-                                            
-                                            <p *ngIf="item.note" class="small text-muted fst-italic mt-2 mb-0 border-start ps-2">
-                                                "{{ item.note }}"
-                                            </p>
+                                            <p *ngIf="item.note" class="small text-muted fst-italic mt-2 mb-0 border-start ps-2">"{{ item.note }}"</p>
                                         </div>
 
                                         <div class="flex-shrink-0 mt-3 mt-md-0 d-flex gap-2">
+                                            
                                             <button class="btn btn-info btn-sm text-white shadow-sm d-flex align-items-center gap-1" 
-                                                    (click)="openReviewModal(item)">
-                                                <i class='bx bx-search'></i> İncele
+                                                    (click)="openReviewPlayer(item)">
+                                                <i class='bx bx-play-circle'></i> Oynatıcıda İncele
                                             </button>
 
                                             <div class="dropdown">
-                                                <button class="btn btn-primary btn-sm dropdown-toggle shadow-sm d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown">
+                                                <button class="btn btn-primary btn-sm dropdown-toggle shadow-sm d-flex align-items-center gap-1" 
+                                                        type="button" 
+                                                        [id]="'dropdownMenuButton'+item.id" 
+                                                        data-bs-toggle="dropdown" 
+                                                        data-bs-display="static" 
+                                                        aria-expanded="false">
                                                     İşlem
                                                 </button>
-                                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow p-2">
+                                                <ul class="dropdown-menu dropdown-menu-end border-0 shadow p-2" 
+                                                    [attr.aria-labelledby]="'dropdownMenuButton'+item.id"
+                                                    style="z-index: 9999;">
+                                                    
                                                     <li>
                                                         <button class="dropdown-item rounded text-success d-flex align-items-center gap-2 py-2" 
                                                                 (click)="selectedRequest = item; openActionModal('approve')">
@@ -108,117 +99,12 @@
                             </div>
                         </div>
                     </div>
-
+                    
                     <div *ngIf="pendingRequests.length === 0" class="text-center py-5 bg-white rounded-3 shadow-sm">
                         <i class='bx bx-check-double text-success display-1 opacity-25'></i>
                         <h5 class="mt-3 text-dark fw-bold">Tertemiz!</h5>
-                        <p class="text-muted">Şu an onay bekleyen herhangi bir işlem bulunmuyor.</p>
+                        <p class="text-muted">Onay bekleyen işlem yok.</p>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content">
-            <div class="modal-header bg-dark text-white border-0">
-                <div>
-                    <h5 class="modal-title fs-5">
-                        <i class='bx bx-search-alt-2 me-2'></i>Eğitim İnceleme: <span class="fw-bold text-warning">{{selectedTrainingDetail?.title}}</span>
-                    </h5>
-                    <small class="opacity-75 ms-4">Talep Türü: {{selectedRequest?.requestTypeName}}</small>
-                </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body bg-light p-0">
-                <div class="container py-4" *ngIf="selectedTrainingDetail">
-                    
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <img [src]="selectedTrainingDetail.headerImage" class="img-fluid rounded shadow-sm w-100" alt="Cover">
-                        </div>
-                        <div class="col-md-9">
-                            <div class="card border-0 shadow-sm h-100">
-                                <div class="card-body">
-                                    <h6 class="text-muted text-uppercase small ls-1">Eğitim Detayları</h6>
-                                    <p class="mb-2">{{selectedTrainingDetail.description}}</p>
-                                    <div class="d-flex gap-3 mt-3">
-                                        <span class="badge bg-primary">{{selectedTrainingDetail.categoryName}}</span>
-                                        <span class="badge bg-secondary">{{selectedTrainingDetail.levelName}}</span>
-                                        <span class="badge bg-info text-dark">{{selectedTrainingDetail.language}}</span>
-                                    </div>
-                                    <div class="mt-3 text-danger fw-bold" *ngIf="selectedTrainingDetail.isActive">
-                                        <i class='bx bx-error-circle'></i> BU EĞİTİM ŞU AN YAYINDA! (Bu bir güncelleme talebidir)
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h5 class="fw-bold mb-3 d-flex align-items-center">
-                        <i class='bx bx-list-ul me-2'></i> Müfredat Kontrolü
-                        <small class="ms-auto text-muted fs-6 fw-normal">Kırmızı etiketli dersler yeni eklenenlerdir.</small>
-                    </h5>
-
-                    <div class="accordion shadow-sm" id="accordionReview">
-                        <div class="accordion-item border-0 mb-1" *ngFor="let section of selectedTrainingDetail.trainingSections; let i = index">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#collapse'+i">
-                                    <span class="fw-bold me-2">Bölüm {{i+1}}:</span> {{section.title}}
-                                </button>
-                            </h2>
-                            <div [id]="'collapse'+i" class="accordion-collapse collapse show">
-                                <div class="accordion-body p-0">
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item d-flex justify-content-between align-items-center p-3" 
-                                            *ngFor="let content of section.contents"
-                                            [ngClass]="{'bg-danger bg-opacity-10 border-start border-danger border-5': !content.isActive}">
-                                            
-                                            <div class="d-flex align-items-center">
-                                                <i class='bx bx-play-circle fs-4 text-primary me-3'></i>
-                                                <div>
-                                                    <span class="fw-medium">{{content.title}}</span>
-                                                    <div class="small text-muted">{{content.time}} dk • {{content.type || 'Video'}}</div>
-                                                </div>
-                                                
-                                                <span *ngIf="!content.isActive" class="badge bg-danger ms-3 shadow-sm">
-                                                    <i class='bx bxs-hot'></i> YENİ / ONAY BEKLİYOR
-                                                </span>
-                                            </div>
-
-                                            <div class="d-flex gap-2">
-                                                <button class="btn btn-sm btn-outline-primary" (click)="playVideo(content)">
-                                                    <i class='bx bx-play'></i> İçeriği Görüntüle
-                                                </button>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="modal-footer bg-white shadow-lg">
-                <div class="d-flex gap-2 w-100 justify-content-end">
-                    <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Kapat</button>
-                    
-                    <button class="btn btn-warning px-4 text-white" (click)="openActionModal('revision')">
-                        <i class='bx bx-revision'></i> Revizyon İste
-                    </button>
-                    
-                    <button class="btn btn-danger px-4" (click)="openActionModal('reject')">
-                        <i class='bx bx-x-circle'></i> Reddet
-                    </button>
-                    
-                    <button class="btn btn-success px-5 fw-bold" (click)="openActionModal('approve')">
-                        <i class='bx bx-check-circle'></i> ONAYLA VE YAYINLA
-                    </button>
                 </div>
             </div>
         </div>
@@ -228,7 +114,6 @@
 <div class="modal fade" id="actionModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
-            
             <div class="modal-header text-white" 
                  [ngClass]="{
                      'bg-danger': modalAction === 'reject', 
@@ -245,23 +130,15 @@
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            
             <div class="modal-body">
-                <p class="mb-2 text-muted small">Bu not, işlem sonucunda talep sahibine (Eğitmene) iletilecektir.</p>
+                <p class="mb-2 text-muted small">Bu not, işlem sonucunda talep sahibine iletilecektir.</p>
                 <textarea [(ngModel)]="adminNote" class="form-control" rows="4" [placeholder]="modalPlaceholder"></textarea>
             </div>
-            
             <div class="modal-footer bg-light border-0">
                 <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Vazgeç</button>
-                
                 <button type="button" class="btn btn-sm text-white px-4" 
-                        [ngClass]="{
-                            'btn-danger': modalAction === 'reject', 
-                            'btn-warning': modalAction === 'revision',
-                            'btn-success': modalAction === 'approve'
-                        }"
+                        [ngClass]="{'btn-danger': modalAction === 'reject', 'btn-warning': modalAction === 'revision', 'btn-success': modalAction === 'approve'}"
                         (click)="submitDecision()" [disabled]="isProcessing">
-                    
                     <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-1"></span>
                     Kararı Uygula
                 </button>

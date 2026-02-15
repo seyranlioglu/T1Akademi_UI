@@ -7,6 +7,13 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* 🔥 ADMIN HUD */
+.admin-hud {
+    height: 60px; /* Sabit yükseklik */
+    z-index: 1050; /* Header'dan daha üstte */
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
 .player-header {
     height: 56px;
     background-color: #1c1d1f;

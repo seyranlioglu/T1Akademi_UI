@@ -69,10 +69,8 @@ export class InstructorApiService {
     return this.http.put<any>(`${this.controllerUrl}/Approve/${requestId}`, {});
   }
 
-  /**
-   * Eğitmenin durumunu değiştirir.
-   */
-  changeInstructorStatus(instructorId: string, status: number): Observable<any> {
-    return this.http.put<any>(`${this.controllerUrl}/status/${instructorId}`, { status });
+  // 🔥 YENİ EKLENEN: EĞİTMEN DURUM DEĞİŞTİRME (BAN HAMMER)
+  changeInstructorStatus(instructorId: number, isActive: boolean, reason: string): Observable<any> {
+    return this.http.post<any>(`${this.controllerUrl}/ChangeStatus`, { instructorId, isActive, reason });
   }
 }

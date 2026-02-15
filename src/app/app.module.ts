@@ -118,7 +118,7 @@ import { ExamLibraryComponent } from './components/pages/instructor/exam-library
 import { ExamSelectorComponent } from 'src/app/components/common/exam-selector/exam-selector.component';
 import { ExamModule } from './components/student/exam-runner/exam.module';
 import { TrainingApprovalComponent } from './components/admin/training-approval/training-approval.component';   
-
+import { CourseDashboardComponent } from './components/pages/instructor/course-manage/course-dashboard/course-dashboard.component';
 @NgModule({
     declarations: [
         AppComponent,
@@ -213,7 +213,8 @@ import { TrainingApprovalComponent } from './components/admin/training-approval/
         ExamBuilderComponent,
         ExamLibraryComponent,
         ExamSelectorComponent,
-        TrainingApprovalComponent
+        TrainingApprovalComponent,
+        CourseDashboardComponent
     ],
     imports: [
         BrowserModule,

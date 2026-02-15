@@ -1,0 +1,204 @@
+<div class="dashboard-container p-4">
+
+    <div *ngIf="course?.trainingStatus?.code === '5'" class="alert alert-warning border-warning d-flex align-items-start gap-3 shadow-sm mb-4">
+        <i class='bx bx-error-circle fs-1 text-warning mt-1'></i>
+        <div class="w-100">
+            <h5 class="alert-heading fw-bold">Düzeltme Gerekiyor!</h5>
+            <p class="mb-2">Yönetici incelemesi sonucunda bazı eksikler tespit edildi. Lütfen aşağıdaki notu dikkate alarak düzenleme yapınız:</p>
+            
+            <div class="bg-white p-3 rounded border border-warning text-dark fst-italic position-relative">
+                <i class='bx bxs-quote-left position-absolute text-warning opacity-25' style="top: 5px; left: 5px; font-size: 2rem;"></i>
+                <span class="ms-4 fw-medium">{{ processHistory[0]?.note || 'Detay belirtilmemiş.' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        
+        <div class="col-lg-8">
+            
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    
+                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3 gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <h6 class="fw-bold text-secondary text-uppercase small ls-1 m-0">Kurs Durumu</h6>
+                            
+                            <span class="badge px-3 py-2 rounded-pill d-flex align-items-center gap-2 shadow-sm"
+                                [ngClass]="'status-badge-' + (course?.trainingStatus?.code || '1')">
+                                <i class='bx fs-6' 
+                                   [ngClass]="{
+                                       'bx-edit': course?.trainingStatus?.code === '1',
+                                       'bx-time': course?.trainingStatus?.code === '2',
+                                       'bx-check-circle': course?.trainingStatus?.code === '3',
+                                       'bx-revision': course?.trainingStatus?.code === '5',
+                                       'bx-x-circle': course?.trainingStatus?.code === '4'
+                                   }"></i>
+                                <span>{{ course?.trainingStatus?.title || 'Taslak' }}</span>
+                            </span>
+                        </div>
+
+                        <span class="badge bg-light text-dark border align-self-start align-self-sm-center">
+                            %{{ completionRate }} Hazır
+                        </span>
+                    </div>
+                    
+                    <div class="progress mb-3" style="height: 12px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             [ngClass]="{'bg-danger': completionRate < 50, 'bg-warning': completionRate >= 50 && completionRate < 80, 'bg-success': completionRate >= 80}"
+                             role="progressbar" 
+                             [style.width.%]="completionRate">
+                        </div>
+                    </div>
+
+                    <div *ngIf="missingFields.length > 0" class="mt-3">
+                        <small class="text-muted fw-bold d-block mb-2">Tamamlanması gerekenler:</small>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span *ngFor="let item of missingFields" class="badge bg-light text-secondary border d-flex align-items-center gap-1">
+                                <i class='bx bx-radio-circle'></i> {{ item }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="missingFields.length === 0" class="text-success small fw-bold d-flex align-items-center gap-2 mt-3 p-2 bg-success bg-opacity-10 rounded">
+                        <i class='bx bx-check-double fs-4'></i> 
+                        <span>Harika! Kursunuzun temel bilgileri ve içeriği yayına hazır görünüyor.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm" style="min-height: 400px;">
+                <div class="card-header bg-white border-0 py-3 border-bottom d-flex align-items-center gap-2 sticky-top bg-white" style="z-index: 5;">
+                    <i class='bx bx-history text-primary fs-5'></i>
+                    <h6 class="fw-bold m-0 text-dark">Süreç Geçmişi</h6>
+                </div>
+                <div class="card-body p-0 position-relative">
+                    
+                    <div *ngIf="isLoadingHistory" class="text-center py-5">
+                        <div class="spinner-border text-primary spinner-border-sm"></div>
+                        <p class="text-muted small mt-2">Yükleniyor...</p>
+                    </div>
+
+                    <div *ngIf="!isLoadingHistory && processHistory.length > 0" class="timeline-container p-4">
+                        
+                        <div *ngFor="let item of processHistory; let isLast = last" class="timeline-item d-flex gap-3">
+                            
+                            <div class="timeline-left d-flex flex-column align-items-center" style="width: 40px;">
+                                <div class="icon-circle rounded-circle d-flex align-items-center justify-content-center text-white shadow-sm flex-shrink-0"
+                                     [ngClass]="'status-bg-' + item.requestStatusCode">
+                                    <i class='bx fs-6' [ngClass]="{
+                                        'bx-send': item.requestStatusCode === '1',
+                                        'bx-check': item.requestStatusCode === '3',
+                                        'bx-x': item.requestStatusCode === '4',
+                                        'bx-revision': item.requestStatusCode === '5'
+                                    }"></i>
+                                </div>
+                                <div *ngIf="!isLast" class="timeline-line flex-grow-1 my-1"></div>
+                            </div>
+
+                            <div class="timeline-content pb-4 w-100">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="fw-bold mb-1 text-dark" style="font-size: 0.95rem;">
+                                            <span *ngIf="item.requestStatusCode === '1'">İncelemeye Gönderildi</span>
+                                            <span *ngIf="item.requestStatusCode === '3'">Yayına Alındı</span>
+                                            <span *ngIf="item.requestStatusCode === '4'">Reddedildi</span>
+                                            <span *ngIf="item.requestStatusCode === '5'">Revizyon İsteği</span>
+                                        </h6>
+                                        
+                                        <span class="badge fw-normal border" 
+                                              [ngClass]="'timeline-badge-' + item.requestStatusCode">
+                                            {{ item.statusName }}
+                                        </span>
+                                    </div>
+                                    <small class="text-muted d-flex align-items-center gap-1 bg-light px-2 py-1 rounded">
+                                        <i class='bx bx-time'></i> {{ item.createdDate | date:'dd.MM.yyyy HH:mm' }}
+                                    </small>
+                                </div>
+
+                                <div class="mt-2 p-3 bg-light rounded border position-relative">
+                                    <div class="arrow-left"></div>
+                                    
+                                    <p class="mb-2 small text-secondary fst-italic">
+                                        {{ item.note || 'Açıklama belirtilmemiş.' }}
+                                    </p>
+
+                                    <div class="border-top border-secondary-subtle pt-2 mt-2 d-flex justify-content-between align-items-center" style="font-size: 0.75rem;">
+                                        <span class="text-muted d-flex align-items-center gap-1">
+                                            <i class='bx bx-user'></i> Başlatan: <span class="fw-semibold text-dark">{{ item.requesterFullName }}</span>
+                                        </span>
+
+                                        <span *ngIf="item.responderFullName" class="text-primary d-flex align-items-center gap-1">
+                                            <i class='bx bx-check-double'></i> Yanıtlayan: <span class="fw-bold">{{ item.responderFullName }}</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div *ngIf="!isLoadingHistory && processHistory.length === 0" class="text-center py-5">
+                        <div class="mb-3"><i class='bx bx-ghost fs-1 text-muted opacity-25'></i></div>
+                        <p class="text-muted small m-0">Henüz bir işlem geçmişi bulunmuyor.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4 text-center d-flex flex-column">
+                    
+                    <h6 class="fw-bold text-secondary text-uppercase small ls-1 mb-4">Otomatik Kalite Analizi</h6>
+
+                    <ng-container *ngIf="qualityScore; else noScore">
+                        <div class="position-relative mx-auto mb-3 chart-container">
+                            <div class="rounded-circle border border-5 d-flex flex-column align-items-center justify-content-center w-100 h-100 shadow-sm"
+                                 [ngClass]="{
+                                     'border-success text-success': qualityScore.totalScore >= 80,
+                                     'border-warning text-warning': qualityScore.totalScore >= 50 && qualityScore.totalScore < 80,
+                                     'border-danger text-danger': qualityScore.totalScore < 50
+                                 }">
+                                <span class="display-3 fw-bold lh-1">{{ qualityScore.totalScore }}</span>
+                                <span class="small fw-bold text-muted text-uppercase" style="font-size: 0.65rem; letter-spacing: 1px;">Puan</span>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-4">Son hesaplama: {{ qualityScore.lastCalculatedDate | date:'dd.MM.yyyy HH:mm' }}</p>
+                        
+                        <div class="w-100 bg-light rounded p-3 mb-4 text-start">
+                            <ul class="list-unstyled m-0 small">
+                                <li class="d-flex justify-content-between mb-2" *ngFor="let det of qualityScore.scoreDetails | keyvalue | slice:0:4">
+                                    <span class="text-muted">{{ det.key }}</span>
+                                    <span class="fw-bold text-success">+{{ det.value }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </ng-container>
+
+                    <ng-template #noScore>
+                        <div class="py-5 my-auto">
+                            <div class="icon-box bg-light text-primary mx-auto mb-3 rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class='bx bx-analyse fs-1'></i>
+                            </div>
+                            <h6 class="fw-bold text-dark">Analiz Bekleniyor</h6>
+                            <p class="text-muted small mb-0 px-3">Kursunuzun kalitesini ölçmek ve eksikleri görmek için analiz motorunu çalıştırın.</p>
+                        </div>
+                    </ng-template>
+
+                    <button class="btn w-100 mt-auto py-2 shadow-sm fw-bold d-flex align-items-center justify-content-center gap-2" 
+                            [ngClass]="qualityScore ? 'btn-outline-primary' : 'btn-primary'"
+                            [disabled]="isCalculating"
+                            (click)="calculateScore()">
+                        <span *ngIf="isCalculating" class="spinner-border spinner-border-sm"></span>
+                        <i *ngIf="!isCalculating" class='bx' [ngClass]="qualityScore ? 'bx-refresh' : 'bx-radar'"></i>
+                        {{ qualityScore ? 'Puanı Güncelle' : 'Analiz Et ve Puanla' }}
+                    </button>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -50,7 +50,6 @@ export class CourseManageComponent implements OnInit, OnDestroy {
         });
 
         // 🔥 STORE'DAN EĞİTİM DURUMUNU DİNLE
-        // Düzeltme: 'state.course' alanı reducer'da 'state.selectedCourse' olarak tanımlı.
         this.courseSub = this.store.select(state => state.course).subscribe(courseState => {
             if (courseState && courseState.selectedCourse) {
                 this.course = courseState.selectedCourse;
@@ -67,7 +66,7 @@ export class CourseManageComponent implements OnInit, OnDestroy {
 
     // HELPER: Eğitim İncelemede mi? (KİLİT)
     get isLocked(): boolean {
-        // 2: PendingApproval
+        // 2: PendingApproval (İncelemede) -> KİLİTLİ
         return this.currentStatus === '2';
     }
 
@@ -76,8 +75,8 @@ export class CourseManageComponent implements OnInit, OnDestroy {
         if (this.isSubmitting) return 'İşleniyor...';
         
         switch (this.currentStatus) {
-            case '2': return 'İnceleme Bekleniyor 🔒'; // Pending
-            case '3': return 'Güncellemeleri Onaya Gönder'; // Published (Partial Review)
+            case '2': return 'Onay Bekleniyor...'; // 🔥 İsteğin üzerine değişti
+            case '3': return 'Güncellemeleri Onaya Gönder'; // Published
             case '5': return 'Revizyonu Gönder'; // RevisionNeeded
             default: return 'İnceleme için Gönder'; // Preparing / Canceled
         }
@@ -91,7 +90,6 @@ export class CourseManageComponent implements OnInit, OnDestroy {
         this.trainingApiService.getTrainingPreviewToken(this.courseId).subscribe({
             next: (token) => {
                 this.isLoadingCustomerPreview = false;
-                // Yan sekmede aç
                 const url = this.router.serializeUrl(
                     this.router.createUrlTree(['/course', this.courseId], { queryParams: { previewToken: token } })
                 );
@@ -148,7 +146,6 @@ export class CourseManageComponent implements OnInit, OnDestroy {
                     // State'i güncellemek için tekrar yükle
                     this.store.dispatch(loadCourse({ courseId: this.courseId }));
                     
-                    // Published ise listede kalabilir, değilse çıkabilir
                     if(this.currentStatus !== '3') {
                         this.router.navigate(['/instructor/courses']); 
                     }
@@ -158,13 +155,11 @@ export class CourseManageComponent implements OnInit, OnDestroy {
             },
             error: (err) => {
                 if (err.error && err.error.header && err.error.header.msg) {
-                    // Backend'in gönderdiği özel mesajı göster (Örn: "Zaten bekleyen talep var")
                     this.toastr.warning(err.error.header.msg, 'İşlem Başarısız');
                 } else {
-                    // Standart hata
                     this.toastr.error('Sunucu hatası oluştu. Lütfen tekrar deneyin.');
                 }
-                console.error(err);
+                this.isSubmitting = false;
             }
         });
     }

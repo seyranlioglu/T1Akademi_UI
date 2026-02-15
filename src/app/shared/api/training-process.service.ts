@@ -22,4 +22,10 @@ export class TrainingProcessService {
   respondToRequest(data: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/respond`, data);
   }
+
+  // 3. Süreç Geçmişini Getir (Eğitmen Dashboard & History)
+  // Backend: [HttpGet("GetHistory/{trainingId}")]
+  getHistory(trainingId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/GetHistory/${trainingId}`);
+  }
 }

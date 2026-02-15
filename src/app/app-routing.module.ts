@@ -68,7 +68,7 @@ import { CourseSettingsComponent } from './components/pages/instructor/course-ma
 import { ExamBuilderComponent } from './components/pages/instructor/course-manage/curriculum/exam-builder/exam-builder.component';
 import { ExamLibraryComponent } from './components/pages/instructor/exam-library/exam-library.component';
 import { TrainingApprovalComponent } from './components/admin/training-approval/training-approval.component';
-
+import { CourseDashboardComponent } from './components/pages/instructor/course-manage/course-dashboard/course-dashboard.component';
 const routes: Routes = [
 
     // 1. AUTH
@@ -166,7 +166,8 @@ const routes: Routes = [
                 component: CourseManageComponent,
                 canActivate: [IdValidatorGuard],
                 children: [
-                    { path: '', redirectTo: 'what-you-will-learn', pathMatch: 'full' },
+                    { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+                    { path: 'dashboard', component: CourseDashboardComponent },
                     { path: 'what-you-will-learn', component: WhatYouWillLearnComponent },
                     { path: 'curriculum', component: CurriculumComponent },
                     { path: 'course-landing', component: CourseLandingComponent },

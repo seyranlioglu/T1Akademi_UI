@@ -1,0 +1,115 @@
+/* Grafik Animasyonu */
+.chart-container {
+    width: 150px; 
+    height: 150px;
+    transition: transform 0.3s ease;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+}
+
+.border-bottom-dashed {
+    border-bottom: 1px dashed #e9ecef !important;
+    &:last-child {
+        border-bottom: none !important;
+    }
+}
+
+.card {
+    transition: box-shadow 0.3s ease;
+    &:hover {
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.08) !important;
+    }
+}
+
+/* ----------------------------------------------------
+   🔥 STATÜ BADGE RENKLERİ (ANA BAŞLIK)
+   !important kullanarak override sorununu çözüyoruz.
+---------------------------------------------------- */
+.status-badge-1 { background-color: #6c757d !important; color: #fff !important; } /* Taslak - Gri */
+.status-badge-2 { background-color: #0dcaf0 !important; color: #000 !important; } /* Onay Bekliyor - Turkuaz */
+.status-badge-3 { background-color: #198754 !important; color: #fff !important; } /* Yayında - Yeşil */
+.status-badge-4 { background-color: #dc3545 !important; color: #fff !important; } /* Red - Kırmızı */
+.status-badge-5 { background-color: #ffc107 !important; color: #000 !important; } /* Revizyon - Sarı */
+
+
+/* ----------------------------------------------------
+   🔥 TIMELINE IKON ARKAPLANLARI
+---------------------------------------------------- */
+.status-bg-1 { background-color: #0d6efd !important; } /* Mavi */
+.status-bg-2 { background-color: #0dcaf0 !important; } /* Turkuaz */
+.status-bg-3 { background-color: #198754 !important; } /* Yeşil */
+.status-bg-4 { background-color: #dc3545 !important; } /* Kırmızı */
+.status-bg-5 { background-color: #ffc107 !important; } /* Sarı */
+
+
+/* ----------------------------------------------------
+   🔥 TIMELINE BADGE RENKLERİ (SUBTLE - PASTEL)
+   Bootstrap 5.3 öncesi için manuel tanımlama
+---------------------------------------------------- */
+.timeline-badge-1 { background-color: #cfe2ff !important; color: #084298 !important; border-color: #b6d4fe !important; }
+.timeline-badge-2 { background-color: #cff4fc !important; color: #055160 !important; border-color: #b6effb !important; }
+.timeline-badge-3 { background-color: #d1e7dd !important; color: #0f5132 !important; border-color: #badbcc !important; }
+.timeline-badge-4 { background-color: #f8d7da !important; color: #842029 !important; border-color: #f5c2c7 !important; }
+.timeline-badge-5 { background-color: #fff3cd !important; color: #664d03 !important; border-color: #ffecb5 !important; }
+
+
+/* Timeline Genel Stiller */
+.timeline-container {
+    position: relative;
+}
+
+.timeline-item {
+    position: relative;
+}
+
+.icon-circle {
+    width: 36px;
+    height: 36px;
+    border: 3px solid #fff; 
+    z-index: 2;
+    font-size: 1.2rem;
+}
+
+.timeline-line {
+    width: 2px;
+    background-color: #e9ecef;
+    min-height: 20px; 
+}
+
+/* Konuşma Balonu Oku */
+.arrow-left {
+    position: absolute;
+    top: 10px;
+    left: -6px;
+    width: 0; 
+    height: 0; 
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent; 
+    border-right: 6px solid #dee2e6; /* Border rengiyle aynı */
+    
+    &::after {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: 1px; 
+        border-top: 6px solid transparent;
+        border-bottom: 6px solid transparent; 
+        border-right: 6px solid #f8f9fa; /* bg-light rengi */
+    }
+}
+
+/* Scrollbar özelleştirme */
+.list-group {
+    max-height: 500px;
+    overflow-y: auto;
+    
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: #dee2e6;
+        border-radius: 4px;
+    }
+}

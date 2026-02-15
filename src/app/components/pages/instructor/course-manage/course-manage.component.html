@@ -21,6 +21,17 @@
 
         <ul class="menu-sections">
             <li class="menu-section">
+                <ul class="menu-items">
+                    <li class="menu-item" [routerLinkActive]="['active']">
+                        <a [routerLink]="'/instructor/course-manage/'+courseId+'/dashboard'" class="menu-link p-2 d-flex align-items-center rounded">
+                            <span class="completion me-2"><i class='bx bx-grid-alt bx-sm'></i></span>
+                            <span>Genel Bakış</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="menu-section">
                 <div class="section-title">Kursunuzu planlayın</div>
                 <ul class="menu-items">
                     <li class="menu-item" [routerLinkActive]="['active']">
@@ -72,17 +83,24 @@
         <button class="default-btn mt-4 w-100 shadow-sm d-flex align-items-center justify-content-center gap-2" 
                 type="button" 
                 (click)="submitCourseForReview()" 
-                [disabled]="isSubmitting || isLocked"
-                [ngClass]="{'btn-secondary': isLocked, 'btn-primary': !isLocked}">
+                [disabled]="isSubmitting || isLocked" 
+                [ngClass]="{
+                    'btn-secondary cursor-not-allowed opacity-75': isLocked, 
+                    'btn-primary': !isLocked && !isSubmitting
+                }">
             
             <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             
-            <i *ngIf="!isSubmitting" class='bx' [ngClass]="isLocked ? 'bx-lock-alt' : 'bx-send'"></i> 
+            <i *ngIf="!isSubmitting" class='bx' [ngClass]="isLocked ? 'bx-time-five' : 'bx-send'"></i> 
             
             <span>{{ submitButtonText }}</span>
         </button>
 
-        <div *ngIf="currentStatus === '3'" class="text-muted small text-center mt-2 fst-italic">
+        <div *ngIf="isLocked" class="text-muted tiny-text text-center mt-2">
+            <small>Eğitiminiz şu an yönetici onayında.</small>
+        </div>
+
+        <div *ngIf="currentStatus === '3' && !isLocked" class="text-muted small text-center mt-2 fst-italic">
             <i class='bx bx-info-circle'></i> Yeni içerikleri onaya gönderir
         </div>
 

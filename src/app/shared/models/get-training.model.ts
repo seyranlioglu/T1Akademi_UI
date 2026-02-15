@@ -7,13 +7,17 @@ export interface GetTraining {
     trailer?: string;
     langCode?: string;
     
+    // 🔥 EKLENEN: Admin Paneli ve Ban İşlemleri için
+    instructorId?: number; 
+    qualityScore?: number;
+
     // İstatistikler
     totalLectureCount?: number;
     totalDurationMinutes?: number;
     rating?: number;
     reviewCount?: number;
     studentCount?: number;
-    progressPercentage?: number; // UI için eklendi
+    progressPercentage?: number;
 
     // Eğitmen
     instructorTitle?: string;
@@ -30,7 +34,7 @@ export interface GetTraining {
     discountRate?: number;
     priceTierId?: number;
 
-    // Listeler ve İlişkiler (EKSİK OLANLAR EKLENDİ)
+    // Listeler ve İlişkiler
     resumeContext?: ActiveContentResumeDto;
     trainingSections: TrainingSectionDto[];
     
@@ -40,7 +44,7 @@ export interface GetTraining {
     targetAudiences?: TrainingAttributeDto[];
     tags?: TrainingAttributeDto[];
     
-    // 🔥 EKLENEN: Yorumlar Listesi
+    // Yorumlar
     trainingReviews?: TrainingReviewDto[];
 }
 
@@ -58,14 +62,22 @@ export interface TrainingContentDto {
     orderId?: number;
     isLocked?: boolean;
     isChecked?: boolean;
-    isActiveContent?: boolean;
-    contentType?: { title: string }; // Basit tip tanımı
+    
+    // 🔥 EKLENEN: Taslak Kontrolü ve Sınav
+    isActive?: boolean; 
+    examId?: number;
+
+    contentType?: { 
+        code?: string;
+        title: string; 
+    }; 
+    
     trainingContentLibraryDto?: {
         trainingContentLibraryFilePath?: string;
         trainingContentLibraryFileName?: string;
         trainingContentLibraryVideoDuration?: string;
     };
-    // Düzeltilmiş path
+    
     filePath?: string; 
 }
 
@@ -80,9 +92,11 @@ export interface TrainingAttributeDto {
     id: number;
     value: string;
     order: number;
+    // 🔥 Opsiyonel yaptık ki diğer componentler hata vermesin
+    trainingId?: number; 
+    attributeType?: number;
 }
 
-// 🔥 EKLENEN: Yorum Modeli
 export interface TrainingReviewDto {
     rating: number;
     comment: string;
@@ -92,4 +106,13 @@ export interface TrainingReviewDto {
         surName?: string;
         profileImagePath?: string;
     };
+}
+
+// 🔥 EKLENEN: Kalite Puanı Detay Modeli
+export interface TrainingQualityScoreDto {
+    trainingId: number;
+    totalScore: number;
+    lastCalculatedDate: Date;
+    suggestions: string[]; 
+    scoreDetails: { [key: string]: number }; 
 }
