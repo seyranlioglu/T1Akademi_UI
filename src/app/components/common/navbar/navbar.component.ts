@@ -5,6 +5,7 @@ import { CategoryService } from 'src/app/shared/services/category.service';
 import { SidebarService } from 'src/app/shared/services/sidebar.service';
 import { TrainingApiService } from 'src/app/shared/api/training-api.service';
 import { CartService, CartViewDto } from 'src/app/shared/services/cart.service';
+import { NotificationService, AppNotification } from 'src/app/shared/services/notification.service'; // YENİ
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of, catchError } from 'rxjs';
 
 @Component({
@@ -36,9 +37,15 @@ export class NavbarComponent implements OnInit {
   showSearchResults = false;
   private searchSubject = new Subject<string>();
 
-  // SEPET (Başlangıçta boş obje atıyoruz hatayı önlemek için)
+  // SEPET
   cartData: CartViewDto = { cartId: 0, totalAmount: 0, totalItemCount: 0, items: [] };
   showCartDropdown = false;
+
+  // BİLDİRİMLER (YENİ)
+  showNotificationDropdown = false;
+  activeNotifTab: 'notifications' | 'messages' = 'notifications';
+  notifications: AppNotification[] = [];
+  unreadNotifCount = 0;
 
   @ViewChild('searchBoxContainer') searchBoxContainer!: ElementRef;
 
@@ -48,7 +55,8 @@ export class NavbarComponent implements OnInit {
     private router: Router,
     private sidebarService: SidebarService,
     private trainingService: TrainingApiService,
-    private cartService: CartService
+    private cartService: CartService,
+    private notificationService: NotificationService // YENİ
   ) { }
 
   ngOnInit(): void {
@@ -61,6 +69,9 @@ export class NavbarComponent implements OnInit {
             this.processUserData(user);
             this.loadMyCourses(); 
             this.cartService.loadCart();
+            
+            // Bildirimleri Yükle
+            this.notificationService.loadNotifications();
         } catch (e) {
             console.error('User parse error', e);
         }
@@ -96,14 +107,36 @@ export class NavbarComponent implements OnInit {
         }
     });
 
-    // 4. SEPET DİNLEME (Null gelse bile hata vermez)
+    // 4. SEPET DİNLEME
     this.cartService.cart$.subscribe(data => {
       if (data) {
         this.cartData = data;
       }
     });
+
+    // 5. BİLDİRİM DİNLEME (YENİ)
+    this.notificationService.notifications$.subscribe(res => this.notifications = res);
+    this.notificationService.unreadCount$.subscribe(count => this.unreadNotifCount = count);
   }
 
+  // --- BİLDİRİM METODLARI ---
+  switchNotifTab(tab: 'notifications' | 'messages', event: Event) {
+      event.stopPropagation();
+      this.activeNotifTab = tab;
+  }
+
+  onNotificationClick(notif: AppNotification) {
+      if (!notif.isRead) {
+          this.notificationService.markAsRead(notif.id);
+      }
+      this.showNotificationDropdown = false;
+      if (notif.link) {
+          this.router.navigateByUrl(notif.link);
+      }
+  }
+
+  // ... (DİĞER MEVCUT METODLAR AYNEN KALIYOR) ...
+  
   removeItemFromCart(itemId: number, event: Event) {
     event.stopPropagation();
     this.cartService.removeFromCart(itemId).subscribe();

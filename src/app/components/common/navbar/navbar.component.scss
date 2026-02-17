@@ -173,3 +173,37 @@
 .navbar-toggler {
     &:focus { box-shadow: none; outline: none; }
 }
+
+// Bildirim Tabları
+.notification-tab {
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    
+    &:hover {
+        background-color: #f8f9fa;
+    }
+
+    &.active {
+        border-bottom-color: var(--primaryColor, #5624d0);
+        background-color: #fff;
+    }
+}
+
+.x-small {
+    font-size: 0.7rem;
+}
+
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.hover-bg:hover {
+    background-color: #f8f9fa;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}

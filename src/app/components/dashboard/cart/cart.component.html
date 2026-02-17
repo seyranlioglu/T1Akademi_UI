@@ -1,146 +1,104 @@
-<div class="courses-table">
-    <div class="table-responsive">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th scope="col">Course Name</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Quantity</th>
-                    <th scope="col">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">
-                        <a routerLink="/course-details">
-                            Deep Learning a-z Hands on Artificial Neural Networks
-                        </a>
-                    </th>
-                    <td>
-                        $38.00
-                    </td>
-                    <td>
-                        1
-                    </td>
-                    <td class="action">
-                        <button type="button" class="default-btn">
-                            <i class='bx bx-trash-alt'></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <a routerLink="/course-details">
-                            The Data Science Courses Complete Data Science
-                        </a>
-                    </th>
-                    <td>
-                        $32.00
-                    </td>
-                    <td>
-                        1
-                    </td>
-                    <td class="action">
-                        <button type="button" class="default-btn">
-                            <i class='bx bx-trash-alt'></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <a routerLink="/course-details">
-                            Node.js for Beginners Go From Zero Hero Nede.js
-                        </a>
-                    </th>
-                    <td>
-                        $21.00
-                    </td>
-                    <td>
-                        1
-                    </td>
-                    <td class="action">
-                        <button type="button" class="default-btn">
-                            <i class='bx bx-trash-alt'></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <a routerLink="/course-details">
-                            Successful Negotiation: Master Your Negotiating
-                        </a>
-                    </th>
-                    <td>
-                        $99.00
-                    </td>
-                    <td>
-                        1
-                    </td>
-                    <td class="action">
-                        <button type="button" class="default-btn">
-                            <i class='bx bx-trash-alt'></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <a routerLink="/course-details">
-                            Java Programming Master Class for Software
-                        </a>
-                    </th>
-                    <td>
-                        $65.00
-                    </td>
-                    <td>
-                        1
-                    </td>
-                    <td class="action">
-                        <button type="button" class="default-btn">
-                            <i class='bx bx-trash-alt'></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <a routerLink="/course-details">
-                            Machine Learning A-Z™: Hands-On Python & R
-                        </a>
-                    </th>
-                    <td>
-                        $50.00
-                    </td>
-                    <td>
-                        1
-                    </td>
-                    <td class="action">
-                        <button type="button" class="default-btn">
-                            <i class='bx bx-trash-alt'></i>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">
-                        <a routerLink="/course-details">
-                            Node.js for Beginners Go From Zero Hero Nede.js
-                        </a>
-                    </th>
-                    <td>
-                        $33.00
-                    </td>
-                    <td>
-                        1
-                    </td>
-                    <td class="action">
-                        <button type="button" class="default-btn">
-                            <i class='bx bx-trash-alt'></i>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="mt-4 d-flex align-items-center justify-content-between">
-        <span></span>
-        <button class="default-btn two" type="button">Proceed to Checkout</button>
+<div class="cart-area ptb-50">
+    <div class="container">
+        
+        <div class="section-title text-start mb-4">
+            <h2 class="fw-bold">Alışveriş Sepeti</h2>
+            <p class="text-muted">{{ cartData.totalItemCount }} Kurs Sepette</p>
+        </div>
+
+        <div class="row" *ngIf="!isLoading">
+            
+            <div class="col-lg-8 col-md-12">
+                <div class="cart-items-wrapper">
+                    
+                    <div *ngIf="cartData.items.length === 0" class="empty-cart text-center p-5 border rounded bg-white shadow-sm mb-4">
+                        <img src="assets/images/defaults/empty-cart.png" alt="Empty Cart" style="max-width: 150px; opacity: 0.6;">
+                        <h5 class="mt-3 text-muted">Sepetiniz şu an boş.</h5>
+                        <p class="text-muted small">Öğrenmeye başlamak için kursları keşfedin.</p>
+                        <button class="btn btn-primary mt-3" (click)="goToHome()">Kurslara Göz At</button>
+                    </div>
+
+                    <div *ngFor="let item of cartData.items" class="cart-single-item p-3 mb-3 border rounded bg-white shadow-sm d-flex align-items-start gap-3">
+                        <div class="cart-img flex-shrink-0">
+                            <a [routerLink]="['/course', item.trainingId]">
+                                <img [src]="item.trainingImage !== 'none' ? item.trainingImage : 'assets/images/defaults/default.jpg'" 
+                                     (error)="handleMissingImage($event)"
+                                     alt="Course" class="rounded border" style="width: 120px; height: 70px; object-fit: cover;">
+                            </a>
+                        </div>
+
+                        <div class="cart-content flex-grow-1">
+                            <a [routerLink]="['/course', item.trainingId]" class="text-dark text-decoration-none fw-bold d-block mb-1 title-link">
+                                {{ item.trainingTitle }}
+                            </a>
+                            <span class="text-muted small d-block mb-1">Eğitmen: T1 Akademi</span>
+                            
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <span class="badge bg-light text-dark border">{{ item.categoryName }}</span>
+                                <span class="badge bg-info bg-opacity-10 text-info border border-info" *ngIf="item.licenceCount > 1">
+                                    {{ item.licenceCount }} Kişilik Lisans
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="cart-actions text-end d-flex flex-column justify-content-between" style="min-height: 70px;">
+                            <div class="text-primary fw-bold fs-5 price-tag">
+                                {{ item.currentAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}
+                            </div>
+                            <small class="text-decoration-line-through text-muted x-small" *ngIf="item.discountRate > 0">
+                                {{ item.amount | currency:'TRY':'symbol-narrow':'1.0-0' }}
+                            </small>
+                            
+                            <button class="btn btn-link text-danger text-decoration-none p-0 mt-auto ms-auto remove-btn" (click)="removeItem(item.id)">
+                                Sil
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-12" *ngIf="cartData.items.length > 0">
+                <div class="cart-summary p-4 bg-white border rounded shadow-sm sticky-lg-top" style="top: 100px; z-index: 900;">
+                    <h5 class="text-muted mb-3">Toplam:</h5>
+                    <h1 class="fw-bold mb-4 display-6">{{ cartData.totalAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}</h1>
+                    
+                    <button class="btn btn-primary w-100 py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" 
+                            (click)="createPurchaseRequest()">
+                        <span>Satın Alma Talebi Oluştur</span>
+                        <i class='bx bx-right-arrow-alt fs-4'></i>
+                    </button>
+
+                    <div class="border-top pt-3 mt-3">
+                        <label class="form-label fw-bold small text-muted">Kupon Kodu</label>
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="Kodu giriniz" [(ngModel)]="couponCode">
+                            <button class="btn btn-outline-secondary" type="button" (click)="applyCoupon()">Uygula</button>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6 class="fw-bold small text-muted mb-2">Kurumsal Satın Alma</h6>
+                        <p class="x-small text-muted mb-0">
+                            Toplu alımlar ve kurumsal fatura talepleriniz için bu butonu kullanabilirsiniz. Talebiniz yönetici onayına düşecektir.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="recommended-area mt-5 pt-5 border-top" *ngIf="recommendedTrainings.length > 0">
+            <h3 class="fw-bold mb-4">Hoşunuza Gidebilecek Diğer Kurslar</h3>
+            
+            <owl-carousel-o [options]="carouselOptions">
+                <ng-template carouselSlide *ngFor="let item of recommendedTrainings">
+                    
+                    <app-course-card [training]="item"></app-course-card>
+
+                </ng-template>
+            </owl-carousel-o>
+        </div>
+
     </div>
 </div>

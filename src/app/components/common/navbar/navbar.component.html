@@ -97,6 +97,8 @@
                     
                     <a routerLink="/pricing" class="nav-link text-dark d-none d-xl-block fw-bold small">Planlar</a>
                     
+                    <a *ngIf="isInstructor" routerLink="/instructor" class="nav-link text-dark d-none d-lg-block fw-bold small">Eğitmen</a>
+
                     <div class="dropdown position-relative d-none d-lg-block" (mouseenter)="showMyCourses=true" (mouseleave)="showMyCourses=false">
                         <a href="javascript:void(0)" class="nav-link text-dark fw-bold small learning-link px-3 py-2 rounded" 
                            [class.active-menu]="showMyCourses"
@@ -146,9 +148,11 @@
                         </div>
                     </div>
 
-                    <a routerLink="/dashboard/wishlist" class="text-dark d-none d-sm-block" title="İstek Listesi"><i class='bx bx-heart fs-4'></i></a>
+                    <a routerLink="/dashboard/wishlist" class="text-dark d-none d-sm-block position-relative" title="İstek Listesi">
+                        <i class='bx bx-heart fs-4'></i>
+                    </a>
                     
-                    <div class="dropdown position-relative d-none d-sm-block me-3" 
+                    <div class="dropdown position-relative d-none d-sm-block me-1" 
                          (mouseenter)="showCartDropdown=true" 
                          (mouseleave)="showCartDropdown=false">
                         
@@ -191,15 +195,94 @@
                                             <span class="text-primary fw-bold small">{{ item.currentAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}</span>
                                         </div>
                                     </div>
-
-                                    <button class="btn btn-sm text-danger ms-2" (click)="removeItemFromCart(item.id, $event)" title="Kaldır">
-                                        <i class='bx bx-trash'></i>
-                                    </button>
                                 </div>
                             </div>
 
                             <div class="p-3 bg-white" *ngIf="cartData.items.length > 0">
                                 <a routerLink="/dashboard/cart" class="btn btn-primary w-100 fw-bold btn-sm">Sepete Git</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dropdown position-relative d-none d-sm-block me-3" 
+                         (mouseenter)="showNotificationDropdown=true" 
+                         (mouseleave)="showNotificationDropdown=false">
+                        
+                        <a href="javascript:void(0)" class="text-dark position-relative d-flex align-items-center" 
+                           title="Bildirimler">
+                            <i class='bx bx-bell fs-4'></i>
+                            <span *ngIf="unreadNotifCount > 0" 
+                                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                  style="font-size: 10px; border: 2px solid #fff;">
+                                {{ unreadNotifCount }}
+                            </span>
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0 mt-0 animate__animated animate__fadeIn"
+                             [class.show]="showNotificationDropdown"
+                             style="width: 360px; position: absolute; right: -50px; z-index: 1060;">
+                            
+                            <div class="d-flex border-bottom">
+                                <div class="flex-fill text-center py-3 fw-bold cursor-pointer position-relative notification-tab"
+                                     [class.active]="activeNotifTab === 'notifications'"
+                                     [class.text-primary]="activeNotifTab === 'notifications'"
+                                     (click)="switchNotifTab('notifications', $event)">
+                                    Bildirimler
+                                </div>
+                                <div class="flex-fill text-center py-3 fw-bold cursor-pointer position-relative notification-tab"
+                                     [class.active]="activeNotifTab === 'messages'"
+                                     [class.text-primary]="activeNotifTab === 'messages'"
+                                     (click)="switchNotifTab('messages', $event)">
+                                    Mesajlar
+                                </div>
+                            </div>
+
+                            <div class="notification-list-wrapper custom-scrollbar" style="max-height: 400px; overflow-y: auto;">
+                                
+                                <ng-container *ngIf="activeNotifTab === 'notifications'">
+                                    <div *ngIf="notifications.length === 0" class="p-5 text-center text-muted">
+                                        <i class='bx bx-bell-off fs-1 mb-2 opacity-50'></i>
+                                        <p class="mb-0 small">Henüz bildiriminiz yok.</p>
+                                    </div>
+
+                                    <div *ngFor="let notif of notifications" 
+                                         class="notif-item p-3 border-bottom d-flex align-items-start hover-bg cursor-pointer"
+                                         [class.bg-light]="!notif.isRead"
+                                         (click)="onNotificationClick(notif)">
+                                        
+                                        <div class="icon-circle rounded-circle d-flex align-items-center justify-content-center me-3 flex-shrink-0"
+                                             style="width: 40px; height: 40px; background-color: #f8f9fa;">
+                                            <i class='bx fs-4' [ngClass]="notif.iconClass || 'bx-bell'"></i>
+                                        </div>
+                                        
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <h6 class="mb-1 text-dark fw-bold text-truncate" style="font-size: 13px; max-width: 200px;">
+                                                    {{ notif.title }}
+                                                </h6>
+                                                <span class="text-muted x-small text-nowrap">{{ notif.timeAgo }}</span>
+                                            </div>
+                                            <p class="text-muted small mb-0 text-truncate-2" style="line-height: 1.4;">
+                                                {{ notif.message }}
+                                            </p>
+                                        </div>
+                                        <div *ngIf="!notif.isRead" class="ms-2 align-self-center">
+                                            <span class="d-block rounded-circle bg-primary" style="width: 8px; height: 8px;"></span>
+                                        </div>
+                                    </div>
+                                </ng-container>
+
+                                <ng-container *ngIf="activeNotifTab === 'messages'">
+                                    <div class="p-5 text-center text-muted">
+                                        <i class='bx bx-envelope fs-1 mb-2 opacity-50'></i>
+                                        <p class="mb-0 small">Henüz mesajınız yok.</p>
+                                    </div>
+                                </ng-container>
+
+                            </div>
+
+                            <div class="p-2 bg-light border-top text-center" *ngIf="activeNotifTab === 'notifications' && notifications.length > 0">
+                                <a href="javascript:void(0)" class="text-decoration-none fw-bold small text-primary">Tümünü Gör</a>
                             </div>
                         </div>
                     </div>

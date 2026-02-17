@@ -9,9 +9,10 @@ export interface CartItem {
   trainingTitle: string;
   trainingImage: string;
   categoryName: string;
-  amount: number;
-  currentAmount: number;
+  amount: number;       // Birim Fiyat
+  currentAmount: number; // Satır Toplamı (Backend'den bu isimle geliyor)
   licenceCount: number;
+  discountRate: number;
 }
 
 export interface CartViewDto {
@@ -27,7 +28,7 @@ export interface CartViewDto {
 export class CartService {
   private apiUrl = `${environment.apiUrl}/Cart`;
 
-  // Başlangıç değeri boş obje (Hata önlemek için)
+  // Başlangıç değeri
   private initialState: CartViewDto = {
     cartId: 0,
     totalAmount: 0,
@@ -35,6 +36,7 @@ export class CartService {
     items: []
   };
 
+  // BehaviorSubject
   private cartSubject = new BehaviorSubject<CartViewDto>(this.initialState);
   cart$ = this.cartSubject.asObservable();
 
@@ -42,17 +44,18 @@ export class CartService {
     this.loadCart(); 
   }
 
+  // Sepeti yükle
   loadCart() {
     this.http.get<any>(`${this.apiUrl}/get-active-cart`).subscribe({
       next: (res) => {
-        // Backend'den gelen veriyi çözümle (Response Wrapper varsa .data, yoksa direkt kendisi)
-        const data = res.data || res.body || res;
-        
-        if (!data) {
-            this.cartSubject.next(this.initialState);
+        // Response yapısını kontrol et
+        if (res.header && res.header.result && res.body) {
+            this.updateCartState(res.body);
+        } else if (res.data) {
+            // Eğer wrapper farklıysa (eski yapı)
+            this.updateCartState(res.data);
         } else {
-            if (!data.items) data.items = [];
-            this.cartSubject.next(data);
+            this.cartSubject.next(this.initialState);
         }
       },
       error: () => {
@@ -61,35 +64,54 @@ export class CartService {
     });
   }
 
-  // GÜNCELLENDİ: licenceCount parametresi eklendi
+  // Sepete Ekle
   addToCart(trainingId: number, licenceCount: number = 1): Observable<any> {
     const body = { trainingId, licenceCount };
     
     return this.http.post<any>(`${this.apiUrl}/add-to-cart`, body).pipe(
       tap((res) => {
-        // İşlem başarılıysa backend güncel sepeti döner, onu yayına alıyoruz
-        if (res.isSuccess) {
-            const data = res.data || res.body || res;
-            if (data) {
-                if (!data.items) data.items = [];
-                this.cartSubject.next(data);
+        // 🔥 KRİTİK DÜZELTME: Header içindeki result'a bakıyoruz
+        if (res.header && res.header.result) {
+            // Backend güncel sepeti body içinde dönüyor, bunu direkt basıyoruz.
+            // Böylece tekrar loadCart yapmaya gerek kalmadan anında güncellenir.
+            if (res.body) {
+                this.updateCartState(res.body);
+            } else {
+                // Body boşsa garanti olsun diye loadCart çağır
+                this.loadCart();
             }
         }
       })
     );
   }
 
+  // Sepetten Sil
   removeFromCart(cartItemId: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/remove-from-cart/${cartItemId}`).pipe(
       tap((res) => {
-        if (res.isSuccess) {
-            const data = res.data || res.body || res;
-            if (data) {
-                if (!data.items) data.items = [];
-                this.cartSubject.next(data);
+        if (res.header && res.header.result) {
+            // Silme işleminden sonra backend güncel sepeti dönüyorsa kullan
+            if (res.body) {
+                this.updateCartState(res.body);
+            } else {
+                // Dönmüyorsa manuel çek
+                this.loadCart();
             }
         }
       })
     );
+  }
+
+  // Helper: State Güncelleme ve Null Kontrolü
+  private updateCartState(data: any) {
+      if (!data) {
+          this.cartSubject.next(this.initialState);
+          return;
+      }
+      // Items null gelebilir, boş array yapalım
+      if (!data.items) {
+          data.items = [];
+      }
+      this.cartSubject.next(data);
   }
 }

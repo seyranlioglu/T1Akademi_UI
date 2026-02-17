@@ -1,3 +1,28 @@
+export interface PublicReview {
+    userName: string;
+    userImage: string;
+    rating: number;
+    comment: string;
+    date: Date;
+}
+
+export interface PublicContent {
+    id: number;
+    title: string;
+    isPreview: boolean;
+    durationMinutes: number;
+    pageCount: number;
+    type: string; // 'video', 'pdf', 'image', 'exam'
+    filePath: string | null;
+}
+
+export interface PublicSection {
+    id: number;
+    title: string;
+    orderId: number;
+    contents: PublicContent[];
+}
+
 export interface PublicCourseDetail {
     id: number;
     title: string;
@@ -13,6 +38,16 @@ export interface PublicCourseDetail {
     reviewCount: number;
     studentCount: number;
     lastUpdateDate: Date;
+
+    // 🔥 EKLENEN EKSİK ALANLAR (Hata Sebebi Bunlardı)
+    totalResourceCount: number; 
+    videoLength: number;
+    accessPeriod: string;
+    certificateAvailable: boolean;
+
+    // Yeni Metrikler
+    tqs: number;       
+    isPremium: boolean; 
 
     // Fiyat
     amount: number;
@@ -30,38 +65,13 @@ export interface PublicCourseDetail {
     instructorTotalStudents: number;
     instructorTotalCourses: number;
 
-    // 🔥 GÜNCELLENEN & YENİ ALANLAR (String Listeleri)
-    whatYouWillLearn: string[]; // Eskiden obje listesiydi, şimdi string[]
-    requirements: string[];     // Yeni
-    targetAudience: string[];   // Yeni
-    tags: string[];             // Yeni
+    // Listeler
+    whatYouWillLearn: string[];
+    requirements: string[];
+    targetAudience: string[];
+    tags: string[];
 
     // İlişkisel Veriler
     sections: PublicSection[];
     topReviews: PublicReview[];
-}
-
-export interface PublicSection {
-    id: number;
-    title: string;
-    orderId: number;
-    contents: PublicContent[];
-}
-
-export interface PublicContent {
-    id: number;
-    title: string;
-    isPreview: boolean;
-    durationMinutes: number; // Video süresi
-    pageCount: number;
-    type: string;
-    filePath: string | null; // EKLENDİ: Video yolu için gerekli
-}
-
-export interface PublicReview {
-    userName: string;
-    userImage: string;
-    rating: number;
-    comment: string;
-    date: Date;
 }

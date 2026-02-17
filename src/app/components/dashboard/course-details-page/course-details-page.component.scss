@@ -1,24 +1,11 @@
-// --- 1. HERO SECTION (FULL WIDTH & MODERN) ---
+// --- HERO SECTION ---
 .course-hero-section {
     position: relative;
-    background-color: #1c1d1f; // Udemy Koyu Rengi
+    background-color: #1c1d1f; // Udemy Dark
     color: #fff;
-    padding: 80px 0 100px; // Alt boşluğu artırdık ki kart sığsın
-    overflow: hidden;
+    padding: 60px 0 100px; // Alt boşluğu Stats Bar için artırdık
+    overflow: visible; 
 
-    // Arka plan görseli veya degrade
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, rgba(28, 29, 31, 0.9) 0%, rgba(28, 29, 31, 0.8) 100%);
-        z-index: 0;
-    }
-
-    // Full Width Hilesi (Eğer parent container dar ise bunu kullan)
     @media (min-width: 992px) {
         margin-left: calc(-50vw + 50%);
         margin-right: calc(-50vw + 50%);
@@ -27,150 +14,166 @@
         padding-right: calc(50vw - 50%);
     }
 
-    // İçerik z-index ayarı (Arka planın üstünde kalsın)
-    .container {
-        position: relative;
-        z-index: 1;
-    }
-
-    h1 {
-        font-size: 2.4rem;
-        font-weight: 700;
-        line-height: 1.2;
-        margin-bottom: 1rem;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-
-    .lead {
-        font-size: 1.1rem;
-        max-width: 800px;
+    .container { position: relative; z-index: 2; }
+    
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(135deg, rgba(28, 29, 31, 0.95) 0%, rgba(28, 29, 31, 0.9) 100%);
+        z-index: 0;
     }
 }
 
-// --- 2. SIDEBAR KARTI (NEGATIVE MARGIN BÜYÜSÜ) ---
-.sidebar-card-wrapper {
-    position: sticky;
-    top: 20px;
-    z-index: 10;
-    transition: all 0.3s ease;
+// --- STATS BAR ---
+// Negatif margin ile Hero ve Content arasına yerleşir
+.course-stats-bar {
+    position: relative;
+    z-index: 5;
+    margin-top: -45px; 
+    border-bottom: 3px solid var(--primaryColor, #5624d0);
 
-    // Desktop'ta yukarı çek (Overlay Efekti)
-    @media (min-width: 992px) {
-        margin-top: -320px; // 🔥 SİHİRLİ KOD BURASI!
-    }
-
-    .card {
-        border: none;
-        border-radius: 0; // Köşeli veya çok hafif oval
-        box-shadow: 0 4px 16px rgba(0,0,0,0.15); // Derin gölge
-        overflow: hidden;
-        background: #fff;
-
-        // Video/Resim Alanı
-        .position-relative.bg-dark {
-            border-bottom: 1px solid #eee;
-            
-            // Oynat Butonu
-            .btn-light {
-                transition: transform 0.2s ease;
-                &:hover {
-                    transform: scale(1.1);
-                }
-            }
-        }
-
-        .card-body {
-            padding: 2rem;
-        }
-    }
-}
-
-// --- 3. İÇERİK KARTLARI (TEMİZ GÖRÜNÜM) ---
-.standard-card {
-    background: #fff;
-    border: 1px solid #d1d7dc; // Udemy gri çizgi rengi
-    margin-bottom: 2rem;
-    
-    // Köşeleri kaldırdık veya azalttık (Modern Stil)
-    border-radius: 0; 
-    @media(min-width: 768px) { border-radius: 4px; }
-
-    .card-header-custom {
-        background: transparent;
-        border-bottom: 1px solid #d1d7dc;
-        padding: 1.5rem;
-        
-        h4 {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #2d2f31;
-        }
-    }
-
-    .card-body {
-        padding: 1.5rem;
-    }
-}
-
-// --- 4. MÜFREDAT LİSTESİ (Daha Kompakt) ---
-.accordion-button {
-    background-color: #f7f9fa;
-    color: #2d2f31;
-    font-weight: 700;
-    padding: 1rem 1.5rem;
-    
-    &:not(.collapsed) {
-        background-color: #f0f2f5;
-        color: #2d2f31;
-        box-shadow: none;
-    }
-    
-    &:focus {
-        box-shadow: none;
-        border-color: rgba(0,0,0,0.1);
-    }
-}
-
-.list-group-item {
-    border-color: #e6e9ec; // Daha hafif çizgi
-    padding: 0.8rem 1.5rem;
-    
-    &:hover {
-        background-color: #fcfcfc;
-    }
-
-    // Önizleme ikonu
-    .icon-box {
-        width: 32px;
-        height: 32px;
+    .icon-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 50%;
-        background: transparent !important; // Arka planı kaldırdık
-        color: #6a6f73; // Gri ikon
-        
-        &.text-primary {
-            color: #2d2f31 !important; // Koyu renk
+        flex-shrink: 0;
+    }
+}
+
+// Stats barı içeren container'ın z-index'ini yükseltiyoruz
+.z-index-5 {
+    z-index: 5;
+}
+
+// --- SIDEBAR (Sticky) ---
+.sidebar-card-wrapper {
+    transition: all 0.3s ease;
+
+    @media (min-width: 992px) {
+        margin-top: -300px; // Yukarı Hero alanına çekme
+    }
+
+    .card {
+        border-radius: 0; 
+        .btn-light {
+            transition: transform 0.2s;
+            &:hover { transform: scale(1.1); }
         }
     }
 }
 
-// --- 5. DİĞER DETAYLAR ---
-.breadcrumb-item a {
-    color: #c0c4cc !important;
-    font-weight: 600;
-    font-size: 0.9rem;
-    &:hover { color: #fff !important; }
+// --- STANDART KART ---
+.standard-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+
+    .card-header-custom {
+        background: #fff;
+        padding: 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
 }
 
-.badge {
-    font-weight: 700;
-    letter-spacing: 0.5px;
+// --- ÇİFT SÜTUNLU LİSTE ---
+.two-column-list {
+    column-count: 1;
+    @media (min-width: 768px) {
+        column-count: 2;
+        column-gap: 2rem;
+    }
+    .list-item {
+        break-inside: avoid; 
+        margin-bottom: 0.5rem;
+    }
 }
 
-// Video Modal (Aynı kalabilir, sadece z-index yüksek olsun)
+// --- GENEL STİLLER ---
+.accordion-button {
+    background-color: #f7f9fa;
+    color: #2d2f31;
+    font-size: 1rem;
+    padding: 1rem 1.25rem;
+    
+    &:not(.collapsed) {
+        background-color: #eef2f5;
+        color: #000;
+        box-shadow: none;
+    }
+    &:focus { box-shadow: none; }
+}
+
+.list-group-item {
+    &.preview-enabled {
+        cursor: pointer;
+        transition: background-color 0.2s;
+        &:hover { background-color: #f0fcfd; }
+    }
+
+    .icon-box {
+        width: 36px; height: 36px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%;
+    }
+}
+
 .video-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
     z-index: 9999;
-    background-color: rgba(0,0,0,0.85); // Daha koyu arka plan
+    background-color: rgba(0, 0, 0, 0.85);
+
+    .video-modal-backdrop {
+        position: absolute; width: 100%; height: 100%;
+    }
+
+    .video-modal-content {
+        width: 90%;
+        max-width: 900px;
+        z-index: 10000;
+        overflow: hidden;
+    }
+}
+
+.cursor-pointer { cursor: pointer; }
+.hover-bg-light:hover { background-color: #f8f9fa !important; }
+.x-small { font-size: 0.75rem; }
+.ls-1 { letter-spacing: 1px; }
+.break-inside-avoid { break-inside: avoid; }
+
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #fff;
+    color: #333;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10000;
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    border-left: 4px solid #28a745; // Success rengi
+
+    i {
+        font-size: 1.5rem;
+        color: #28a745;
+    }
+
+    &.error {
+        border-left-color: #dc3545;
+        i { color: #dc3545; }
+    }
+
+    &.show {
+        transform: translateX(0);
+    }
 }
