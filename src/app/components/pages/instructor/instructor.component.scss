@@ -1,9 +1,9 @@
 // T1 Akademi Instructor Studio Theme
 
-$sidebar-bg: #1c1d1f;       // Koyu antrasit
-$sidebar-text: #a1a7b3;     // Gri metin
-$sidebar-active: #ffffff;   // Aktif metin
-$sidebar-hover: #2d2f31;    // Hover arka planı
+$sidebar-bg: #1c1d1f;
+$sidebar-text: #a1a7b3;
+$sidebar-active: #ffffff;
+$sidebar-hover: #2d2f31;
 $sidebar-width: 260px;
 $sidebar-width-collapsed: 70px;
 
@@ -18,7 +18,7 @@ $sidebar-width-collapsed: 70px;
     width: $sidebar-width;
     background-color: $sidebar-bg;
     color: $sidebar-text;
-    transition: width 0.3s ease;
+    transition: width 0.3s ease, left 0.3s ease; // Mobilde left geçişi için
     flex-shrink: 0;
     z-index: 1000;
 
@@ -88,21 +88,60 @@ $sidebar-width-collapsed: 70px;
     align-items: center;
     justify-content: space-between;
     padding: 0 1.5rem;
-    flex-shrink: 0; /* Boyutunun daralmasını engelle */
+    flex-shrink: 0; 
     z-index: 900;
 }
 
-/* RESPONSIVE */
+// 🔥 BİLDİRİM STİLLERİ
+.notification-tab {
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    
+    &:hover {
+        background-color: #f8f9fa;
+    }
+
+    &.active {
+        border-bottom-color: var(--primaryColor, #5624d0);
+        background-color: #fff;
+    }
+}
+
+.notif-item {
+    &.hover-bg:hover {
+        background-color: #f8f9fa;
+    }
+}
+
+.x-small {
+    font-size: 0.7rem;
+}
+
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* RESPONSIVE DÜZENLEMELER */
 @media (max-width: 992px) {
     .studio-sidebar {
         position: fixed;
         height: 100%;
-        left: -100%; /* Başlangıçta gizle */
-        transition: left 0.3s ease;
+        left: -100%; // Varsayılan olarak gizli
+        width: $sidebar-width !important; // Mobilde hep geniş
         
+        // Açıldığında
+        &.mobile-open {
+            left: 0;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+        }
+
+        // Mobilde collapsed classı metinleri gizlememeli, kontrolü mobile-open ile yapıyoruz
         &.collapsed {
-            left: 0; /* Açılınca göster */
-            width: $sidebar-width; /* Mobilde tam genişlik */
+            width: $sidebar-width; 
         }
     }
 }
