@@ -4,7 +4,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { combineLatest } from 'rxjs';
 import { TrainingApiService } from 'src/app/shared/api/training-api.service';
 import { CartService } from 'src/app/shared/services/cart.service';
-import { PublicContent, PublicCourseDetail } from 'src/app/shared/models/public-course-detail.model';
+import { PublicContent, PublicCourseDetail, CourseActionType } from 'src/app/shared/models/public-course-detail.model';
 import * as bootstrap from 'bootstrap';
 
 @Component({
@@ -14,13 +14,16 @@ import * as bootstrap from 'bootstrap';
 })
 export class CourseDetailsPageComponent implements OnInit {
 
+    // 🔥 HTML İÇİN ENUM REFERANSI
+    public ActionTypes = CourseActionType;
+
     courseId!: number;
     previewToken: string | null = null;
     course: PublicCourseDetail | null = null;
     isLoading: boolean = true;
     errorMsg: string | null = null;
 
-    // --- TOAST BİLDİRİM (YENİ EKLENDİ) ---
+    // --- TOAST BİLDİRİM ---
     toastMessage: string = '';
     showToast: boolean = false;
     toastType: 'success' | 'error' = 'success';
@@ -70,6 +73,7 @@ export class CourseDetailsPageComponent implements OnInit {
             next: (data: PublicCourseDetail) => {
                 this.course = data;
                 if (!this.course.tqs) this.course.tqs = 95;
+                if (!this.course.availableActions) this.course.availableActions = []; // Fallback
                 this.isLoading = false;
             },
             error: (err) => {
@@ -84,22 +88,60 @@ export class CourseDetailsPageComponent implements OnInit {
         });
     }
 
-    // --- TOAST NOTIFICATION METODU ---
+    // 🔥 DİNAMİK BUTON KONTROL METODU
+    hasAction(action: CourseActionType): boolean {
+        return this.course?.availableActions?.includes(action) ?? false;
+    }
+
     showNotification(message: string, type: 'success' | 'error') {
         this.toastMessage = message;
         this.toastType = type;
         this.showToast = true;
 
-        if (this.toastTimeout) {
-            clearTimeout(this.toastTimeout);
-        }
+        if (this.toastTimeout) clearTimeout(this.toastTimeout);
 
         this.toastTimeout = setTimeout(() => {
             this.showToast = false;
         }, 3000);
     }
 
-    // --- SEPET İŞLEMLERİ ---
+    // =======================================================
+    // AKILLI VİTRİN AKSİYON METOTLARI
+    // =======================================================
+
+    goToTraining() {
+        this.router.navigate(['/learning', this.courseId]);
+    }
+
+    assignToEmployees() {
+        // TODO: Yarınki iş listemizde yer alan Atama Modalı (Kişi Seçimi) açılacak
+        this.showNotification('Öğrenci atama paneli açılıyor...', 'success');
+    }
+
+    addToLibraryFree() {
+        this.isAddingToCart = true;
+        // TODO: Backend'de yazacağımız "Kütüphaneye Direk Ekle (0 TL)" endpointine bağlanacak.
+        // Şimdilik simüle ediyoruz.
+        setTimeout(() => {
+            this.isAddingToCart = false;
+            this.showNotification('Eğitim şirket kütüphanenize ücretsiz eklendi!', 'success');
+            this.loadCourseData(); // Butonların güncellenmesi için sayfayı tazele
+        }, 1000);
+    }
+
+    requestLicense() {
+        this.showNotification('Yöneticinize lisans tanımlama talebi iletildi.', 'success');
+        // TODO: SysRequest'e kayıt atılacak
+    }
+
+    requestPurchase() {
+        this.showNotification('Yöneticinize kurumsal satın alma talebi iletildi.', 'success');
+        // TODO: SysRequest'e kayıt atılacak
+    }
+
+    // =======================================================
+    // SEPET İŞLEMLERİ (Aynen Kalıyor)
+    // =======================================================
 
     openCartModal() {
         if (!this.course) return;
@@ -201,7 +243,6 @@ export class CourseDetailsPageComponent implements OnInit {
 
                 if (isSuccess) {
                     this.cartModal.hide();
-                    // Alert yerine Toast kullanıyoruz
                     this.showNotification('Sepet başarıyla güncellendi!', 'success');
                 } else {
                     const errorMsg = res.header?.msg || res.message || 'Bir hata oluştu.';
@@ -216,7 +257,9 @@ export class CourseDetailsPageComponent implements OnInit {
         });
     }
 
-    // --- DİĞER AKSİYONLAR ---
+    // =======================================================
+    // YARDIMCI VE UI METOTLARI
+    // =======================================================
     toggleWishlist() {
         this.showNotification('İstek listesine eklendi!', 'success');
     }
@@ -231,7 +274,7 @@ export class CourseDetailsPageComponent implements OnInit {
     }
 
     startSubscription() {
-        this.showNotification('Abonelik sistemi hazırlanıyor.', 'error');
+        this.router.navigate(['/b2b-subscription-plans']); // Yarınki plana uygun
     }
 
     goToCategory(categoryName: string) {
@@ -242,7 +285,6 @@ export class CourseDetailsPageComponent implements OnInit {
         this.showNotification('Yorum sayfası hazırlanıyor...', 'error');
     }
 
-    // --- İÇERİK ÖNİZLEME YÖNETİMİ ---
     openPromoVideo() {
         if (this.course && this.course.previewVideoPath) {
             this.currentPreviewTitle = "Kurs Tanıtımı";

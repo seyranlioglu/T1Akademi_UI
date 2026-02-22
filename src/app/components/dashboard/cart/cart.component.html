@@ -19,6 +19,7 @@
                     </div>
 
                     <div *ngFor="let item of cartData.items" class="cart-single-item p-3 mb-3 border rounded bg-white shadow-sm d-flex align-items-start gap-3">
+                        
                         <div class="cart-img flex-shrink-0">
                             <a [routerLink]="['/course', item.trainingId]">
                                 <img [src]="item.trainingImage !== 'none' ? item.trainingImage : 'assets/images/defaults/default.jpg'" 
@@ -63,10 +64,36 @@
                     <h5 class="text-muted mb-3">Toplam:</h5>
                     <h1 class="fw-bold mb-4 display-6">{{ cartData.totalAmount | currency:'TRY':'symbol-narrow':'1.0-0' }}</h1>
                     
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Sipariş Notu (Opsiyonel)</label>
+                        <textarea class="form-control text-muted" rows="2" 
+                                  placeholder="Mesajınız..." 
+                                  [(ngModel)]="requestNote"
+                                  [disabled]="isProcessing"
+                                  style="font-size: 0.9rem; resize: none;"></textarea>
+                    </div>
+
                     <button class="btn btn-primary w-100 py-3 fw-bold mb-3 d-flex align-items-center justify-content-center gap-2" 
-                            (click)="createPurchaseRequest()">
-                        <span>Satın Alma Talebi Oluştur</span>
-                        <i class='bx bx-right-arrow-alt fs-4'></i>
+                            (click)="processCartAction()"
+                            [disabled]="isProcessing">
+                        
+                        <ng-container *ngIf="cartData.primaryAction === ActionTypes.Checkout">
+                            <span *ngIf="!isProcessing">Siparişi Tamamla</span>
+                            <i *ngIf="!isProcessing" class='bx bx-credit-card fs-4'></i>
+                        </ng-container>
+
+                        <ng-container *ngIf="cartData.primaryAction === ActionTypes.B2BPurchaseRequest">
+                            <span *ngIf="!isProcessing">Satın Alma Talebi Oluştur</span>
+                            <i *ngIf="!isProcessing" class='bx bx-building-house fs-4'></i>
+                        </ng-container>
+
+                        <ng-container *ngIf="cartData.primaryAction === ActionTypes.RequestFromManager">
+                            <span *ngIf="!isProcessing">Yöneticiden Talep Et</span>
+                            <i *ngIf="!isProcessing" class='bx bx-send fs-4'></i>
+                        </ng-container>
+                        
+                        <span *ngIf="isProcessing" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span *ngIf="isProcessing">İşleminiz Yapılıyor...</span>
                     </button>
 
                     <div class="border-top pt-3 mt-3">
@@ -77,10 +104,13 @@
                         </div>
                     </div>
 
-                    <div class="mt-4">
-                        <h6 class="fw-bold small text-muted mb-2">Kurumsal Satın Alma</h6>
-                        <p class="x-small text-muted mb-0">
-                            Toplu alımlar ve kurumsal fatura talepleriniz için bu butonu kullanabilirsiniz. Talebiniz yönetici onayına düşecektir.
+                    <div class="mt-4 text-center">
+                        <h6 class="fw-bold small text-muted mb-2">Güvenli İşlem</h6>
+                        <p class="x-small text-muted mb-0" *ngIf="cartData.primaryAction === ActionTypes.Checkout">
+                            Satın alma işlemi 256-bit SSL sertifikası ile korunmaktadır.
+                        </p>
+                        <p class="x-small text-muted mb-0" *ngIf="cartData.primaryAction !== ActionTypes.Checkout">
+                            Bu talep, finans onayı gerektirdiği için yöneticilerinize veya kurum içi merkezinize iletilecektir.
                         </p>
                     </div>
                 </div>

@@ -1,3 +1,12 @@
+export enum CourseActionType {
+    AddToCart = 'AddToCart',
+    AddToLibraryFree = 'AddToLibraryFree',
+    AssignToEmployees = 'AssignToEmployees',
+    GoToTraining = 'GoToTraining',
+    RequestLicense = 'RequestLicense',
+    RequestPurchase = 'RequestPurchase'
+}
+
 export interface PublicReview {
     userName: string;
     userImage: string;
@@ -74,4 +83,7 @@ export interface PublicCourseDetail {
     // İlişkisel Veriler
     sections: PublicSection[];
     topReviews: PublicReview[];
+
+    // 🔥 YENİ: Backend'in karar verip gönderdiği Buton Listesi
+    availableActions: string[];
 }

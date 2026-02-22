@@ -4,7 +4,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { CategoryService } from 'src/app/shared/services/category.service';
 import { SidebarService } from 'src/app/shared/services/sidebar.service';
 import { TrainingApiService } from 'src/app/shared/api/training-api.service';
-import { CartService, CartViewDto } from 'src/app/shared/services/cart.service';
+import { CartService, CartViewDto, CartActionType } from 'src/app/shared/services/cart.service';
 import { NotificationService, AppNotification } from 'src/app/shared/services/notification.service'; // YENİ
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of, catchError } from 'rxjs';
 
@@ -38,7 +38,13 @@ export class NavbarComponent implements OnInit {
   private searchSubject = new Subject<string>();
 
   // SEPET
-  cartData: CartViewDto = { cartId: 0, totalAmount: 0, totalItemCount: 0, items: [] };
+cartData: CartViewDto = { 
+    cartId: 0, 
+    totalAmount: 0, 
+    totalItemCount: 0, 
+    primaryAction: CartActionType.Checkout, // 🔥 Eksik olan buydu
+    items: [] 
+};
   showCartDropdown = false;
 
   // BİLDİRİMLER (YENİ)

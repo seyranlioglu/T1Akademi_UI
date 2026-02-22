@@ -15,10 +15,18 @@ export interface CartItem {
   discountRate: number;
 }
 
+// 🔥 YENİ: Backend'deki Enum'ın birebir TypeScript karşılığı
+export enum CartActionType {
+  Checkout = 0,             // Bireysel Kullanıcı -> "Siparişi Tamamla"
+  B2BPurchaseRequest = 1,   // Kurum Yöneticisi -> "Satın Alma Talebi Oluştur"
+  RequestFromManager = 2    // Standart Personel -> "Yöneticiden Talep Et"
+}
+
 export interface CartViewDto {
   cartId: number;
   totalAmount: number;
   totalItemCount: number;
+  primaryAction: CartActionType; // 🔥 YENİ: Backend'in emrettiği buton tipi
   items: CartItem[];
 }
 
@@ -33,6 +41,7 @@ export class CartService {
     cartId: 0,
     totalAmount: 0,
     totalItemCount: 0,
+    primaryAction: CartActionType.Checkout, // Varsayılan değer
     items: []
   };
 
@@ -44,15 +53,12 @@ export class CartService {
     this.loadCart(); 
   }
 
-  // Sepeti yükle
   loadCart() {
     this.http.get<any>(`${this.apiUrl}/get-active-cart`).subscribe({
       next: (res) => {
-        // Response yapısını kontrol et
         if (res.header && res.header.result && res.body) {
             this.updateCartState(res.body);
         } else if (res.data) {
-            // Eğer wrapper farklıysa (eski yapı)
             this.updateCartState(res.data);
         } else {
             this.cartSubject.next(this.initialState);
@@ -64,20 +70,14 @@ export class CartService {
     });
   }
 
-  // Sepete Ekle
   addToCart(trainingId: number, licenceCount: number = 1): Observable<any> {
     const body = { trainingId, licenceCount };
-    
     return this.http.post<any>(`${this.apiUrl}/add-to-cart`, body).pipe(
       tap((res) => {
-        // 🔥 KRİTİK DÜZELTME: Header içindeki result'a bakıyoruz
         if (res.header && res.header.result) {
-            // Backend güncel sepeti body içinde dönüyor, bunu direkt basıyoruz.
-            // Böylece tekrar loadCart yapmaya gerek kalmadan anında güncellenir.
             if (res.body) {
                 this.updateCartState(res.body);
             } else {
-                // Body boşsa garanti olsun diye loadCart çağır
                 this.loadCart();
             }
         }
@@ -85,16 +85,13 @@ export class CartService {
     );
   }
 
-  // Sepetten Sil
   removeFromCart(cartItemId: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/remove-from-cart/${cartItemId}`).pipe(
       tap((res) => {
         if (res.header && res.header.result) {
-            // Silme işleminden sonra backend güncel sepeti dönüyorsa kullan
             if (res.body) {
                 this.updateCartState(res.body);
             } else {
-                // Dönmüyorsa manuel çek
                 this.loadCart();
             }
         }
@@ -102,13 +99,28 @@ export class CartService {
     );
   }
 
-  // Helper: State Güncelleme ve Null Kontrolü
+  // 🔥 GÜNCELLENDİ: Hem Checkout hem de Talep (B2B) için aynı veya farklı endpoint kullanılabilir. 
+  // Şimdilik senin yazdığın PurchaseRequest metodunu kullanıyoruz.
+  createPurchaseRequest(requestNote?: string): Observable<any> {
+    let url = `${this.apiUrl}/create-purchase-request`;
+    if (requestNote) {
+        url += `?requestNote=${encodeURIComponent(requestNote)}`;
+    }
+    
+    return this.http.post<any>(url, {}).pipe(
+      tap((res) => {
+        if (res.header && res.header.result) {
+            this.cartSubject.next(this.initialState);
+        }
+      })
+    );
+  }
+
   private updateCartState(data: any) {
       if (!data) {
           this.cartSubject.next(this.initialState);
           return;
       }
-      // Items null gelebilir, boş array yapalım
       if (!data.items) {
           data.items = [];
       }

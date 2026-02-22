@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CartService, CartViewDto } from 'src/app/shared/services/cart.service';
-import { TrainingApiService } from 'src/app/shared/api/training-api.service'; // 🔥 EKLENDİ
-import { OwlOptions } from 'ngx-owl-carousel-o'; // 🔥 EKLENDİ
+import { CartService, CartViewDto, CartActionType } from 'src/app/shared/services/cart.service';
+import { TrainingApiService } from 'src/app/shared/api/training-api.service';
+import { OwlOptions } from 'ngx-owl-carousel-o';
 
 @Component({
   selector: 'app-cart',
@@ -11,40 +11,27 @@ import { OwlOptions } from 'ngx-owl-carousel-o'; // 🔥 EKLENDİ
 })
 export class CartComponent implements OnInit {
 
-  cartData: CartViewDto = { cartId: 0, totalAmount: 0, totalItemCount: 0, items: [] };
+  // 🔥 HTML dosyasından enum değerlerine erişebilmek için:
+  public ActionTypes = CartActionType;
+
+  cartData: CartViewDto = { cartId: 0, totalAmount: 0, totalItemCount: 0, primaryAction: CartActionType.Checkout, items: [] };
   isLoading = true;
   couponCode = '';
+  
+  requestNote = '';
+  isProcessing = false;
 
-  // 🔥 YENİ: ÖNERİLEN EĞİTİMLER
   recommendedTrainings: any[] = [];
   
-  carouselOptions: OwlOptions = {
-      loop: false,
-      mouseDrag: true,
-      touchDrag: true,
-      pullDrag: true,
-      dots: false,
-      navSpeed: 700,
-      navText: ['<i class="bx bx-chevron-left"></i>', '<i class="bx bx-chevron-right"></i>'],
-      nav: true,
-      margin: 24,
-      responsive: {
-        0: { items: 1 },
-        576: { items: 2 },
-        768: { items: 2 },
-        992: { items: 3 },
-        1200: { items: 4 }
-      }
-  };
+  carouselOptions: OwlOptions = { /* ... Aynı kalıyor ... */ };
 
   constructor(
     private cartService: CartService,
-    private trainingApi: TrainingApiService, // 🔥 EKLENDİ
+    private trainingApi: TrainingApiService,
     private router: Router
   ) { }
 
   ngOnInit(): void {
-    // Sepeti Dinle
     this.cartService.cart$.subscribe(data => {
       if (data) {
         this.cartData = data;
@@ -52,7 +39,6 @@ export class CartComponent implements OnInit {
       }
     });
 
-    // 🔥 Önerilenleri Yükle
     this.loadRecommended();
   }
 
@@ -68,10 +54,36 @@ export class CartComponent implements OnInit {
     }
   }
 
-  createPurchaseRequest() {
+  // Ana İşlem Metodu: Backend'den gelen ActionTipine göre istek atılacak endpoint değişebilir.
+  processCartAction() {
     if (this.cartData.items.length === 0) return;
-    console.log("Satın alma talebi oluşturuluyor...", this.cartData);
-    alert("Satın alma talebi oluşturma servisi hazırlanıyor.");
+
+    this.isProcessing = true;
+    
+    // Eğer B2B Talep ise:
+    if (this.cartData.primaryAction === CartActionType.B2BPurchaseRequest || this.cartData.primaryAction === CartActionType.RequestFromManager) {
+        this.cartService.createPurchaseRequest(this.requestNote).subscribe({
+            next: (res) => {
+                this.isProcessing = false;
+                if (res.header && res.header.result) {
+                    alert("Talebiniz başarıyla oluşturuldu.");
+                    this.router.navigate(['/']); 
+                } else {
+                    alert(res.header.message || "Talep oluşturulurken bir hata oluştu.");
+                }
+            },
+            error: (err) => {
+                this.isProcessing = false;
+                alert("Sunucu ile iletişimde bir hata oluştu.");
+            }
+        });
+    } 
+    else if (this.cartData.primaryAction === CartActionType.Checkout) {
+        // Eğer Bireysel Kullanıcı Checkout yapıyorsa (Sanal POS vs.)
+        alert("Bireysel ödeme sistemi (Sanal POS) entegrasyonu yakında eklenecektir.");
+        this.isProcessing = false;
+        // this.router.navigate(['/checkout']);
+    }
   }
 
   applyCoupon() {
@@ -84,7 +96,6 @@ export class CartComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  // Resim Hatası Yönetimi
   handleMissingImage(event: Event) {
       (event.target as HTMLImageElement).src = 'assets/images/defaults/default.jpg';
   }

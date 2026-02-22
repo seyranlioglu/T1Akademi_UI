@@ -296,6 +296,7 @@
                 <div class="sidebar-card-wrapper sticky-lg-top" style="top: 20px; z-index: 10;">
                     
                     <div class="card shadow-lg border-0 overflow-hidden mb-3">
+                        
                         <div class="position-relative bg-dark" style="height: 200px;">
                             <img [src]="course.headerImage || 'assets/images/defaults/default.jpg'" 
                                  class="w-100 h-100" style="object-fit: cover; opacity: 0.85;">
@@ -326,8 +327,43 @@
                                 </div>
                             </div>
 
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-primary btn-lg fw-bold py-3" (click)="openCartModal()">
+                            <div class="d-grid gap-2 mb-3">
+                                
+                                <button class="btn btn-success btn-lg fw-bold py-3 text-white" 
+                                        *ngIf="hasAction(ActionTypes.GoToTraining)" 
+                                        (click)="goToTraining()">
+                                    <i class='bx bx-play-circle me-2'></i>Eğitime Git
+                                </button>
+
+                                <button class="btn btn-warning btn-lg fw-bold py-3 text-dark" 
+                                        *ngIf="hasAction(ActionTypes.AssignToEmployees)" 
+                                        (click)="assignToEmployees()">
+                                    <i class='bx bx-group me-2'></i>Öğrencilere Ata
+                                </button>
+
+                                <button class="btn btn-primary btn-lg fw-bold py-3" 
+                                        *ngIf="hasAction(ActionTypes.AddToLibraryFree)" 
+                                        (click)="addToLibraryFree()" 
+                                        [disabled]="isAddingToCart">
+                                    <span *ngIf="isAddingToCart" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    <span *ngIf="!isAddingToCart"><i class='bx bx-library me-2'></i>Kütüphaneye Ekle (Ücretsiz)</span>
+                                </button>
+
+                                <button class="btn btn-outline-primary btn-lg fw-bold py-3 bg-white" 
+                                        *ngIf="hasAction(ActionTypes.RequestLicense)" 
+                                        (click)="requestLicense()">
+                                    <i class='bx bx-key me-2'></i>Yöneticiden Lisans İste
+                                </button>
+
+                                <button class="btn btn-outline-primary btn-lg fw-bold py-3 bg-white" 
+                                        *ngIf="hasAction(ActionTypes.RequestPurchase)" 
+                                        (click)="requestPurchase()">
+                                    <i class='bx bx-send me-2'></i>Satın Alma Talebi Gönder
+                                </button>
+
+                                <button class="btn btn-primary btn-lg fw-bold py-3" 
+                                        *ngIf="hasAction(ActionTypes.AddToCart)" 
+                                        (click)="openCartModal()">
                                     <i class='bx bx-cart me-2'></i>Sepete Ekle
                                 </button>
                                 
@@ -339,25 +375,30 @@
                                     <button class="btn btn-light flex-fill border text-muted small fw-bold" (click)="shareCourse()">
                                         <i class='bx bx-share-alt'></i> Paylaş
                                     </button>
-                                    <button class="btn btn-light flex-fill border text-muted small fw-bold" (click)="applyCoupon()">
+                                    <button class="btn btn-light flex-fill border text-muted small fw-bold" 
+                                            *ngIf="hasAction(ActionTypes.AddToCart)" 
+                                            (click)="applyCoupon()">
                                         <i class='bx bxs-coupon'></i> Kupon
                                     </button>
                                 </div>
                             </div>
                             
-                            <div class="text-center mt-3">
+                            <div class="text-center mt-3" *ngIf="hasAction(ActionTypes.AddToLibraryFree)">
+                                <small class="text-success fw-bold x-small"><i class='bx bx-check-circle'></i> Bu eğitim abonelik paketinize dahildir.</small>
+                            </div>
+                            <div class="text-center mt-3" *ngIf="hasAction(ActionTypes.AddToCart)">
                                 <small class="text-muted x-small">30 gün para iade garantisi</small>
                             </div>
                         </div>
                     </div>
 
                     <div class="card border-0 shadow-sm bg-gradient-primary text-white mb-3" 
-                         style="background: linear-gradient(45deg, #2b32b2, #1488cc);">
+                         style="background: linear-gradient(45deg, #2b32b2, #1488cc);"
+                         *ngIf="!hasAction(ActionTypes.AddToLibraryFree) && !hasAction(ActionTypes.AssignToEmployees) && !hasAction(ActionTypes.GoToTraining)">
                         <div class="card-body p-4 text-center">
-                            <h6 class="fw-bold mb-2 text-uppercase ls-1">Sınırsız Erişim</h6>
-                            <p class="small opacity-75 mb-3">T1 Akademi'nin en seçkin kurslarına sınırsız erişim sağlayın.</p>
-                            <button class="btn btn-light w-100 fw-bold text-primary mb-2 shadow-sm" (click)="startSubscription()">Abone Ol</button>
-                            <small class="d-block text-white-50 x-small">Ayda ₺199. Dilediğiniz zaman iptal edin.</small>
+                            <h6 class="fw-bold mb-2 text-uppercase ls-1">Kurumsal Çözümler</h6>
+                            <p class="small opacity-75 mb-3">Şirketiniz için abonelik paketlerimizi keşfedin, sınırsız erişim sağlayın.</p>
+                            <button class="btn btn-light w-100 fw-bold text-primary mb-2 shadow-sm" (click)="startSubscription()">Paketleri İncele</button>
                         </div>
                     </div>
 
