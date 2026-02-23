@@ -296,7 +296,6 @@
                 <div class="sidebar-card-wrapper sticky-lg-top" style="top: 20px; z-index: 10;">
                     
                     <div class="card shadow-lg border-0 overflow-hidden mb-3">
-                        
                         <div class="position-relative bg-dark" style="height: 200px;">
                             <img [src]="course.headerImage || 'assets/images/defaults/default.jpg'" 
                                  class="w-100 h-100" style="object-fit: cover; opacity: 0.85;">
@@ -345,8 +344,8 @@
                                         *ngIf="hasAction(ActionTypes.AddToLibraryFree)" 
                                         (click)="addToLibraryFree()" 
                                         [disabled]="isAddingToCart">
-                                    <span *ngIf="isAddingToCart" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    <span *ngIf="!isAddingToCart"><i class='bx bx-library me-2'></i>Kütüphaneye Ekle (Ücretsiz)</span>
+                                    <span *ngIf="isAddingToCart" class="spinner-border spinner-border-sm me-2"></span>
+                                    <i class='bx bx-library me-2' *ngIf="!isAddingToCart"></i>Kütüphaneye Ekle (Ücretsiz)
                                 </button>
 
                                 <button class="btn btn-outline-primary btn-lg fw-bold py-3 bg-white" 

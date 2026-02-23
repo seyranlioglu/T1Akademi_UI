@@ -14,7 +14,6 @@ import * as bootstrap from 'bootstrap';
 })
 export class CourseDetailsPageComponent implements OnInit {
 
-    // 🔥 HTML İÇİN ENUM REFERANSI
     public ActionTypes = CourseActionType;
 
     courseId!: number;
@@ -23,19 +22,16 @@ export class CourseDetailsPageComponent implements OnInit {
     isLoading: boolean = true;
     errorMsg: string | null = null;
 
-    // --- TOAST BİLDİRİM ---
     toastMessage: string = '';
     showToast: boolean = false;
     toastType: 'success' | 'error' = 'success';
     private toastTimeout: any;
 
-    // --- ÖNİZLEME MODAL DEĞİŞKENLERİ ---
     isPreviewOpen: boolean = false;
     currentPreviewUrl: SafeResourceUrl | null = null;
     currentPreviewTitle: string = '';
     currentPreviewType: 'video' | 'image' | 'pdf' | 'exam' = 'video';
 
-    // --- SEPET & FİYAT MODALI DEĞİŞKENLERİ ---
     pricingTiers: any[] = [];
     selectedTier: any = null;
     licenseCount: number = 1;
@@ -73,7 +69,7 @@ export class CourseDetailsPageComponent implements OnInit {
             next: (data: PublicCourseDetail) => {
                 this.course = data;
                 if (!this.course.tqs) this.course.tqs = 95;
-                if (!this.course.availableActions) this.course.availableActions = []; // Fallback
+                if (!this.course.availableActions) this.course.availableActions = [];
                 this.isLoading = false;
             },
             error: (err) => {
@@ -88,7 +84,6 @@ export class CourseDetailsPageComponent implements OnInit {
         });
     }
 
-    // 🔥 DİNAMİK BUTON KONTROL METODU
     hasAction(action: CourseActionType): boolean {
         return this.course?.availableActions?.includes(action) ?? false;
     }
@@ -102,11 +97,11 @@ export class CourseDetailsPageComponent implements OnInit {
 
         this.toastTimeout = setTimeout(() => {
             this.showToast = false;
-        }, 3000);
+        }, 4000);
     }
 
     // =======================================================
-    // AKILLI VİTRİN AKSİYON METOTLARI
+    // GERÇEK AKSİYON METOTLARI
     // =======================================================
 
     goToTraining() {
@@ -114,33 +109,57 @@ export class CourseDetailsPageComponent implements OnInit {
     }
 
     assignToEmployees() {
-        // TODO: Yarınki iş listemizde yer alan Atama Modalı (Kişi Seçimi) açılacak
-        this.showNotification('Öğrenci atama paneli açılıyor...', 'success');
+        this.router.navigate(['/company/assign-training'], { queryParams: { trainingId: this.courseId } });
     }
 
     addToLibraryFree() {
         this.isAddingToCart = true;
-        // TODO: Backend'de yazacağımız "Kütüphaneye Direk Ekle (0 TL)" endpointine bağlanacak.
-        // Şimdilik simüle ediyoruz.
-        setTimeout(() => {
-            this.isAddingToCart = false;
-            this.showNotification('Eğitim şirket kütüphanenize ücretsiz eklendi!', 'success');
-            this.loadCourseData(); // Butonların güncellenmesi için sayfayı tazele
-        }, 1000);
+        this.trainingApi.addToLibrary(this.courseId).subscribe({
+            next: (res) => {
+                this.isAddingToCart = false;
+                if (res?.header?.result) {
+                    this.showNotification('Eğitim şirket kütüphanenize ücretsiz eklendi!', 'success');
+                    this.loadCourseData(); 
+                } else {
+                    const errorMsg = res?.header?.msg || 'Kütüphaneye eklenirken bir hata oluştu.';
+                    this.showNotification(errorMsg, 'error');
+                }
+            },
+            error: (err) => {
+                this.isAddingToCart = false;
+                const errorMsg = err.error?.header?.msg || 'Kütüphaneye eklenirken sistemsel bir hata oluştu.';
+                this.showNotification(errorMsg, 'error');
+            }
+        });
+    }
+
+    requestTraining() {
+        this.trainingApi.requestTraining(this.courseId).subscribe({
+            next: (res) => {
+                if (res?.header?.result) {
+                    this.showNotification('Talebiniz yöneticinize iletildi.', 'success');
+                } else {
+                    const errorMsg = res?.header?.msg || 'Talep gönderilirken hata oluştu.';
+                    this.showNotification(errorMsg, 'error');
+                }
+            },
+            error: (err) => {
+                const errorMsg = err.error?.header?.msg || 'Talep gönderilemedi.';
+                this.showNotification(errorMsg, 'error');
+            }
+        });
     }
 
     requestLicense() {
-        this.showNotification('Yöneticinize lisans tanımlama talebi iletildi.', 'success');
-        // TODO: SysRequest'e kayıt atılacak
+        this.requestTraining();
     }
 
     requestPurchase() {
-        this.showNotification('Yöneticinize kurumsal satın alma talebi iletildi.', 'success');
-        // TODO: SysRequest'e kayıt atılacak
+        this.requestTraining();
     }
 
     // =======================================================
-    // SEPET İŞLEMLERİ (Aynen Kalıyor)
+    // SEPET İŞLEMLERİ
     // =======================================================
 
     openCartModal() {
@@ -233,14 +252,11 @@ export class CourseDetailsPageComponent implements OnInit {
 
     confirmAddToCart() {
         if (!this.course) return;
-
         this.isAddingToCart = true;
-
         this.cartService.addToCart(this.course.id, this.licenseCount).subscribe({
             next: (res: any) => {
                 this.isAddingToCart = false;
                 const isSuccess = res.isSuccess || (res.header && res.header.result);
-
                 if (isSuccess) {
                     this.cartModal.hide();
                     this.showNotification('Sepet başarıyla güncellendi!', 'success');
@@ -251,17 +267,17 @@ export class CourseDetailsPageComponent implements OnInit {
             },
             error: (err) => {
                 this.isAddingToCart = false;
-                console.error(err);
                 this.showNotification('Sunucu ile iletişim hatası.', 'error');
             }
         });
     }
 
     // =======================================================
-    // YARDIMCI VE UI METOTLARI
+    // YARDIMCI METOTLAR
     // =======================================================
-    toggleWishlist() {
-        this.showNotification('İstek listesine eklendi!', 'success');
+
+    toggleWishlist() { 
+        this.showNotification('İstek listesine eklendi!', 'success'); 
     }
 
     shareCourse() {
@@ -269,20 +285,20 @@ export class CourseDetailsPageComponent implements OnInit {
         this.showNotification('Kurs bağlantısı kopyalandı!', 'success');
     }
 
-    applyCoupon() {
-        this.showNotification('Kupon sistemi yakında aktif olacak.', 'error');
+    applyCoupon() { 
+        this.showNotification('Kupon sistemi yakında aktif olacak.', 'error'); 
     }
 
     startSubscription() {
-        this.router.navigate(['/b2b-subscription-plans']); // Yarınki plana uygun
+        this.router.navigate(['/b2b-subscription-plans']);
     }
 
     goToCategory(categoryName: string) {
         this.router.navigate(['/courses'], { queryParams: { search: categoryName } });
     }
 
-    showAllReviews() {
-        this.showNotification('Yorum sayfası hazırlanıyor...', 'error');
+    showAllReviews() { 
+        this.showNotification('Yorum sayfası hazırlanıyor...', 'error'); 
     }
 
     openPromoVideo() {
@@ -297,27 +313,18 @@ export class CourseDetailsPageComponent implements OnInit {
 
     openContentPreview(content: PublicContent) {
         if (!content.isPreview) return;
-
         this.currentPreviewTitle = content.title;
-
         if (content.type === 'exam') {
             this.currentPreviewType = 'exam';
             this.currentPreviewUrl = null;
-        }
-        else if (content.filePath) {
+        } else if (content.filePath) {
             this.currentPreviewType = content.type as any;
-            
             let finalUrl = content.filePath;
             if (this.currentPreviewType === 'video' && (finalUrl.includes('youtube') || finalUrl.includes('youtu.be'))) {
                 finalUrl = this.getYouTubeEmbedUrl(finalUrl);
             }
-
             this.currentPreviewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(finalUrl);
-        } else {
-            this.showNotification('İçerik dosyası bulunamadı.', 'error');
-            return;
         }
-
         this.openModal();
     }
 
@@ -329,30 +336,19 @@ export class CourseDetailsPageComponent implements OnInit {
     closePreview() {
         this.isPreviewOpen = false;
         this.currentPreviewUrl = null;
-        this.currentPreviewTitle = '';
         document.body.style.overflow = 'auto';
     }
 
     private getYouTubeEmbedUrl(url: string): string {
         if (!url) return '';
         if (url.includes('/embed/')) return url;
-
         let videoId = '';
         if (url.includes('youtu.be')) {
-            videoId = url.split('youtu.be/')[1];
-            const ampersandPosition = videoId.indexOf('?');
-            if (ampersandPosition !== -1) {
-                videoId = videoId.substring(0, ampersandPosition);
-            }
-        }
-        else if (url.includes('youtube.com/watch')) {
+            videoId = url.split('youtu.be/')[1].split('?')[0];
+        } else if (url.includes('youtube.com/watch')) {
             const urlParams = new URLSearchParams(new URL(url).search);
             videoId = urlParams.get('v') || '';
         }
-
-        if (videoId) {
-            return `https://www.youtube.com/embed/${videoId}`;
-        }
-        return url;
+        return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
     }
 }

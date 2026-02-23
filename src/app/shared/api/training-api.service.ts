@@ -13,6 +13,7 @@ const API_DASHBOARD_URL = `${environment.apiUrl}/Dashboard`;
 const API_TRAINING_CATEGORY_URL = `${environment.apiUrl}/TrainingCategory`;
 const API_TRAINING_CONTENT_URL = `${environment.apiUrl}/TrainingContent`;
 const API_TRAINING_SECTION_URL = `${environment.apiUrl}/TrainingSection`;
+const API_CURRACC_TRAINING_URL = `${environment.apiUrl}/CurrAccTraining`;
 
 @Injectable({
   providedIn: 'root',
@@ -21,34 +22,48 @@ export class TrainingApiService {
   constructor(private http: HttpClient) {}
 
   // ===========================================================================
-  // 🔥 PLAYER / İÇERİK OYNATMA METOTLARI (YENİ)
+  // 🔥 KURUMSAL KÜTÜPHANE, ATAMA VE TALEP METOTLARI
   // ===========================================================================
 
-  /**
-   * Kullanıcı için belirli bir içeriği (video, doküman) getirir.
-   * Yetki kontrolü, resume bilgisi ve kilit durumu dahildir.
-   */
+  addToLibrary(trainingId: number): Observable<any> {
+    return this.http.post<any>(`${API_TRAINING_URL}/add-to-library`, trainingId, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  requestTraining(trainingId: number): Observable<any> {
+    return this.http.post<any>(`${API_TRAINING_URL}/request-training`, trainingId, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  assignTraining(payload: any): Observable<any> {
+    return this.http.post<any>(`${API_CURRACC_TRAINING_URL}/assign-training`, payload).pipe(
+        map(res => res.data || res.body || res)
+    );
+  }
+
+  // ===========================================================================
+  // PLAYER / İÇERİK OYNATMA METOTLARI
+  // ===========================================================================
+
   getContentForPlayer(contentId: number): Observable<any> {
     return this.http.get<any>(`${API_TRAINING_CONTENT_URL}/GetForPlayer/${contentId}`).pipe(
         map(res => res.data || res.body || res)
     );
   }
 
-getContent(payload: { 
+  getContent(payload: { 
       trainingId: number, 
       currentContentId?: number, 
       targetContentId?: number,
-      previewToken?: string | null // 🔥 YENİ PARAMETRE
+      previewToken?: string | null 
   }): Observable<any> {
     return this.http.post<any>(`${API_TRAINING_CONTENT_URL}/GetNextContent`, payload).pipe(
         map(res => res.data || res.body || res)
     );
   }
 
-  // ===========================================================================
-  // 🔥 ÖNİZLEME (PREVIEW) TOKEN
-  // ===========================================================================
-  
   getTrainingPreviewToken(trainingId: number): Observable<string> {
     return this.http.get<any>(`${API_TRAINING_URL}/GetPreviewToken/${trainingId}`).pipe(
         map(res => res.data || res.body || res)
@@ -182,11 +197,9 @@ getContent(payload: {
 
   getTrainingById(id: number, previewToken?: string): Observable<GetTraining> {
     let params = new HttpParams().set('id', id.toString());
-    
     if (previewToken) {
         params = params.set('previewToken', previewToken);
     }
-
     return this.http.get<any>(`${API_TRAINING_URL}/GetById`, { params }).pipe(
         map(res => res.data || res.body || res)
     );
@@ -196,7 +209,6 @@ getContent(payload: {
     return this.http.delete<any>(`${API_TRAINING_URL}/DeleteTraining/${id}`);
   }
 
-  // ... Category ...
   addTrainingCategory(payload: any): Observable<any> {
     return this.http.post<any>(`${API_TRAINING_CATEGORY_URL}/AddTrainingCategory`, payload);
   }
@@ -217,7 +229,6 @@ getContent(payload: {
     return this.http.delete<any>(`${API_TRAINING_CATEGORY_URL}/DeleteTrainingCategory/${id}`);
   }
 
-  // ... Content (Admin CRUD) ...
   addTrainingContent(payload: any): Observable<any> {
     return this.http.post<any>(`${API_TRAINING_CONTENT_URL}/AddTrainingContent`, payload);
   }
@@ -238,7 +249,6 @@ getContent(payload: {
     return this.http.delete<any>(`${API_TRAINING_CONTENT_URL}/DeleteTrainingContent`, { body: { id } });
   }
 
-  // ... Section ...
   addTrainingSection(payload: any): Observable<any> {
     return this.http.post<any>(`${API_TRAINING_SECTION_URL}/AddTrainingSection`, payload);
   }
