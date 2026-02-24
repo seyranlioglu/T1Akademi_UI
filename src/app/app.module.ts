@@ -119,6 +119,10 @@ import { ExamSelectorComponent } from 'src/app/components/common/exam-selector/e
 import { ExamModule } from './components/student/exam-runner/exam.module';
 import { TrainingApprovalComponent } from './components/admin/training-approval/training-approval.component';   
 import { CourseDashboardComponent } from './components/pages/instructor/course-manage/course-dashboard/course-dashboard.component';
+
+// YENİ EKLENEN BİLEŞEN
+import { AssignTrainingComponent } from './components/pages/assign-training/assign-training.component';
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -214,7 +218,10 @@ import { CourseDashboardComponent } from './components/pages/instructor/course-m
         ExamLibraryComponent,
         ExamSelectorComponent,
         TrainingApprovalComponent,
-        CourseDashboardComponent
+        CourseDashboardComponent,
+        
+        // YENİ EKLENEN
+        AssignTrainingComponent
     ],
     imports: [
         BrowserModule,
@@ -240,11 +247,11 @@ import { CourseDashboardComponent } from './components/pages/instructor/course-m
         TooltipModule,
         NgxExtendedPdfViewerModule,
         NgxEditorModule,
-                ExamModule
+        ExamModule
     ],
     exports: [
-    ExamSelectorComponent // Dışarıya aç (Burası önemli!)
-  ],
+        ExamSelectorComponent // Dışarıya aç (Burası önemli!)
+    ],
     providers: [
         {
             provide: HTTP_INTERCEPTORS,

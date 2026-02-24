@@ -69,6 +69,10 @@ import { ExamBuilderComponent } from './components/pages/instructor/course-manag
 import { ExamLibraryComponent } from './components/pages/instructor/exam-library/exam-library.component';
 import { TrainingApprovalComponent } from './components/admin/training-approval/training-approval.component';
 import { CourseDashboardComponent } from './components/pages/instructor/course-manage/course-dashboard/course-dashboard.component';
+
+// YENİ EKLENEN BİLEŞEN
+import { AssignTrainingComponent } from './components/pages/assign-training/assign-training.component';
+
 const routes: Routes = [
 
     // 1. AUTH
@@ -107,6 +111,10 @@ const routes: Routes = [
             { path: 'event-details', component: EventDetailsPageComponent },
             { path: 'success-stories', component: SuccessStoriesPageComponent },
             { path: 'admin/training-approval', component: TrainingApprovalComponent },
+            
+            // YENİ EKLENEN ROTA: Kurum Atama Ekranı (Sayfa olarak açıldığında)
+            { path: 'company/assign', component: AssignTrainingComponent, canActivate: [AuthGuard] },
+            
             { path: 'blog-grid', component: BlogGridPageComponent },
             { path: 'blog-right-sidebar', component: BlogRightSidebarPageComponent },
             { path: 'blog-details', component: BlogDetailsPageComponent },

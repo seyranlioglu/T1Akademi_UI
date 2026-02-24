@@ -1,0 +1,134 @@
+<div class="assign-wrapper" [ngClass]="{'is-modal': isModal}">
+  
+  <div class="assign-header">
+    <div>
+      <h2 class="title">Personellere Eğitim Ata</h2>
+      <p class="subtitle">Kütüphanenizdeki eğitimleri çalışanlarınıza tanımlayın.</p>
+    </div>
+    <button *ngIf="isModal" class="btn-close-icon" (click)="closeComponent()">✕</button>
+  </div>
+
+  <div class="assign-body">
+    
+    <div class="settings-column">
+      
+      <div class="form-group">
+        <label>Eğitim Seçiniz <span class="text-danger">*</span></label>
+        <select class="form-control" 
+                [ngModel]="selectedTrainingId" 
+                (ngModelChange)="onTrainingSelect($event)"
+                [disabled]="isLoading">
+          <option [ngValue]="null">-- Eğitim Seçin --</option>
+          <option *ngFor="let tr of libraryTrainings" [ngValue]="tr.currAccTrainingId">
+            {{ tr.trainingTitle }}
+          </option>
+        </select>
+      </div>
+
+      <div class="quota-card" *ngIf="selectedTrainingQuotaInfo">
+        <div class="quota-header">
+          <span class="badge" 
+                [ngClass]="selectedTrainingQuotaInfo.isCompanyOwned ? 'badge-vip' : 'badge-standard'">
+            {{ selectedTrainingQuotaInfo.isCompanyOwned ? '⭐ Kuruma Özel' : 'Lisanslı Eğitim' }}
+          </span>
+        </div>
+        
+        <div class="quota-details" *ngIf="selectedTrainingQuotaInfo.isUnlimited">
+          <h3 class="unlimited-text">Sınırsız Atama</h3>
+          <p>Bu eğitim firmanıza özel olduğu için kişi sınırı yoktur.</p>
+        </div>
+
+        <div class="quota-details" *ngIf="!selectedTrainingQuotaInfo.isUnlimited">
+          <div class="quota-stats">
+            <div class="stat-box">
+              <span class="stat-label">Toplam</span>
+              <span class="stat-val">{{ selectedTrainingQuotaInfo.totalQuota }}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Kullanılan</span>
+              <span class="stat-val">{{ selectedTrainingQuotaInfo.usedQuota }}</span>
+            </div>
+            <div class="stat-box highlight">
+              <span class="stat-label">Kalan</span>
+              <span class="stat-val">{{ selectedTrainingQuotaInfo.remainingQuota }}</span>
+            </div>
+          </div>
+          <p class="quota-hint">
+            * {{ selectedTrainingQuotaInfo.quotaType === 'Subscription' ? 'Abonelik paketinizdeki genel koltuk sayısı.' : 'Bu eğitime özel satın alınan lisans sayısı.' }}
+          </p>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group half">
+          <label>Başlangıç Tarihi</label>
+          <input type="date" class="form-control" [(ngModel)]="startDate" [disabled]="isLoading">
+        </div>
+        <div class="form-group half">
+          <label>Son Bitirme (Opsiyonel)</label>
+          <input type="date" class="form-control" [(ngModel)]="dueDate" [disabled]="isLoading">
+        </div>
+      </div>
+    </div>
+
+    <div class="users-column">
+      <div class="users-header">
+        <label>Personel Listesi</label>
+        <span class="selected-count" *ngIf="selectedUserIds.length > 0">
+          {{ selectedUserIds.length }} Kişi Seçildi
+        </span>
+      </div>
+
+      <div class="empty-state" *ngIf="!selectedTrainingId">
+        <div class="icon">👈</div>
+        <p>Lütfen önce sol taraftan bir eğitim seçiniz.</p>
+      </div>
+
+      <div class="user-list" *ngIf="selectedTrainingId">
+        
+        <div class="loading-state" *ngIf="isLoading">
+          <span class="spinner"></span> Yükleniyor...
+        </div>
+
+        <div class="empty-state" *ngIf="!isLoading && companyUsers.length === 0">
+          <p>Firmanıza kayıtlı personel bulunamadı.</p>
+        </div>
+
+        <label class="user-item" 
+               *ngFor="let user of companyUsers" 
+               [ngClass]="{'is-assigned': user.isAssigned}">
+          
+          <div class="user-checkbox">
+            <input type="checkbox" 
+                   [checked]="user.isAssigned || selectedUserIds.includes(user.userId)"
+                   [disabled]="user.isAssigned || isLoading"
+                   (change)="toggleUserSelection(user.userId, $event)">
+          </div>
+          
+          <div class="user-info">
+            <h4 class="user-name">{{ user.fullName }}</h4>
+            <span class="user-title" *ngIf="user.title">{{ user.title }}</span>
+          </div>
+
+          <div class="user-status">
+            <span class="badge badge-success" *ngIf="user.isAssigned">Zaten Atanmış</span>
+          </div>
+        </label>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="assign-footer">
+    <button class="btn btn-outline" (click)="closeComponent()" [disabled]="isLoading">
+      İptal
+    </button>
+    <button class="btn btn-primary" 
+            (click)="submitAssignment()" 
+            [disabled]="isLoading || !selectedTrainingId || selectedUserIds.length === 0">
+      <span *ngIf="isLoading" class="spinner-small"></span>
+      {{ isLoading ? 'İşleniyor...' : 'Seçili Personellere Ata' }}
+    </button>
+  </div>
+
+</div>
