@@ -3,19 +3,27 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
-// --- GENEL TİPLER ---
+// --- BACKEND STANDART RESPONSE YAPISI ---
+export interface ResponseHeader {
+  msgId: string;
+  result: boolean; // Backend'deki 'result' alanı
+  msg: string | null;
+  resCode: number;
+  dt: string;
+}
+
 export interface Response<T> {
-  isSuccess: boolean;
-  message: string;
-  data: T;
+  header: ResponseHeader;
+  body: T; // Datalar 'body' içinde geliyor
 }
 
 export interface CommonResponse {
-  result: boolean;
-  message: string;
+  header: ResponseHeader;
+  // Post işlemlerinde bazen body boş dönebilir veya işlem sonucu dönebilir
+  body?: any; 
 }
 
-// --- DTO TİPLERİ ---
+// --- DTO TANIMLARI ---
 export interface CompanyLibraryForAssignDto {
   currAccTrainingId: number;
   trainingId: number;
@@ -56,27 +64,29 @@ export interface AssignTrainingRequestDto {
 })
 export class CurrAccTrainingApiService {
   
-  // Backend rotası (Dün yazdığımız Controller)
   private apiUrl = `${environment.apiUrl}/CurrAccTraining`;
 
   constructor(private http: HttpClient) { }
 
   /**
-   * MainUser'ın atama yapabileceği aktif kütüphane eğitimlerini getirir.
+   * Kurum kütüphanesindeki eğitimleri ve kota bilgilerini getirir.
+   * Endpoint: GET api/CurrAccTraining/company-library-for-assign
    */
   getCompanyLibraryForAssign(): Observable<Response<CompanyLibraryForAssignDto[]>> {
     return this.http.get<Response<CompanyLibraryForAssignDto[]>>(`${this.apiUrl}/company-library-for-assign`);
   }
 
   /**
-   * Seçilen eğitime göre personellerin listesini ve atanma durumlarını getirir.
+   * Seçilen eğitime göre personellerin atama durumlarını getirir.
+   * Endpoint: GET api/CurrAccTraining/company-users-assignment-status/{trainingId}
    */
   getCompanyUsersAssignmentStatus(trainingId: number): Observable<Response<CompanyUserAssignmentStatusDto[]>> {
     return this.http.get<Response<CompanyUserAssignmentStatusDto[]>>(`${this.apiUrl}/company-users-assignment-status/${trainingId}`);
   }
 
   /**
-   * Atama işlemini (POST) gerçekleştirir.
+   * Personellere toplu eğitim ataması yapar.
+   * Endpoint: POST api/CurrAccTraining/assign-training
    */
   assignTraining(data: AssignTrainingRequestDto): Observable<CommonResponse> {
     return this.http.post<CommonResponse>(`${this.apiUrl}/assign-training`, data);

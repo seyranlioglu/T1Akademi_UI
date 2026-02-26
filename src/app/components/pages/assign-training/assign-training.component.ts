@@ -1,9 +1,12 @@
-import { Component, OnInit, Optional, Inject } from '@angular/core';
+import { Component, OnInit, Optional, Inject, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
-// Servisin yolunu kendi projene göre ayarla:
-import { CurrAccTrainingApiService, CompanyLibraryForAssignDto, CompanyUserAssignmentStatusDto  } from 'src/app/shared/api/curr-acc-training-api.service';
+import { 
+  CurrAccTrainingApiService, 
+  CompanyLibraryForAssignDto, 
+  CompanyUserAssignmentStatusDto 
+} from 'src/app/shared/api/curr-acc-training-api.service';
 
 @Component({
   selector: 'app-assign-training',
@@ -12,6 +15,11 @@ import { CurrAccTrainingApiService, CompanyLibraryForAssignDto, CompanyUserAssig
 })
 export class AssignTrainingComponent implements OnInit {
   
+  // --- PARAMETRİK AYARLAR ---
+  // Başarıdan sonra ekran kapansın mı? 
+  // Modal açılırken data içinde 'keepOpen' gönderilirse ona göre davranır.
+  @Input() keepOpenAfterSuccess: boolean = true; 
+
   // --- EKRAN DATALARI ---
   libraryTrainings: CompanyLibraryForAssignDto[] = [];
   companyUsers: CompanyUserAssignmentStatusDto[] = [];
@@ -37,6 +45,11 @@ export class AssignTrainingComponent implements OnInit {
     @Optional() @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.isModal = !!this.dialogRef;
+    
+    // Eğer Modal içinden bir tercih gelmişse onu uygula, yoksa varsayılan true.
+    if (this.isModal && this.data?.keepOpenAfterSuccess !== undefined) {
+      this.keepOpenAfterSuccess = this.data.keepOpenAfterSuccess;
+    }
   }
 
   ngOnInit(): void {
@@ -58,23 +71,27 @@ export class AssignTrainingComponent implements OnInit {
     this.isLoading = true;
     this.trainingApi.getCompanyLibraryForAssign().subscribe({
       next: (res) => {
-        if (res.isSuccess) {
-          this.libraryTrainings = res.data;
+        if (res.header && res.header.result) {
+          this.libraryTrainings = res.body || [];
+        } else {
+          this.toastr.error(res.header?.msg || 'Eğitimler yüklenemedi');
         }
         this.isLoading = false;
       },
-      error: () => this.isLoading = false
+      error: () => {
+        this.toastr.error('Sunucu bağlantı hatası');
+        this.isLoading = false;
+      }
     });
   }
 
   onTrainingSelect(currAccTrainingId: number) {
     this.selectedTrainingId = currAccTrainingId;
+    const training = this.libraryTrainings.find(x => x.currAccTrainingId === currAccTrainingId);
     
-    // Kota bilgisini yakala
-    this.selectedTrainingQuotaInfo = this.libraryTrainings.find(x => x.currAccTrainingId === currAccTrainingId) || null;
-
-    if (this.selectedTrainingQuotaInfo) {
-      this.loadCompanyUsers(this.selectedTrainingQuotaInfo.trainingId);
+    if (training) {
+      this.selectedTrainingQuotaInfo = training;
+      this.loadCompanyUsers(training.trainingId); 
     }
   }
 
@@ -82,16 +99,21 @@ export class AssignTrainingComponent implements OnInit {
     this.isLoading = true;
     this.trainingApi.getCompanyUsersAssignmentStatus(trainingId).subscribe({
       next: (res) => {
-        if (res.isSuccess) {
-          this.companyUsers = res.data;
+        if (res.header && res.header.result) {
+          this.companyUsers = res.body || [];
           
-          // Zaten atanmış olan personelleri seçili (selectedUserIds) listesinden güvenlice çıkar
-          const alreadyAssignedIds = this.companyUsers.filter(u => u.isAssigned).map(u => u.userId);
+          // Zaten atanmış olanları seçili listesinden temizle
+          const alreadyAssignedIds = this.companyUsers
+            .filter(u => u.isAssigned)
+            .map(u => u.userId);
+            
           this.selectedUserIds = this.selectedUserIds.filter(id => !alreadyAssignedIds.includes(id));
         }
         this.isLoading = false;
       },
-      error: () => this.isLoading = false
+      error: () => {
+        this.isLoading = false;
+      }
     });
   }
 
@@ -105,13 +127,27 @@ export class AssignTrainingComponent implements OnInit {
     }
   }
 
-submitAssignment() {
-    if (!this.selectedTrainingId) {
-      this.toastr.warning('Lütfen bir eğitim seçiniz.');
-      return;
+  toggleAllUsers(event: any) {
+    if (event.target.checked) {
+      const availableUserIds = this.companyUsers
+        .filter(u => !u.isAssigned)
+        .map(u => u.userId);
+      this.selectedUserIds = [...availableUserIds];
+    } else {
+      this.selectedUserIds = [];
     }
-    if (this.selectedUserIds.length === 0) {
-      this.toastr.warning('Lütfen en az bir personel seçiniz.');
+  }
+
+  isAllSelected(): boolean {
+    if (!this.companyUsers.length) return false;
+    const availableUsers = this.companyUsers.filter(u => !u.isAssigned);
+    if (!availableUsers.length) return false;
+    return availableUsers.every(u => this.selectedUserIds.includes(u.userId));
+  }
+
+  submitAssignment() {
+    if (!this.selectedTrainingId || this.selectedUserIds.length === 0) {
+      this.toastr.warning('Lütfen seçimlerinizi kontrol ediniz.');
       return;
     }
 
@@ -126,16 +162,30 @@ submitAssignment() {
     this.trainingApi.assignTraining(payload).subscribe({
       next: (res) => {
         this.isLoading = false;
-        if (res.result) {
-          this.toastr.success(res.message);
-          this.closeComponent(true); 
+        
+        if (res.header && res.header.result) {
+          this.toastr.success(res.header.msg || 'Atama başarıyla tamamlandı.');
+          
+          // --- BURASI KRİTİK ---
+          if (this.keepOpenAfterSuccess) {
+            // Ekranı kapatma, sadece mevcut seçimleri sıfırla ve listeyi tazele
+            this.selectedUserIds = [];
+            // Seçili eğitimi tekrar tetikle ki personellerin yanındaki "Atandı" yazısı güncellensin
+            this.onTrainingSelect(this.selectedTrainingId!);
+            // Kotayı da kütüphaneden tazeleyelim (Kalan lisans sayısı düşsün)
+            this.loadLibraryTrainings();
+          } else {
+            // Parametrik olarak istenmişse veya sayfadaysa kapat/yönlendir
+            this.closeComponent(true);
+          }
+
         } else {
-          this.toastr.error(res.message);
+          this.toastr.error(res.header?.msg || 'Bir hata oluştu.');
         }
       },
       error: () => {
         this.isLoading = false;
-        this.toastr.error('Atama işlemi sırasında bir hata oluştu.');
+        this.toastr.error('Sunucuyla iletişim kurulurken bir hata oluştu.');
       }
     });
   }
@@ -144,7 +194,7 @@ submitAssignment() {
     if (this.isModal) {
       this.dialogRef.close(isSuccess);
     } else {
-      // Sayfadan açıldıysa geriye veya başka bir listeye yönlendir (Rotayı kendine göre düzenle)
+      // Eğer sayfadan yönlendirileceksek (Personel Listesine Dön)
       this.router.navigate(['/company/personnel-list']); 
     }
   }
