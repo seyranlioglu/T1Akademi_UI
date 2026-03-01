@@ -36,6 +36,13 @@ export interface CompanyLibraryForAssignDto {
   remainingQuota: number;
   quotaType: string;
   isCompanyOwned: boolean;
+
+  // 🔥 YENİ EKLENENLER
+  shortDescription?: string;
+  categoryName?: string;
+  instructorName?: string;
+  levelName?: string;
+  totalDurationMinutes?: number;
 }
 
 export interface CompanyUserAssignmentStatusDto {
@@ -55,6 +62,14 @@ export interface CompanyUserAssignmentStatusDto {
 export interface AssignTrainingRequestDto {
   currAccTrainingId: number;
   userIds: number[];
+  startDate?: Date;
+  dueDate?: Date;
+}
+
+// 🔥 YENİ EKLENEN: 1 Kullanıcıya N Eğitim atama DTO'su
+export interface AssignUserToTrainingsRequestDto {
+  userId: number;
+  currAccTrainingIds: number[];
   startDate?: Date;
   dueDate?: Date;
 }
@@ -85,10 +100,31 @@ export class CurrAccTrainingApiService {
   }
 
   /**
-   * Personellere toplu eğitim ataması yapar.
+   * 1 Eğitimi N Personele atar (Çoklu Personel).
    * Endpoint: POST api/CurrAccTraining/assign-training
    */
   assignTraining(data: AssignTrainingRequestDto): Observable<CommonResponse> {
     return this.http.post<CommonResponse>(`${this.apiUrl}/assign-training`, data);
+  }
+
+  // =================================================================================
+  // 🔥 YENİ EKLENEN METOTLAR (Personel Listesinden Çoklu Eğitim Atama İçin)
+  // =================================================================================
+
+  /**
+   * 1 Personele N Eğitim atar (Çoklu Eğitim).
+   * Endpoint: POST api/CurrAccTraining/assign-user-to-trainings
+   */
+  assignUserToTrainings(data: AssignUserToTrainingsRequestDto): Observable<CommonResponse> {
+    return this.http.post<CommonResponse>(`${this.apiUrl}/assign-user-to-trainings`, data);
+  }
+
+  /**
+   * (Opsiyonel/Önerilen) Seçilen kullanıcının halihazırda atanmış olduğu eğitimlerin ID listesini getirir.
+   * Modal açıldığında zaten atanmış eğitimlerin checkbox'larını disabled yapmak için kullanacağız.
+   * Endpoint: GET api/CurrAccTraining/user-assigned-training-ids/{userId}
+   */
+  getUserAssignedTrainingIds(userId: number): Observable<Response<number[]>> {
+    return this.http.get<Response<number[]>>(`${this.apiUrl}/user-assigned-training-ids/${userId}`);
   }
 }

@@ -1,0 +1,117 @@
+// Modalın arka planını çok hafif bir gri yapıyoruz, içindeki div'ler bembeyaz parlasın diye.
+.bg-light-soft {
+    background-color: #fafbfc;
+}
+
+// İnputlara tıklandığında çıkan glow efektini yumuşat
+.form-control:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+}
+
+.table {
+    th {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    td {
+        vertical-align: middle;
+        border-bottom: 1px solid #f8f9fa;
+        font-size: 0.95rem;
+    }
+
+    // Ana Satır (Tıklanabilir)
+    .main-row {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-left: 3px solid transparent;
+
+        &:hover:not(.assigned-row) {
+            background-color: #fcfdfe;
+            border-left: 3px solid #1488cc;
+        }
+
+        &.expanded {
+            background-color: #fcfdfe;
+            border-left: 3px solid #1488cc;
+            border-bottom: none;
+            td { border-bottom: none; }
+        }
+
+        // Zaten Atanmış Satır Görünümü
+        &.assigned-row {
+            background-color: #fefefe;
+            opacity: 0.55;
+            cursor: not-allowed;
+            border-left: 3px solid #dee2e6;
+            
+            td { color: #999 !important; }
+        }
+    }
+}
+
+// Checkbox Tasarımı
+.custom-checkbox {
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+    border-radius: 4px;
+    
+    &:checked {
+        background-color: #1488cc;
+        border-color: #1488cc;
+    }
+    &:disabled {
+        cursor: not-allowed;
+    }
+}
+
+// Soft ve Kibar Badgeler
+.badge {
+    padding: 0.4em 0.65em;
+    letter-spacing: 0.3px;
+    font-weight: 500;
+
+    &.soft-success { background-color: rgba(25, 135, 84, 0.08); color: #198754; }
+    &.soft-primary { background-color: rgba(13, 110, 253, 0.08); color: #0d6efd; }
+    &.soft-info    { background-color: rgba(13, 202, 240, 0.08); color: #08a0be; }
+    &.soft-secondary{ background-color: #f4f4f4; color: #777; border: 1px solid #e9ecef;}
+}
+
+// Footer Uyarı Stili (Çok şık bir banner)
+.bg-warning-light {
+    background-color: #fffaf0 !important;
+}
+.border-warning {
+    border-color: #ffe082 !important;
+}
+.text-warning-dark {
+    color: #b38300;
+}
+
+.html-description-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Kaç satır görünmesini istiyorsan burayı değiştirebilirsin (Örn: 2 veya 3) */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #6c757d; // text-muted rengi
+
+    // Editörden gelen etiketlerin tasarıma zarar vermemesi için:
+    ::ng-deep {
+        p, h1, h2, h3, h4, h5, h6, ul, ol {
+            margin-bottom: 0.1rem;
+            font-size: 0.9rem;
+            font-weight: normal; 
+        }
+        strong, b {
+            font-weight: 500; // Aşırı kalın siyah olmasın, zarif dursun
+            color: #444;
+        }
+    }
+}

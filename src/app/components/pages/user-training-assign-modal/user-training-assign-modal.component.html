@@ -1,0 +1,183 @@
+<div class="modal-header border-bottom-0 pb-0 mt-3 mx-3">
+    <h5 class="modal-title fw-normal" style="color: #333; font-size: 1.25rem;">
+        <i class='bx bx-book-add text-primary me-2'></i> 
+        Eğitim Ata: <span class="text-dark fw-medium">{{ userName }}</span>
+    </h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
+
+<div class="modal-body p-4 p-md-5">
+    
+    <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-3 text-muted">Kütüphane bilgileri getiriliyor...</p>
+    </div>
+
+    <div *ngIf="!isLoading">
+        
+        <form [formGroup]="assignForm" class="row mb-5 bg-white p-4 border border-light rounded-3 shadow-sm">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <label class="form-label text-secondary fw-normal mb-2">Erişim Başlangıç Tarihi</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white text-muted border-end-0"><i class='bx bx-calendar'></i></span>
+                    <input type="date" class="form-control border-start-0 ps-0" formControlName="startDate" style="color: #555;">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label text-secondary fw-normal mb-2">Son Tamamlama Tarihi (Opsiyonel)</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white text-muted border-end-0"><i class='bx bx-calendar-x'></i></span>
+                    <input type="date" class="form-control border-start-0 ps-0" formControlName="dueDate" style="color: #555;">
+                </div>
+            </div>
+        </form>
+
+        <div class="d-flex align-items-center mb-3">
+            <h6 class="text-dark mb-0 fw-medium">Kurum Kütüphanesi</h6>
+            <span class="ms-auto text-muted small">Toplam {{ library.length }} eğitim listeleniyor</span>
+        </div>
+        
+        <div class="table-responsive border border-light rounded-3 bg-white shadow-sm">
+            <table class="table align-middle mb-0">
+                <thead class="bg-light text-secondary">
+                    <tr>
+                        <th style="width: 50px;" class="text-center py-3 fw-normal border-0">#</th>
+                        <th class="py-3 fw-normal border-0">Eğitim Adı</th>
+                        <th class="py-3 fw-normal border-0">Lisans Tipi</th>
+                        <th class="text-center py-3 fw-normal border-0">Kalan Kota</th>
+                        <th class="text-end pe-4 py-3 fw-normal border-0">Durum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let item of library">
+                        
+                        <tr class="main-row"
+                            [class.assigned-row]="isAssigned(item.currAccTrainingId)"
+                            [class.expanded]="expandedRowId === item.currAccTrainingId"
+                            (click)="toggleAccordion(item.currAccTrainingId)">
+                            
+                            <td class="text-center py-3" (click)="$event.stopPropagation()">
+                                <div class="form-check d-flex justify-content-center m-0">
+                                    <input class="form-check-input custom-checkbox" type="checkbox" 
+                                           [checked]="isSelected(item.currAccTrainingId) || isAssigned(item.currAccTrainingId)"
+                                           [disabled]="isAssigned(item.currAccTrainingId)"
+                                           (change)="toggleSelection($event, item.currAccTrainingId)">
+                                </div>
+                            </td>
+                            
+                            <td class="py-3" style="color: #444; font-weight: 500;">
+                                {{ item.trainingTitle }}
+                            </td>
+                            
+                            <td class="py-3">
+                                <span class="badge" [ngClass]="item.paymentMethod === 1 ? 'soft-info' : 'soft-primary'">
+                                    {{ item.paymentMethod === 1 ? 'Abonelik' : 'Satın Alınan' }}
+                                </span>
+                            </td>
+
+                            <td class="text-center py-3">
+                                <span *ngIf="item.isUnlimited" class="badge soft-success">Sınırsız</span>
+                                <span *ngIf="!item.isUnlimited" [ngClass]="item.remainingQuota > 0 ? 'text-success fw-medium' : 'text-danger fw-medium'">
+                                    {{ item.remainingQuota }}
+                                </span>
+                            </td>
+
+                            <td class="text-end pe-4 py-3">
+                                <span *ngIf="isAssigned(item.currAccTrainingId)" class="badge soft-secondary fw-normal">
+                                    <i class='bx bx-check'></i> Atanmış
+                                </span>
+                                <span *ngIf="!isAssigned(item.currAccTrainingId) && isSelected(item.currAccTrainingId)" class="badge soft-success fw-normal">
+                                    Seçildi
+                                </span>
+                                <i class='bx text-muted ms-3 fs-5' style="vertical-align: middle;"
+                                   [ngClass]="expandedRowId === item.currAccTrainingId ? 'bx-chevron-up' : 'bx-chevron-down'">
+                                </i>
+                            </td>
+                        </tr>
+                        
+                        <tr *ngIf="expandedRowId === item.currAccTrainingId" class="detail-row">
+                            <td colspan="5" class="p-0 border-0">
+                                <div class="bg-light p-4 m-2 rounded-3 border border-light">
+                                    <div class="d-flex align-items-start">
+                                        
+                                        <img [src]="item.trainingImage !== 'none' && item.trainingImage ? item.trainingImage : 'assets/img/default-course.jpg'" 
+                                             alt="Eğitim Görseli" class="rounded-3 me-4 object-fit-cover shadow-sm" style="width: 160px; height: 100px;">
+                                        
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-2 text-dark fw-medium" style="font-size: 1.05rem;">{{ item.trainingTitle }}</h6>
+                                            
+                                            <div class="mb-3 html-description-clamp" style="max-width: 800px;">
+                                                <div *ngIf="item.shortDescription" [innerHTML]="item.shortDescription"></div>
+                                                
+                                                <div *ngIf="!item.shortDescription" class="text-muted">
+                                                    Bu eğitim için bir açıklama girilmemiştir.
+                                                </div>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <span class="badge bg-white text-secondary border px-2 py-1 fw-normal">
+                                                    <i class='bx bx-category text-primary me-1'></i> {{ item.categoryName }}
+                                                </span>
+                                                <span class="badge bg-white text-secondary border px-2 py-1 fw-normal">
+                                                    <i class='bx bx-user-voice text-info me-1'></i> {{ item.instructorName }}
+                                                </span>
+                                                <span class="badge bg-white text-secondary border px-2 py-1 fw-normal">
+                                                    <i class='bx bx-time-five text-warning me-1'></i> {{ item.totalDurationMinutes }} Dk
+                                                </span>
+                                                <span class="badge bg-white text-secondary border px-2 py-1 fw-normal">
+                                                    <i class='bx bx-bar-chart-alt-2 text-success me-1'></i> {{ item.levelName }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    
+                    <tr *ngIf="library.length === 0">
+                        <td colspan="5" class="text-center py-5 text-muted">
+                            <i class='bx bx-folder-open fs-1 mb-3 text-light'></i><br>
+                            Kurum kütüphanenizde aktif eğitim bulunmamaktadır.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+</div>
+
+<div class="modal-footer border-top-0 px-4 pb-4 pt-0" *ngIf="!isLoading">
+    
+    <ng-container *ngIf="!showEndlessWarning">
+        <div class="me-auto text-muted" style="font-size: 0.95rem;">
+            Seçilen Eğitim: <span class="badge bg-primary rounded-pill px-2 ms-1">{{ selectedTrainingIds.size }}</span>
+        </div>
+        <button type="button" class="btn btn-light px-4" (click)="activeModal.dismiss()">İptal</button>
+        <button type="button" class="btn btn-primary px-4" 
+                [disabled]="selectedTrainingIds.size === 0 || isSaving" 
+                (click)="attemptSave()">
+            <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!isSaving" class='bx bx-check me-1'></i> Atamayı Tamamla
+        </button>
+    </ng-container>
+
+    <ng-container *ngIf="showEndlessWarning">
+        <div class="w-100 bg-warning-light border border-warning rounded-3 p-3 d-flex align-items-center shadow-sm">
+            <i class='bx bx-error-circle fs-2 me-3 text-warning-dark'></i>
+            <div class="text-start flex-grow-1">
+                <span class="d-block fw-medium text-warning-dark mb-1" style="font-size: 1rem;">Tarih Aralığı Seçilmedi!</span>
+                <span class="text-muted" style="font-size: 0.9rem;">Öğrenci bu eğitimlere <b>süresiz</b> şekilde erişebilecek. Onaylıyor musunuz?</span>
+            </div>
+            <div class="d-flex">
+                <button class="btn btn-sm btn-outline-secondary me-2 px-3 bg-white" (click)="cancelWarning()">Vazgeç</button>
+                <button class="btn btn-sm btn-warning px-4" (click)="confirmAndSave()" style="color: #5c4600; font-weight: 500;">
+                    <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+                    Evet, Ata
+                </button>
+            </div>
+        </div>
+    </ng-container>
+
+</div>

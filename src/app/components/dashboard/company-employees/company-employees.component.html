@@ -52,7 +52,7 @@
                                                 {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
                                             </div>
                                             <div class="d-flex flex-column">
-                                                <span class="fw-bold text-dark">{{ user.firstName }} {{ user.lastName }}</span>
+                                                <span class="fw-bold text-dark">{{ user.firstName }} {{ user.lastName }} <span *ngIf="user.id === currentUserId" class="badge bg-secondary ms-1" style="font-size: 0.65rem;">Siz</span></span>
                                                 <span class="text-muted x-small">{{ user.companyName || '-' }}</span>
                                             </div>
                                         </div>
@@ -70,11 +70,13 @@
                                     </td>
                                     <td class="text-end pe-4">
                                         <div class="btn-group">
-                                            <button class="btn btn-icon btn-light btn-sm me-1 text-info" title="Eğitim Ata">
+                                            
+                                            <button class="btn btn-icon btn-light btn-sm me-1 text-info" title="Eğitim Ata" (click)="openAssignTrainingModal(user)">
                                                 <i class='bx bx-book-add'></i>
                                             </button>
 
-                                            <button class="btn btn-icon btn-light btn-sm me-1" 
+                                            <button *ngIf="user.id !== currentUserId"
+                                                    class="btn btn-icon btn-light btn-sm me-1" 
                                                     [title]="user.isActive ? 'Pasife Al' : 'Aktifleştir'"
                                                     (click)="toggleUserStatus(user)">
                                                 <i class='bx' [ngClass]="user.isActive ? 'bx-block text-warning' : 'bx-check-circle text-success'"></i>
@@ -84,9 +86,11 @@
                                                 <i class='bx bx-edit-alt'></i>
                                             </button>
 
-                                            <button class="btn btn-icon btn-light btn-sm text-danger" title="Sil" (click)="deleteUser(user)">
+                                            <button *ngIf="user.id !== currentUserId"
+                                                    class="btn btn-icon btn-light btn-sm text-danger" title="Sil" (click)="deleteUser(user)">
                                                 <i class='bx bx-trash'></i>
                                             </button>
+
                                         </div>
                                     </td>
                                 </tr>

@@ -7,6 +7,7 @@ import { AuthService } from 'src/app/shared/services/auth.service';
 import { CurrAccApiService, CompanyDto } from 'src/app/shared/api/curr-acc-api.service';
 import { Subject, Observable, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, switchMap, tap, startWith } from 'rxjs/operators';
+import { UserTrainingAssignModalComponent } from 'src/app/components/pages/user-training-assign-modal/user-training-assign-modal.component';
 
 export interface ManagedUser {
   id: number;
@@ -42,6 +43,7 @@ export class CompanyEmployeesComponent implements OnInit {
   // Yetki ve Firma Yönetimi
   currentCompanyId: number = 0;
   isAdmin = false;
+  currentUserId: number = 0; // 🔥 GİRİŞ YAPAN KULLANICININ ID'Sİ
   
   // NG-SELECT (Firma Arama) Değişkenleri
   companyList$: Observable<CompanyDto[]> | undefined;
@@ -68,14 +70,15 @@ export class CompanyEmployeesComponent implements OnInit {
     // --- YETKİ VE ROL KONTROLÜ ---
     const currentUser = this.authService.currentUserValue;
     if(currentUser) {
-        // Roles dizisi kontrolü
+        // 🔥 Kendi ID'mizi alıyoruz
+        this.currentUserId = currentUser.id || currentUser.Id || 0;
+
         if (currentUser.roles && Array.isArray(currentUser.roles)) {
             const lowerRoles = currentUser.roles.map((r: any) => r.toString().toLowerCase());
             if (lowerRoles.includes('superadmin') || lowerRoles.includes('admin') || lowerRoles.includes('sa')) {
                 this.isAdmin = true;
             }
         }
-        // Token decode kontrolü (Yedek)
         if (!this.isAdmin && currentUser.accessToken) {
             try {
                 const payload = JSON.parse(atob(currentUser.accessToken.split('.')[1]));
@@ -125,18 +128,45 @@ export class CompanyEmployeesComponent implements OnInit {
   // 2. FİRMA ARAMA
   loadCompanies() {
       this.companyList$ = this.companyInput$.pipe(
-          startWith(''), // Başlangıçta boş değer ile tetikle
+          startWith(''),
           debounceTime(500),
           distinctUntilChanged(),
           tap(() => this.companyLoading = true),
           switchMap(term => {
-              // Boş gelirse backend'e boş string gider, backend hepsini döner
               return this.currAccApiService.getCompanies(term).pipe(
                   catchError(() => of([])),
                   tap(() => this.companyLoading = false)
               );
           })
       );
+  }
+
+  // ==============================================================================
+  // 🔥 EĞİTİM ATAMA MODALINI AÇMA METODU
+  // ==============================================================================
+  openAssignTrainingModal(user: ManagedUser) {
+    if (!user.isActive) {
+        this.toastr.warning(`${user.firstName} adlı personel şu an "Pasif" durumda olduğu için eğitim atanamaz. Lütfen önce aktifleştirin.`, 'Uyarı');
+        return;
+    }
+
+    const modalRef = this.modalService.open(UserTrainingAssignModalComponent, { 
+        size: 'lg', 
+        backdrop: 'static', 
+        centered: true 
+    });
+    
+    modalRef.componentInstance.userId = user.id;
+    modalRef.componentInstance.userName = `${user.firstName} ${user.lastName}`;
+    
+    modalRef.result.then((result) => {
+       if (result === 'success') {
+           // İhtiyaç duyarsan listeyi tazeleyebilirsin
+           // this.fetchUsers();
+       }
+    }).catch(() => {
+        // Modal dışarı tıklanarak kapatıldı
+    });
   }
 
   // 3. MODAL AÇMA (EKLEME)
@@ -149,7 +179,6 @@ export class CompanyEmployeesComponent implements OnInit {
         this.userForm.get('currAccId')?.enable();
         this.userForm.patchValue({ currAccId: null }); 
         
-        // Modalın animasyonu bitip DOM'a yerleşmesi için biraz bekle ve listeyi tetikle
         setTimeout(() => {
             this.companyInput$.next(''); 
         }, 200); 
@@ -161,10 +190,6 @@ export class CompanyEmployeesComponent implements OnInit {
 
     this.modalService.open(this.userModal, { backdrop: 'static', size: 'lg', centered: true });
   }
-
-  // ... (Diğer metodlar aynı: openEditModal, saveUser, deleteUser, toggleUserStatus, onDynamicInput vb.)
-  // Bunlar değişmediği için kod kalabalığı yapmamak adına tekrar yazmıyorum.
-  // Eski dosyadaki diğer fonksiyonları olduğu gibi koruyabilirsin.
   
   // 4. MODAL AÇMA (DÜZENLEME)
   openEditModal(user: ManagedUser) {

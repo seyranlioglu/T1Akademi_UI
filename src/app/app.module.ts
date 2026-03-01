@@ -119,9 +119,8 @@ import { ExamSelectorComponent } from 'src/app/components/common/exam-selector/e
 import { ExamModule } from './components/student/exam-runner/exam.module';
 import { TrainingApprovalComponent } from './components/admin/training-approval/training-approval.component';   
 import { CourseDashboardComponent } from './components/pages/instructor/course-manage/course-dashboard/course-dashboard.component';
-
-// YENİ EKLENEN BİLEŞEN
 import { AssignTrainingComponent } from './components/pages/assign-training/assign-training.component';
+import { UserTrainingAssignModalComponent } from './components/pages/user-training-assign-modal/user-training-assign-modal.component';
 
 @NgModule({
     declarations: [
@@ -219,9 +218,8 @@ import { AssignTrainingComponent } from './components/pages/assign-training/assi
         ExamSelectorComponent,
         TrainingApprovalComponent,
         CourseDashboardComponent,
-        
-        // YENİ EKLENEN
-        AssignTrainingComponent
+        AssignTrainingComponent,
+        UserTrainingAssignModalComponent
     ],
     imports: [
         BrowserModule,
