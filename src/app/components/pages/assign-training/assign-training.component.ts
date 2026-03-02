@@ -55,6 +55,9 @@ export class AssignTrainingComponent implements OnInit {
   ngOnInit(): void {
     this.loadLibraryTrainings();
 
+    if (this.isModal && this.data && this.data.preSelectedTrainingId) {
+    this.onTrainingSelect(this.data.preSelectedTrainingId);
+  }
     // Ön Seçili Personel Mantığı (Pre-select)
     if (this.isModal && this.data && this.data.preSelectedUserId) {
       this.selectedUserIds.push(this.data.preSelectedUserId);
@@ -67,12 +70,20 @@ export class AssignTrainingComponent implements OnInit {
     }
   }
 
-  loadLibraryTrainings() {
+loadLibraryTrainings() {
     this.isLoading = true;
     this.trainingApi.getCompanyLibraryForAssign().subscribe({
       next: (res) => {
         if (res.header && res.header.result) {
           this.libraryTrainings = res.body || [];
+          
+          // 🔥 KRİTİK: Veri geldiği anda eğer dışarıdan ID gelmişse seçimi tetikle
+          if (this.isModal && this.data?.preSelectedTrainingId) {
+            // Listenin render olması için 50ms bekle ve tetikle
+            setTimeout(() => {
+              this.onTrainingSelect(this.data.preSelectedTrainingId);
+            }, 50);
+          }
         } else {
           this.toastr.error(res.header?.msg || 'Eğitimler yüklenemedi');
         }

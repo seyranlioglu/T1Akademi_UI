@@ -10,16 +10,18 @@
 .assign-container {
   display: flex;
   flex-direction: column;
-  /* Çift scroll'u engellemek için min-height ve overflow yönetimi */
   min-height: calc(100vh - 120px); 
   background: transparent;
   margin-top: -15px;
   overflow: visible; 
 
   &.is-modal {
-    height: 90vh;
+    // 🔥 Sabit yükseklik vererek çift scroll'u engelliyoruz
+    height: 75vh; 
     margin-top: 0;
-    overflow: hidden;
+    overflow: hidden; // Ana kapsayıcı asla scroll olmasın
+    background: #fff;
+    border-radius: 12px;
   }
 }
 
@@ -31,14 +33,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
+  flex-shrink: 0; // Header boyutu asla değişmesin
   z-index: 100;
   border-radius: 12px 12px 0 0;
 
   h1 { font-size: 1.15rem; margin: 0; font-weight: 800; color: var(--text-main); }
   .step-indicator { font-size: 0.75rem; color: var(--text-muted); }
-
   .top-actions { display: flex; gap: 12px; }
 }
 
@@ -47,22 +47,37 @@
   flex: 1;
   background: #fff;
   border-radius: 0 0 12px 12px;
-  overflow: visible;
+  overflow: hidden; // İçerik taşmasın, altındakiler scroll olsun
 }
 
-// SİDEBAR (SOL)
+// SIDEBAR (SOL)
 .training-sidebar {
   width: 280px;
   background: var(--bg-sidebar);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  position: sticky;
-  top: 60px;
-  height: calc(100vh - 180px);
+  height: 100%; // Kendi alanını kaplasın
 
   .panel-label { padding: 1rem; font-size: 0.7rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
-  .training-scroll { flex: 1; overflow-y: auto; }
+  
+  // 🔥 Sadece bu alan scroll olsun
+  .training-scroll { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding-bottom: 20px;
+  }
+}
+
+// MAIN PANEL (SAĞ)
+.assignment-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  height: 100%;
+  overflow-y: auto; // 🔥 Personel tablosu çoksa sadece burası scroll olsun
+  padding-bottom: 30px;
 }
 
 .training-item {
@@ -95,22 +110,13 @@
       .type-tag { background: #e2e8f0; padding: 1px 4px; border-radius: 3px; }
     }
   }
-
   .active-indicator { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: transparent; }
-}
-
-// MAİN PANEL (SAĞ)
-.assignment-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  overflow: visible;
 }
 
 .schedule-bar {
   padding: 1rem 2rem;
   border-bottom: 1px dotted var(--border-color);
+  flex-shrink: 0;
 
   .input-grid { display: flex; gap: 1.5rem; margin-top: 0.8rem; }
   .form-field {
@@ -121,16 +127,13 @@
 }
 
 .personnel-section {
-  flex: 1;
   padding: 1.2rem 2rem;
-  
   .section-header-inline { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; }
   .selection-summary { font-size: 0.8rem; color: var(--primary); background: #fef2f2; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
 }
 
 .section-title { font-size: 0.85rem; font-weight: 700; color: var(--text-main); }
 
-// TABLO
 .user-table-wrapper { 
   margin-top: 0.5rem; 
   border: 1px solid #f1f5f9; 
@@ -139,21 +142,17 @@
 
 .user-table {
   width: 100%; border-collapse: collapse;
-  
   thead th { 
     position: sticky; top: 0; background: #fafafa; z-index: 5;
     text-align: left; font-size: 0.75rem; color: #94a3b8; padding: 10px; border-bottom: 1px solid #f1f5f9; 
   }
-  
   td { padding: 10px; border-bottom: 1px solid #f8fafc; font-size: 0.8rem; }
-
   .name-cell { display: flex; align-items: center; gap: 10px; }
   .avatar { width: 28px; height: 28px; border-radius: 50%; background: #e0e7ff; color: #4338ca; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; }
   .user-text { display: flex; flex-direction: column; .email { font-size: 0.65rem; color: #94a3b8; } }
   .title-text { color: var(--text-muted); font-size: 0.75rem; }
 }
 
-// CHECKBOX
 .custom-check {
   display: block; position: relative; padding-left: 25px; cursor: pointer; user-select: none;
   input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
@@ -174,7 +173,6 @@
 
 .already-assigned { background: #fafafa; opacity: 0.6; }
 
-// BUTTONS
 .btn-submit {
   background: var(--primary); color: #fff; border: none; padding: 8px 20px; border-radius: 6px; 
   font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: 0.2s;
@@ -188,3 +186,15 @@
 
 .loader { border: 2px solid #f3f3f3; border-top: 2px solid var(--primary); border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; display: inline-block; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* 🔥 MatDialog'un kendi içindeki scroll'u ve navbar taşmasını engellemek için */
+::ng-deep .custom-assign-modal {
+  max-height: 75vh !important;
+  
+  mat-dialog-container {
+    padding: 0 !important;
+    overflow: hidden !important; // Burası çift scroll'un ana sebebidir, kapattık.
+    border-radius: 12px !important;
+    height: 75vh !important;
+  }
+}

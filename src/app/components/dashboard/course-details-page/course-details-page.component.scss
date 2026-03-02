@@ -1,179 +1,125 @@
-// --- HERO SECTION ---
+// 🔥 1. STICKY KİLİDİNİ KIRAN VE SİSTEM GENELİNDEKİ OVERFLOW'U EZEN KODLAR 🔥
+:host {
+    display: block;
+    overflow: visible !important;
+}
+
+.course-details-wrapper {
+    overflow: visible !important;
+    clip-path: none !important;
+}
+
+::ng-deep {
+    body, html, .main-content, .content-wrapper, main {
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+    }
+}
+
+// 2. HERO SECTION (Siyah Alan - Dar ve Kibar)
 .course-hero-section {
     position: relative;
-    background-color: #1c1d1f; // Udemy Dark
+    background-color: #1c1d1f;
     color: #fff;
-    padding: 60px 0 100px; // Alt boşluğu Stats Bar için artırdık
-    overflow: visible; 
-
-    @media (min-width: 992px) {
+    padding: 10px 0 60px; 
+    &::before { 
+        content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        background: linear-gradient(135deg, rgba(28, 29, 31, 0.95) 0%, rgba(28, 29, 31, 0.9) 100%); 
+        z-index: 0; 
+    }
+    @media (min-width: 992px) { 
         margin-left: calc(-50vw + 50%);
         margin-right: calc(-50vw + 50%);
         width: 100vw;
         padding-left: calc(50vw - 50%);
         padding-right: calc(50vw - 50%);
-    }
-
-    .container { position: relative; z-index: 2; }
-    
-    &::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(135deg, rgba(28, 29, 31, 0.95) 0%, rgba(28, 29, 31, 0.9) 100%);
-        z-index: 0;
+        padding-bottom: 70px;
     }
 }
 
-// --- STATS BAR ---
-// Negatif margin ile Hero ve Content arasına yerleşir
+// 3. STATS BAR (BİLGİ BANDI - Responsive)
 .course-stats-bar {
-    position: relative;
-    z-index: 5;
+    position: relative; 
+    z-index: 5; 
     margin-top: -45px; 
-    border-bottom: 3px solid var(--primaryColor, #5624d0);
+    border-bottom: 3px solid #5624d0;
 
-    .icon-circle {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-}
-
-// Stats barı içeren container'ın z-index'ini yükseltiyoruz
-.z-index-5 {
-    z-index: 5;
-}
-
-// --- SIDEBAR (Sticky) ---
-.sidebar-card-wrapper {
-    transition: all 0.3s ease;
-
-    @media (min-width: 992px) {
-        margin-top: -300px; // Yukarı Hero alanına çekme
+    .icon-circle { 
+        width: 40px; 
+        height: 40px; 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        flex-shrink: 0; 
     }
 
-    .card {
-        border-radius: 0; 
-        .btn-light {
-            transition: transform 0.2s;
-            &:hover { transform: scale(1.1); }
+    .responsive-border {
+        border-right: 1px solid #edf2f9;
+
+        @media (max-width: 991px) {
+            &:nth-child(2), &:nth-child(4) { border-right: none; } 
+            &:nth-child(1), &:nth-child(2) { 
+                border-bottom: 1px solid #edf2f9; 
+                padding-bottom: 10px; 
+                margin-bottom: 5px; 
+            }
+        }
+
+        @media (min-width: 992px) {
+            &:last-child { border-right: none; }
         }
     }
 }
 
-// --- STANDART KART ---
-.standard-card {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    overflow: hidden;
+.z-index-5 { z-index: 5; }
 
-    .card-header-custom {
-        background: #fff;
-        padding: 1.5rem;
-        border-bottom: 1px solid #f0f0f0;
-    }
-}
-
-// --- ÇİFT SÜTUNLU LİSTE ---
-.two-column-list {
-    column-count: 1;
-    @media (min-width: 768px) {
-        column-count: 2;
-        column-gap: 2rem;
-    }
-    .list-item {
-        break-inside: avoid; 
-        margin-bottom: 0.5rem;
-    }
-}
-
-// --- GENEL STİLLER ---
-.accordion-button {
-    background-color: #f7f9fa;
-    color: #2d2f31;
-    font-size: 1rem;
-    padding: 1rem 1.25rem;
+// 🔥 4. STICKY SIDEBAR ÇÖZÜMÜ (Kilidi açıldı, rayına oturtuldu) 🔥
+.sidebar-card-wrapper {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 80px !important; // Navbar'ın altında bırakacağı mesafe (Kendine göre değiştirebilirsin)
+    z-index: 100;
     
-    &:not(.collapsed) {
-        background-color: #eef2f5;
-        color: #000;
-        box-shadow: none;
+    @media (min-width: 992px) { 
+        margin-top: -200px; // Siyah alanın üzerine çıkması için margin buraya alındı
     }
-    &:focus { box-shadow: none; }
-}
-
-.list-group-item {
-    &.preview-enabled {
-        cursor: pointer;
-        transition: background-color 0.2s;
-        &:hover { background-color: #f0fcfd; }
-    }
-
-    .icon-box {
-        width: 36px; height: 36px;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 50%;
+    
+    .card { 
+        border-radius: 8px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
     }
 }
 
-.video-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 9999;
-    background-color: rgba(0, 0, 0, 0.85);
-
-    .video-modal-backdrop {
-        position: absolute; width: 100%; height: 100%;
-    }
-
-    .video-modal-content {
-        width: 90%;
-        max-width: 900px;
-        z-index: 10000;
-        overflow: hidden;
-    }
+// 5. DİĞER STANDART STİLLER
+.standard-card { 
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; overflow: hidden; 
+    .card-header-custom { background: #fff; padding: 1.5rem; border-bottom: 1px solid #f0f0f0; } 
 }
 
-.cursor-pointer { cursor: pointer; }
-.hover-bg-light:hover { background-color: #f8f9fa !important; }
-.x-small { font-size: 0.75rem; }
-.ls-1 { letter-spacing: 1px; }
-.break-inside-avoid { break-inside: avoid; }
-
-.toast-notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #fff;
-    color: #333;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    z-index: 10000;
-    transform: translateX(120%);
-    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-    border-left: 4px solid #28a745; // Success rengi
-
-    i {
-        font-size: 1.5rem;
-        color: #28a745;
-    }
-
-    &.error {
-        border-left-color: #dc3545;
-        i { color: #dc3545; }
-    }
-
-    &.show {
-        transform: translateX(0);
-    }
+.two-column-list { 
+    column-count: 1; 
+    @media (min-width: 768px) { column-count: 2; column-gap: 2rem; } 
+    .list-item { break-inside: avoid; } 
 }
+
+.accordion-button { 
+    background-color: #f7f9fa; color: #2d2f31; 
+    &:not(.collapsed) { background-color: #eef2f5; color: #000; box-shadow: none; } 
+}
+
+.video-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background-color: rgba(0, 0, 0, 0.85); 
+    .video-modal-backdrop { position: absolute; width: 100%; height: 100%; } 
+    .video-modal-content { width: 90%; max-width: 900px; z-index: 10000; } 
+}
+
+.toast-notification { 
+    position: fixed; top: 20px; right: 20px; background-color: #fff; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; z-index: 10000; transform: translateX(120%); transition: transform 0.3s ease; border-left: 4px solid #28a745; 
+    &.show { transform: translateX(0); } 
+    &.error { border-left-color: #dc3545; } 
+}
+
+// Modal Yüksekliği
+::ng-deep .cdk-overlay-pane { max-height: 95vh !important; }
+::ng-deep .mat-dialog-container { padding: 0 !important; overflow: hidden !important; }
