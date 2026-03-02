@@ -1,11 +1,11 @@
-import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { UserApiService } from 'src/app/shared/api/user-api.service';
 import { AuthService } from 'src/app/shared/services/auth.service';
 import { CurrAccApiService, CompanyDto } from 'src/app/shared/api/curr-acc-api.service';
-import { Subject, Observable, of } from 'rxjs';
+import { Subject, Observable, of, Subscription } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, switchMap, tap, startWith } from 'rxjs/operators';
 import { UserTrainingAssignModalComponent } from 'src/app/components/pages/user-training-assign-modal/user-training-assign-modal.component';
 
@@ -20,6 +20,8 @@ export interface ManagedUser {
   isActive: boolean;
   status: string;
   viewMode: 'AdminView' | 'CompanyView' | 'InstructorView';
+  isMainUser?: boolean; 
+  role?: string;        
 }
 
 @Component({
@@ -27,13 +29,12 @@ export interface ManagedUser {
   templateUrl: './company-employees.component.html',
   styleUrls: ['./company-employees.component.scss']
 })
-export class CompanyEmployeesComponent implements OnInit {
+export class CompanyEmployeesComponent implements OnInit, OnDestroy {
 
   users: ManagedUser[] = [];
   isLoading = true;
   errorMessage = '';
   
-  // Modal ve Form Değişkenleri
   @ViewChild('userModal') userModal!: TemplateRef<any>;
   userForm!: FormGroup;
   isEditMode = false;
@@ -43,12 +44,24 @@ export class CompanyEmployeesComponent implements OnInit {
   // Yetki ve Firma Yönetimi
   currentCompanyId: number = 0;
   isAdmin = false;
-  currentUserId: number = 0; // 🔥 GİRİŞ YAPAN KULLANICININ ID'Sİ
+  isCurrentUserMainUser = false;
+  currentUserId: number = 0; 
   
-  // NG-SELECT (Firma Arama) Değişkenleri
+  // Firma Arama (ng-select)
   companyList$: Observable<CompanyDto[]> | undefined;
   companyLoading = false;
   companyInput$ = new Subject<string>();
+
+  // 🔥 FİLTRELEME DEĞİŞKENLERİ
+  filterParams = {
+    searchTerm: '',
+    status: '',
+    currAccId: null as number | null
+  };
+  
+  // Arama için debounce (her harfte API'ye gitmemesi için)
+  searchSubject = new Subject<string>();
+  private searchSubscription!: Subscription;
 
   constructor(
     private userApiService: UserApiService,
@@ -58,19 +71,18 @@ export class CompanyEmployeesComponent implements OnInit {
     private toastr: ToastrService,
     private authService: AuthService
   ) { 
-    // Formu Hazırla
     this.userForm = this.fb.group({
         name: ['', [Validators.required, Validators.minLength(2)]],
         surName: ['', [Validators.required, Validators.minLength(2)]],
         email: ['', [Validators.required, Validators.email]],
         phoneNumber: ['', [Validators.required, Validators.minLength(14)]],
-        currAccId: [null, Validators.required]
+        currAccId: [null, Validators.required],
+        role: ['user'],
+        isMainUser: [false]
     });
 
-    // --- YETKİ VE ROL KONTROLÜ ---
     const currentUser = this.authService.currentUserValue;
     if(currentUser) {
-        // 🔥 Kendi ID'mizi alıyoruz
         this.currentUserId = currentUser.id || currentUser.Id || 0;
 
         if (currentUser.roles && Array.isArray(currentUser.roles)) {
@@ -79,16 +91,22 @@ export class CompanyEmployeesComponent implements OnInit {
                 this.isAdmin = true;
             }
         }
-        if (!this.isAdmin && currentUser.accessToken) {
+        if (currentUser.accessToken) {
             try {
                 const payload = JSON.parse(atob(currentUser.accessToken.split('.')[1]));
+                
                 const roleClaim = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] || payload['role'];
-                if (roleClaim) {
+                if (roleClaim && !this.isAdmin) {
                     const rolesArray = Array.isArray(roleClaim) ? roleClaim : [roleClaim];
                     const lowerRoles = rolesArray.map((r: any) => r ? r.toString().toLowerCase() : '');
                     if (lowerRoles.includes('sa') || lowerRoles.includes('superadmin') || lowerRoles.includes('admin')) {
                         this.isAdmin = true;
                     }
+                }
+
+                const mainUserClaim = payload['IsMainUser'] || payload['isMainUser'];
+                if (mainUserClaim !== undefined) {
+                    this.isCurrentUserMainUser = String(mainUserClaim).toLowerCase() === 'true';
                 }
             } catch (e) {
                 console.error('Token yetki kontrolü sırasında hata:', e);
@@ -101,20 +119,43 @@ export class CompanyEmployeesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Arama gecikmesi (Kullanıcı yazmayı bıraktıktan 400ms sonra tetiklenir)
+    this.searchSubscription = this.searchSubject.pipe(
+        debounceTime(400),
+        distinctUntilChanged()
+    ).subscribe(() => {
+        this.fetchUsers();
+    });
+
     this.fetchUsers();
+    
     if (this.isAdmin) {
         this.loadCompanies();
     }
   }
 
+  ngOnDestroy(): void {
+    if (this.searchSubscription) {
+        this.searchSubscription.unsubscribe();
+    }
+  }
+
   get f() { return this.userForm.controls; }
 
-  // 1. LİSTELEME
+  // 🔥 BACKEND'DEN FİLTRELİ VERİYİ ÇEKME
   fetchUsers() {
     this.isLoading = true;
-    this.userApiService.getManagedUsers().subscribe({
+    
+    // API'nin beklediği ManagedUserFilterDto yapısı
+    const payload = {
+        searchTerm: this.filterParams.searchTerm,
+        status: this.filterParams.status,
+        currAccId: this.filterParams.currAccId
+    };
+
+    this.userApiService.getManagedUsers(payload).subscribe({
       next: (data) => {
-        this.users = data;
+        this.users = data || [];
         this.isLoading = false;
         this.errorMessage = '';
       },
@@ -125,7 +166,16 @@ export class CompanyEmployeesComponent implements OnInit {
     });
   }
 
-  // 2. FİRMA ARAMA
+  // Arama inputu değiştikçe Subject'i tetikler
+  onSearchChange(term: string) {
+      this.searchSubject.next(term);
+  }
+
+  // Durum veya Firma dropdown'ı değişince anında API'ye gider
+  onFilterChange() {
+      this.fetchUsers();
+  }
+
   loadCompanies() {
       this.companyList$ = this.companyInput$.pipe(
           startWith(''),
@@ -141,80 +191,56 @@ export class CompanyEmployeesComponent implements OnInit {
       );
   }
 
-  // ==============================================================================
-  // 🔥 EĞİTİM ATAMA MODALINI AÇMA METODU
-  // ==============================================================================
   openAssignTrainingModal(user: ManagedUser) {
     if (!user.isActive) {
         this.toastr.warning(`${user.firstName} adlı personel şu an "Pasif" durumda olduğu için eğitim atanamaz. Lütfen önce aktifleştirin.`, 'Uyarı');
         return;
     }
-
-    const modalRef = this.modalService.open(UserTrainingAssignModalComponent, { 
-        size: 'lg', 
-        backdrop: 'static', 
-        centered: true 
-    });
-    
+    const modalRef = this.modalService.open(UserTrainingAssignModalComponent, { size: 'lg', backdrop: 'static', centered: true });
     modalRef.componentInstance.userId = user.id;
     modalRef.componentInstance.userName = `${user.firstName} ${user.lastName}`;
-    
     modalRef.result.then((result) => {
-       if (result === 'success') {
-           // İhtiyaç duyarsan listeyi tazeleyebilirsin
-           // this.fetchUsers();
-       }
-    }).catch(() => {
-        // Modal dışarı tıklanarak kapatıldı
-    });
+       if (result === 'success') { /* Atama başarılı */ }
+    }).catch(() => { });
   }
 
-  // 3. MODAL AÇMA (EKLEME)
   openAddModal() {
     this.isEditMode = false;
     this.selectedUserId = null;
-    this.userForm.reset();
+    this.userForm.reset({ role: 'user', isMainUser: false });
     
     if (this.isAdmin) {
         this.userForm.get('currAccId')?.enable();
         this.userForm.patchValue({ currAccId: null }); 
-        
-        setTimeout(() => {
-            this.companyInput$.next(''); 
-        }, 200); 
+        setTimeout(() => { this.companyInput$.next(''); }, 200); 
     } else {
         this.userForm.patchValue({ currAccId: this.currentCompanyId });
     }
-    
     this.userForm.get('email')?.enable();
-
     this.modalService.open(this.userModal, { backdrop: 'static', size: 'lg', centered: true });
   }
   
-  // 4. MODAL AÇMA (DÜZENLEME)
   openEditModal(user: ManagedUser) {
     this.isEditMode = true;
     this.selectedUserId = user.id;
-    
     this.userForm.patchValue({
         name: user.firstName,
         surName: user.lastName,
         email: user.email,
         phoneNumber: user.phoneNumber,
-        currAccId: this.currentCompanyId 
+        currAccId: this.currentCompanyId,
+        role: user.role || 'user',
+        isMainUser: user.isMainUser || false 
     });
-
     this.userForm.get('email')?.disable();
     this.modalService.open(this.userModal, { backdrop: 'static', size: 'lg', centered: true });
   }
 
-  // 5. KAYDET
   saveUser() {
     if (this.userForm.invalid) {
         this.userForm.markAllAsTouched();
         return;
     }
-
     this.isSaving = true;
     const formData = this.userForm.getRawValue();
 
@@ -223,7 +249,9 @@ export class CompanyEmployeesComponent implements OnInit {
             id: this.selectedUserId,
             name: formData.name,
             surName: formData.surName,
-            currAccId: formData.currAccId
+            currAccId: formData.currAccId,
+            role: formData.role,
+            isMainUser: formData.isMainUser
         };
         this.userApiService.updateUser(updatePayload).subscribe({
             next: (res: any) => { 
@@ -231,15 +259,10 @@ export class CompanyEmployeesComponent implements OnInit {
                     this.toastr.success(res.body?.message || 'Personel bilgileri güncellendi.');
                     this.modalService.dismissAll();
                     this.fetchUsers();
-                } else {
-                    this.toastr.error(res.header?.msg || 'Güncelleme başarısız.');
-                }
+                } else { this.toastr.error(res.header?.msg || 'Güncelleme başarısız.'); }
                 this.isSaving = false;
             },
-            error: (err: any) => {
-                this.toastr.error('Bir hata oluştu.');
-                this.isSaving = false;
-            }
+            error: (err: any) => { this.toastr.error(err.error?.header?.msg || 'Bir hata oluştu.'); this.isSaving = false; }
         });
     } else {
         const addPayload = {
@@ -247,7 +270,9 @@ export class CompanyEmployeesComponent implements OnInit {
             surName: formData.surName,
             email: formData.email,
             phoneNumber: formData.phoneNumber, 
-            currAccId: formData.currAccId
+            currAccId: formData.currAccId,
+            role: formData.role,
+            isMainUser: formData.isMainUser
         };
         this.userApiService.addUser(addPayload).subscribe({
             next: (res: any) => {
@@ -255,16 +280,10 @@ export class CompanyEmployeesComponent implements OnInit {
                     this.toastr.success(res.body?.message || 'Personel eklendi ve şifresi gönderildi.');
                     this.modalService.dismissAll();
                     this.fetchUsers(); 
-                } else {
-                    this.toastr.error(res.header?.msg || 'Ekleme başarısız.');
-                }
+                } else { this.toastr.error(res.header?.msg || 'Ekleme başarısız.'); }
                 this.isSaving = false;
             },
-            error: (err: any) => {
-                const errorMsg = err.error?.header?.msg || 'Bir hata oluştu.';
-                this.toastr.error(errorMsg);
-                this.isSaving = false;
-            }
+            error: (err: any) => { this.toastr.error(err.error?.header?.msg || 'Bir hata oluştu.'); this.isSaving = false; }
         });
     }
   }
@@ -276,11 +295,9 @@ export class CompanyEmployeesComponent implements OnInit {
                 if(res && res.header && res.header.result) {
                     this.toastr.success('Personel silindi.');
                     this.fetchUsers();
-                } else {
-                    this.toastr.error(res.header?.msg || res.message || 'Hata oluştu');
-                }
+                } else { this.toastr.error(res.header?.msg || res.message || 'Hata oluştu'); }
             },
-            error: (err: any) => this.toastr.error('Silme işleminde hata oluştu.')
+            error: (err: any) => this.toastr.error(err.error?.header?.msg || 'Silme işleminde hata oluştu.')
         });
     }
   }
@@ -288,18 +305,15 @@ export class CompanyEmployeesComponent implements OnInit {
   toggleUserStatus(user: ManagedUser) {
     const newStatus = !user.isActive;
     const actionName = newStatus ? 'Aktifleştirmek' : 'Pasife almak';
-    
     if(confirm(`${user.firstName} ${user.lastName} kullanıcısını ${actionName} istediğinize emin misiniz?`)) {
         this.userApiService.setUserStatus(user.id, newStatus).subscribe({
             next: (res: any) => {
                 if(res && res.header && res.header.result) {
                     this.toastr.success(`Kullanıcı durumu güncellendi.`);
                     this.fetchUsers();
-                } else {
-                    this.toastr.error(res.header?.msg || res.message || 'Hata oluştu');
-                }
+                } else { this.toastr.error(res.header?.msg || res.message || 'Hata oluştu'); }
             },
-            error: (err: any) => this.toastr.error('Durum değiştirilemedi.')
+            error: (err: any) => this.toastr.error(err.error?.header?.msg || 'Durum değiştirilemedi.')
         });
     }
   }
@@ -310,10 +324,7 @@ export class CompanyEmployeesComponent implements OnInit {
     if (!originalValue) return;
 
     let numbers = originalValue.replace(/\D/g, '');
-
-    if (numbers.startsWith('0')) { 
-        if (numbers.length > 1 && numbers[1] !== '5') { numbers = '0'; } 
-    } 
+    if (numbers.startsWith('0')) { if (numbers.length > 1 && numbers[1] !== '5') { numbers = '0'; } } 
     else if (numbers.startsWith('5')) { numbers = '0' + numbers; } 
     else { numbers = '05' + numbers; }
 
@@ -339,6 +350,7 @@ export class CompanyEmployeesComponent implements OnInit {
     switch (status?.toLowerCase()) {
       case 'aktif': return 'bg-success';
       case 'pasif': return 'bg-danger';
+      case 'beklemede': return 'bg-warning';
       case 'öğrenci': return 'bg-info';
       default: return 'bg-secondary';
     }

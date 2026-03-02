@@ -46,15 +46,14 @@ export class UserApiService {
         return this.http.post<any>(`${API_USER_URL}/VerifyConfirm`, payload);
     }
 
-    // YENİ METOD (DÜZELTİLMİŞ)
-    getManagedUsers(): Observable<any[]> {
-        // API_USER_URL zaten '.../User' ile bitiyor, o yüzden '/managed-users' yeterli.
-        return this.http.get<any>(`${API_USER_URL}/managed-users`)
-            .pipe(map(response => {
-                // Backend'den { data: [...], isSuccessful: true } dönüyor
-                return response.data || response.body || [];
-            }));
-    }
+// YENİ METOD (FİLTRE DESTEKLİ POST)
+  getManagedUsers(filterPayload: any = {}): Observable<any[]> {
+      return this.http.post<any>(`${API_USER_URL}/managed-users`, filterPayload)
+          .pipe(map(response => {
+              // Backend'den { data: [...], isSuccessful: true } veya direkt liste dönebilir
+              return response.data || response.body || response || [];
+          }));
+  }
 
 addUser(payload: any): Observable<any> {
     return this.http.post<any>(`${API_USER_URL}/AddUser`, payload);
@@ -72,4 +71,11 @@ addUser(payload: any): Observable<any> {
     const payload = { userId: userId, isActive: isActive };
     return this.http.post<any>(`${API_USER_URL}/SetStatus`, payload);
   }
+
+  // 🔥 YENİ EKLENEN METOT (INTERCEPTOR İÇİN)
+    refreshToken(payload: any): Observable<any> {
+        // Backend'deki AuthenticationService.CreateAccessTokenByRefreshToken metoduna denk gelen endpoint'i çağırır.
+        // Endpoint adını (CreateAccessTokenByRefreshToken) backend controller'ına göre teyit et!
+        return this.http.post<any>(`${API_USER_URL}/CreateAccessTokenByRefreshToken`, payload);
+    }
 }

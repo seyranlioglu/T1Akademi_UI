@@ -210,4 +210,26 @@ export class AuthService {
 
         this.currentUserSubject.next(user);
     }
+
+    updateTokens(newTokens: any) {
+        const user = this.currentUserValue;
+        if (user) {
+            // Backend'in dönüş yapısına göre (token veya accessToken olarak dönebilir)
+            user.accessToken = newTokens.token || newTokens.accessToken; 
+            user.refreshToken = newTokens.refreshToken;
+            
+            const userString = JSON.stringify(user);
+
+            // Kullanıcı login olurken beni hatırla (localStorage) mı dedi, 
+            // yoksa hatırlama (sessionStorage) mı dediğini bulmak için kontrol ediyoruz:
+            if (localStorage.getItem(this.authLocalStorageToken)) {
+                localStorage.setItem(this.authLocalStorageToken, userString);
+            } else if (sessionStorage.getItem(this.authLocalStorageToken)) {
+                sessionStorage.setItem(this.authLocalStorageToken, userString);
+            }
+
+            // Sistemdeki mevcut kullanıcı bilgisini güncelle
+            this.currentUserSubject.next(user);
+        }
+    }
 }

@@ -1,20 +1,55 @@
 <div class="company-employees-area ptb-25 bg-f9f9f9">
     <div class="container">
         
-        <div class="section-title d-flex justify-content-between align-items-center mb-4">
-            <div class="text-start">
-                <h2 class="mb-1">Personel Listesi</h2>
-                <p class="text-muted small mb-0">Şirket personellerinin durum ve yetki yönetimi.</p>
-            </div>
-            <div class="action-btn">
-                <button class="btn btn-primary" (click)="openAddModal()">
-                    <i class='bx bx-plus'></i> Personel Ekle
-                </button>
-            </div>
+        <div class="section-title d-flex flex-column mb-3">
+            <h2 class="mb-1">Personel Listesi</h2>
         </div>
 
         <div *ngIf="errorMessage" class="alert alert-danger mb-4 shadow-sm border-0">
             <i class='bx bx-error-circle me-2'></i> {{ errorMessage }}
+        </div>
+
+        <div class="action-bar bg-white p-3 rounded-3 shadow-sm border border-light mb-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+            
+            <div class="d-flex flex-wrap align-items-center gap-3 flex-grow-1">
+                <div class="search-box" style="flex: 1; min-width: 250px; max-width: 350px;">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-muted border-end-0"><i class='bx bx-search'></i></span>
+                        <input type="text" class="form-control border-start-0 ps-0" 
+                               placeholder="Ad, soyad, e-posta veya telefon..." 
+                               [(ngModel)]="filterParams.searchTerm" 
+                               (ngModelChange)="onSearchChange($event)">
+                    </div>
+                </div>
+
+                <div class="status-filter" style="width: 160px;">
+                    <select class="form-select text-secondary" [(ngModel)]="filterParams.status" (change)="onFilterChange()">
+                        <option value="">Tüm Durumlar</option>
+                        <option value="aktif">Aktif</option>
+                        <option value="beklemede">Beklemede</option>
+                        <option value="pasif">Pasif</option>
+                        <option value="öğrenci">Öğrenci</option>
+                    </select>
+                </div>
+
+                <div class="company-filter" style="flex: 1; min-width: 200px; max-width: 300px;" *ngIf="isAdmin">
+                    <ng-select [items]="companyList$ | async"
+                               bindLabel="title"
+                               bindValue="id"
+                               [loading]="companyLoading"
+                               [typeahead]="companyInput$"
+                               placeholder="Firma filtrele..."
+                               [(ngModel)]="filterParams.currAccId"
+                               (change)="onFilterChange()">
+                    </ng-select>
+                </div>
+            </div>
+
+            <div class="action-btn">
+                <button class="btn btn-primary text-nowrap" (click)="openAddModal()">
+                    <i class='bx bx-plus'></i> Personel Ekle
+                </button>
+            </div>
         </div>
 
         <div class="row">
@@ -52,7 +87,7 @@
                                                 {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
                                             </div>
                                             <div class="d-flex flex-column">
-                                                <span class="fw-bold text-dark">{{ user.firstName }} {{ user.lastName }} <span *ngIf="user.id === currentUserId" class="badge bg-secondary ms-1" style="font-size: 0.65rem;">Siz</span></span>
+                                                <span class="fw-bold text-dark">{{ user.firstName }} {{ user.lastName }} <span *ngIf="user.id === currentUserId" class="badge bg-secondary ms-1" style="font-size: 0.65rem; padding: 3px 6px;">Siz</span></span>
                                                 <span class="text-muted x-small">{{ user.companyName || '-' }}</span>
                                             </div>
                                         </div>
@@ -70,27 +105,18 @@
                                     </td>
                                     <td class="text-end pe-4">
                                         <div class="btn-group">
-                                            
                                             <button class="btn btn-icon btn-light btn-sm me-1 text-info" title="Eğitim Ata" (click)="openAssignTrainingModal(user)">
                                                 <i class='bx bx-book-add'></i>
                                             </button>
-
-                                            <button *ngIf="user.id !== currentUserId"
-                                                    class="btn btn-icon btn-light btn-sm me-1" 
-                                                    [title]="user.isActive ? 'Pasife Al' : 'Aktifleştir'"
-                                                    (click)="toggleUserStatus(user)">
+                                            <button *ngIf="user.id !== currentUserId" class="btn btn-icon btn-light btn-sm me-1" [title]="user.isActive ? 'Pasife Al' : 'Aktifleştir'" (click)="toggleUserStatus(user)">
                                                 <i class='bx' [ngClass]="user.isActive ? 'bx-block text-warning' : 'bx-check-circle text-success'"></i>
                                             </button>
-
                                             <button class="btn btn-icon btn-light btn-sm me-1 text-primary" title="Düzenle" (click)="openEditModal(user)">
                                                 <i class='bx bx-edit-alt'></i>
                                             </button>
-
-                                            <button *ngIf="user.id !== currentUserId"
-                                                    class="btn btn-icon btn-light btn-sm text-danger" title="Sil" (click)="deleteUser(user)">
+                                            <button *ngIf="user.id !== currentUserId" class="btn btn-icon btn-light btn-sm text-danger" title="Sil" (click)="deleteUser(user)">
                                                 <i class='bx bx-trash'></i>
                                             </button>
-
                                         </div>
                                     </td>
                                 </tr>
@@ -101,23 +127,16 @@
                                     <div class="empty-state">
                                         <div class="mb-3">
                                             <div class="bg-light d-inline-block rounded-circle p-4">
-                                                <i class='bx bx-user-plus text-muted' style="font-size: 3rem;"></i>
+                                                <i class='bx bx-search text-muted' style="font-size: 3rem;"></i>
                                             </div>
                                         </div>
-                                        <h6 class="text-dark">Henüz Personel Eklenmedi</h6>
-                                        <p class="text-muted small mb-3">
-                                            Listeniz boş görünüyor. Hemen yeni bir personel ekleyerek başlayın.
-                                        </p>
-                                        <button class="btn btn-sm btn-primary" (click)="openAddModal()">
-                                            <i class='bx bx-plus'></i> İlk Personeli Ekle
-                                        </button>
+                                        <h6 class="text-dark">Kayıt Bulunamadı</h6>
+                                        <p class="text-muted small mb-0">Arama kriterlerinize uygun personel bulunmuyor.</p>
                                     </div>
                                 </td>
                             </tr>
-
                         </tbody>
                     </table>
-
                 </div>
             </div>
         </div>
@@ -125,96 +144,109 @@
 </div>
 
 <ng-template #userModal let-modal>
-    <div class="modal-header border-bottom-0 pb-0">
-        <h5 class="modal-title fw-bold">{{ isEditMode ? 'Personel Bilgilerini Düzenle' : 'Yeni Personel Oluştur' }}</h5>
+    <div class="modal-header border-bottom-0 pb-0 mt-2 mx-2">
+        <h5 class="modal-title fw-bold" style="color: #333;">
+            <i class="bx bx-user me-2 text-primary"></i> 
+            {{ isEditMode ? 'Personel Bilgilerini Düzenle' : 'Yeni Personel Oluştur' }}
+        </h5>
         <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
     </div>
-    <div class="modal-body pt-4">
+    <div class="modal-body p-4">
         
-        <div *ngIf="!isEditMode" class="alert alert-info d-flex align-items-center mb-4" role="alert">
-            <i class='bx bx-info-circle me-2 fs-4'></i>
+        <div *ngIf="!isEditMode" class="alert alert-info d-flex align-items-center mb-4 border-0 shadow-sm" role="alert">
+            <i class='bx bx-info-circle me-3 fs-3 text-info'></i>
             <div class="small">
                 Kullanıcı oluşturulduğunda sisteme giriş şifresi otomatik olarak üretilip <strong>e-posta adresine</strong> gönderilecektir.
             </div>
         </div>
 
-        <form [formGroup]="userForm">
-            <div class="row g-3">
+        <form [formGroup]="userForm" class="bg-white p-4 rounded-3 border border-light shadow-sm">
+            <div class="row g-4">
                 
                 <div class="col-12" *ngIf="isAdmin && !isEditMode">
-                    <label class="form-label fw-bold small">Firma Seçimi <span class="text-danger">*</span></label>
-                    
-                    <ng-select [items]="companyList$ | async"
-                               bindLabel="title"
-                               bindValue="id"
-                               [loading]="companyLoading"
-                               [typeahead]="companyInput$"
-                               formControlName="currAccId"
-                               appendTo="body" 
+                    <label class="form-label fw-bold small text-secondary">Firma Seçimi <span class="text-danger">*</span></label>
+                    <ng-select [items]="companyList$ | async" bindLabel="title" bindValue="id"
+                               [loading]="companyLoading" [typeahead]="companyInput$"
+                               formControlName="currAccId" appendTo="body" 
                                placeholder="Firma adı yazarak arayın..."
                                [class.is-invalid]="f['currAccId'].touched && f['currAccId'].invalid">
-                        
                         <ng-template ng-option-tmp let-item="item">
-                            <div>
-                                <span class="fw-bold">{{ item.title }}</span>
-                            </div>
+                            <div><span class="fw-bold">{{ item.title }}</span></div>
                         </ng-template>
-
                     </ng-select>
-                    
                     <div class="invalid-feedback d-block" *ngIf="f['currAccId'].touched && f['currAccId'].invalid">
                         Lütfen personelin ekleneceği firmayı seçiniz.
                     </div>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label fw-bold small">Ad <span class="text-danger">*</span></label>
+                    <label class="form-label fw-bold small text-secondary">Ad <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" formControlName="name" placeholder="Ad"
                            [class.is-invalid]="f['name'].touched && f['name'].invalid">
                     <div class="invalid-feedback" *ngIf="f['name'].errors?.['required']">Ad alanı zorunludur.</div>
                 </div>
 
                 <div class="col-md-6">
-                    <label class="form-label fw-bold small">Soyad <span class="text-danger">*</span></label>
+                    <label class="form-label fw-bold small text-secondary">Soyad <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" formControlName="surName" placeholder="Soyad"
                            [class.is-invalid]="f['surName'].touched && f['surName'].invalid">
                     <div class="invalid-feedback" *ngIf="f['surName'].errors?.['required']">Soyad alanı zorunludur.</div>
                 </div>
 
                 <div class="col-12">
-                    <label class="form-label fw-bold small">E-posta Adresi <span class="text-danger">*</span></label>
+                    <label class="form-label fw-bold small text-secondary">E-posta Adresi <span class="text-danger">*</span></label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light"><i class='bx bx-envelope'></i></span>
-                        <input type="email" class="form-control" formControlName="email" placeholder="ornek@sirket.com"
+                        <span class="input-group-text bg-light text-muted border-end-0"><i class='bx bx-envelope'></i></span>
+                        <input type="email" class="form-control border-start-0 ps-0" formControlName="email" placeholder="ornek@sirket.com"
                                [class.is-invalid]="f['email'].touched && f['email'].invalid">
                     </div>
                     <div class="text-danger small mt-1" *ngIf="f['email'].touched && f['email'].errors?.['required']">E-posta alanı zorunludur.</div>
                     <div class="text-danger small mt-1" *ngIf="f['email'].touched && f['email'].errors?.['email']">Geçerli bir e-posta adresi giriniz.</div>
-                    <div *ngIf="isEditMode" class="form-text text-warning small"><i class='bx bx-lock-alt'></i> Güvenlik nedeniyle e-posta adresi değiştirilemez.</div>
+                    <div *ngIf="isEditMode" class="form-text text-warning small mt-2"><i class='bx bx-lock-alt'></i> E-posta adresi değiştirilemez.</div>
                 </div>
 
                 <div class="col-12">
-                    <label class="form-label fw-bold small">Telefon Numarası <span class="text-danger">*</span></label>
+                    <label class="form-label fw-bold small text-secondary">Telefon Numarası <span class="text-danger">*</span></label>
                     <div class="input-group">
-                        <span class="input-group-text bg-light"><i class='bx bx-phone'></i></span>
-                        <input type="text" class="form-control" formControlName="phoneNumber" 
-                               placeholder="05XX XXX XX XX"
-                               maxlength="14"
-                               (input)="onDynamicInput($event)"
-                               (keypress)="numberOnly($event)"
+                        <span class="input-group-text bg-light text-muted border-end-0"><i class='bx bx-phone'></i></span>
+                        <input type="text" class="form-control border-start-0 ps-0" formControlName="phoneNumber" 
+                               placeholder="05XX XXX XX XX" maxlength="14"
+                               (input)="onDynamicInput($event)" (keypress)="numberOnly($event)"
                                [class.is-invalid]="f['phoneNumber'].touched && f['phoneNumber'].invalid">
                     </div>
                     <div class="invalid-feedback" *ngIf="f['phoneNumber'].errors?.['required']">Telefon alanı zorunludur.</div>
                 </div>
 
+                <div class="col-12 border-top pt-4 mt-4" *ngIf="isAdmin || isCurrentUserMainUser">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0" *ngIf="isAdmin">
+                            <label class="form-label fw-bold small text-secondary">Sistem Yetki Rolü</label>
+                            <select class="form-select" formControlName="role">
+                                <option value="user">Standart Kullanıcı</option>
+                                <option value="admin">Sistem Yöneticisi (Admin)</option>
+                                <option value="sa">Süper Admin</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-check form-switch custom-switch-lg d-flex align-items-center" [ngClass]="{'mt-md-4 pt-md-2': isAdmin}">
+                                <input class="form-check-input ms-0 me-3" type="checkbox" id="mainUserSwitch" formControlName="isMainUser" style="width: 2.5rem; height: 1.25rem; cursor: pointer;">
+                                <label class="form-check-label text-dark" for="mainUserSwitch" style="cursor: pointer;">
+                                    <strong class="d-block mb-0" style="font-size: 0.95rem;">Kurum Yöneticisi (Main User)</strong>
+                                    <span class="text-muted small">Bu personel firma adına tam yetkili olur.</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
-    <div class="modal-footer border-top-0">
-        <button type="button" class="btn btn-light" (click)="modal.dismiss('Cancel')">Vazgeç</button>
+    <div class="modal-footer border-top-0 px-4 pb-4 pt-0">
+        <button type="button" class="btn btn-outline-secondary px-4" (click)="modal.dismiss('Cancel')">Vazgeç</button>
         <button type="button" class="btn btn-primary px-4" (click)="saveUser()" [disabled]="userForm.invalid || isSaving">
             <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
-            {{ isEditMode ? 'Değişiklikleri Kaydet' : 'Personeli Kaydet' }}
+            <i class="bx bx-save me-1" *ngIf="!isSaving"></i> {{ isEditMode ? 'Değişiklikleri Kaydet' : 'Personeli Kaydet' }}
         </button>
     </div>
 </ng-template>
