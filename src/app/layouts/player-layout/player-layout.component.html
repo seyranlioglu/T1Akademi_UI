@@ -5,8 +5,8 @@
             <i class='bx bxs-shield-security fs-3'></i>
             <div>
                 <h6 class="m-0 fw-bold">YÖNETİCİ İNCELEME MODU</h6>
-                <small class="opacity-75 cursor-pointer text-decoration-underline" 
-                       (click)="openQualityScoreModal()" 
+                <small class="opacity-75 cursor-pointer text-decoration-underline"
+                       (click)="openQualityScoreModal()"
                        title="Detaylı rapor için tıklayınız">
                     Kalite Puanı: {{ qualityScoreData?.totalScore || 'Hesaplanıyor...' }} <i class='bx bx-info-circle ms-1'></i>
                 </small>
@@ -34,11 +34,11 @@
     </div>
 
     <ng-container *ngIf="!isLoading && course">
-        
+
         <div class="player-header d-flex justify-content-between align-items-center px-3">
             <div class="d-flex align-items-center gap-3 overflow-hidden">
-                <a routerLink="/instructor/courses" class="text-white text-decoration-none d-flex align-items-center gap-2 flex-shrink-0">
-                    <i class='bx bx-left-arrow-alt fs-4'></i> <span class="d-none d-md-inline small fw-bold">Kurslara Dön</span>
+                <a (click)="goBack()" class="text-white text-decoration-none d-flex align-items-center gap-2 flex-shrink-0 cursor-pointer">
+                    <i class='bx bx-left-arrow-alt fs-4'></i> <span class="d-none d-md-inline small fw-bold">Geri Dön</span>
                 </a>
                 <div class="vr bg-secondary mx-2 h-50 d-none d-md-block"></div>
                 <h6 class="text-white m-0 d-none d-md-block text-truncate fw-bold small">{{ course.title }}</h6>
@@ -57,26 +57,26 @@
         <div class="player-body d-flex">
 
             <div class="player-main flex-grow-1 d-flex flex-column">
-                
+
                 <div class="viewer-container" [ngClass]="{'auto-height': viewType === 'pdf' || viewType === 'image', 'exam-active': isExamRunnerVisible}">
-                    
+
                     <div *ngIf="isContentLoading" class="text-white text-center">
                         <div class="spinner-border text-light mb-3" style="width: 3rem; height: 3rem;"></div>
                         <p class="m-0">İçerik yükleniyor...</p>
                     </div>
 
                     <ng-container *ngIf="!isContentLoading && currentContent; else noContent">
-                        
+
                         <div *ngIf="viewType === 'youtube'" class="w-100 h-100">
-                            <iframe [src]="getYoutubeEmbedUrl(currentContent)" class="w-100 h-100 border-0" allowfullscreen></iframe>
+                            <div id="youtube-player-container" class="w-100 h-100 border-0"></div>
                         </div>
-                        
+
                         <div *ngIf="viewType === 'video'" class="w-100 h-100">
                             <video #videoPlayer [src]="getFileUrl()" controls controlsList="nodownload" class="w-100 h-100" autoplay
                                    (loadedmetadata)="onVideoLoadedMetadata()" (play)="onVideoPlay()" (pause)="onVideoPause()" (ended)="onVideoEnded()" (seeked)="onVideoSeeked()">
                             </video>
                         </div>
-                        
+
                         <div *ngIf="viewType === 'pdf'" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-4">
                             <div class="pdf-card text-center p-5 bg-white rounded-4 shadow-lg border-0">
                                 <div class="pdf-icon-box mb-4 mx-auto shadow-sm"><i class='bx bxs-file-pdf text-danger'></i></div>
@@ -84,9 +84,19 @@
                                 <button class="btn btn-danger btn-lg rounded-pill px-5 shadow" (click)="openPdfModal()">Tam Ekran Oku</button>
                             </div>
                         </div>
-                        
-                        <div *ngIf="viewType === 'image'" class="w-100 h-100 d-flex align-items-center justify-content-center bg-dark">
+
+                        <div *ngIf="viewType === 'image'" class="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-dark position-relative">
                             <img [src]="getFileUrl()" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+
+                            <div class="position-absolute bottom-0 end-0 m-4" *ngIf="!isPreviewMode">
+                                <button class="btn btn-lg shadow-lg fw-bold px-4"
+                                        [ngClass]="isTimerGreen ? 'btn-success' : 'btn-light text-dark'"
+                                        [disabled]="isTimerGreen"
+                                        (click)="markImageAsCompleted()">
+                                    <i class='bx me-2' [ngClass]="isTimerGreen ? 'bx-check-double' : 'bx-check-circle'"></i>
+                                    {{ isTimerGreen ? 'İçerik Tamamlandı' : 'Okudum, Tamamla' }}
+                                </button>
+                            </div>
                         </div>
 
                         <div *ngIf="viewType === 'exam' && !isExamRunnerVisible" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 bg-white">
@@ -102,7 +112,7 @@
                         <div class="text-white-50 text-center" *ngIf="!isContentLoading"><i class='bx bx-play-circle display-1 opacity-50'></i><p class="mt-2 small">Bir ders seçin.</p></div>
                     </ng-template>
 
-                    <div class="next-lesson-overlay" 
+                    <div class="next-lesson-overlay"
                          *ngIf="currentContent && !isContentLoading && getNextLessonTitle() && viewType !== 'exam'"
                          (click)="loadAndPlayContent(undefined, 'AutoNext')">
                         <div class="next-label-container">
@@ -129,7 +139,7 @@
                     </div>
 
                     <div class="tab-content p-4">
-                        
+
                         <div *ngIf="activeTab === 'overview'" class="fade-in udemy-layout">
                             <h2 class="fw-bold text-dark mb-2">{{ course.title }}</h2>
                             <p class="lead fs-6 mb-4 text-dark">{{ course.subTitle }}</p>
@@ -187,7 +197,7 @@
                             <div class="mb-4">
                                 <h6 class="fw-bold mb-3">Eğitmen</h6>
                                 <div class="d-flex gap-3 align-items-center mb-3">
-                                    <img [src]="course.instructorPicturePath || 'assets/images/defaults/defaultuser.png'" 
+                                    <img [src]="course.instructorPicturePath || 'assets/images/defaults/defaultuser.png'"
                                          class="rounded-circle border" width="64" height="64" style="object-fit: cover;">
                                     <div>
                                         <div class="fw-bold text-primary">{{ course.instructorName }}</div>
@@ -257,16 +267,16 @@
                                          [class.active-lesson]="currentContent?.id === content.id"
                                          [class.locked-lesson]="content.isLocked && !isPreviewMode"
                                          (click)="onSidebarClick(content)">
-                                        
+
                                         <div class="mt-1">
                                             <i *ngIf="content.isLocked && !isPreviewMode" class='bx bxs-lock-alt text-muted fs-5'></i>
-                                            <input *ngIf="!content.isLocked || isPreviewMode" type="checkbox" class="form-check-input cursor-pointer" [checked]="!!content.isChecked" disabled> 
+                                            <input *ngIf="!content.isLocked || isPreviewMode" type="checkbox" class="form-check-input cursor-pointer" [checked]="!!content.isChecked" disabled>
                                         </div>
-                                        
+
                                         <div class="flex-grow-1 overflow-hidden">
                                             <p class="m-0 small text-break lesson-title mb-1" [ngClass]="{'text-muted': content.isLocked && !isPreviewMode}">
                                                 {{ content.title }}
-                                                
+
                                                 <span *ngIf="!content.isActive && isPreviewMode" class="badge bg-danger ms-1" style="font-size: 0.6rem;">TASLAK</span>
                                             </p>
                                             <div class="d-flex align-items-center gap-2 tiny-text text-muted">
@@ -283,7 +293,7 @@
 
         </div>
     </ng-container>
-    
+
     <button *ngIf="!isSidebarOpen && !isLoading" class="btn btn-dark position-absolute end-0 top-100 translate-middle-y rounded-start py-3 shadow" style="top: 120px; z-index: 1040;" (click)="toggleSidebar()"><i class='bx bx-menu fs-4'></i></button>
 </div>
 
@@ -304,45 +314,45 @@
     </div>
 </div>
 
-<app-exam-runner 
+<app-exam-runner
     *ngIf="isExamRunnerVisible"
     [examId]="activeExamId"
     [mode]="isPreviewMode ? 'preview' : 'student'"
-    [isLastContent]="!getNextLessonTitle()" 
+    [isLastContent]="!getNextLessonTitle()"
     (closeExam)="onExamClosed($event)">
 </app-exam-runner>
 
 <div class="modal fade" id="adminActionModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header text-white" 
+            <div class="modal-header text-white"
                  [ngClass]="{
-                     'bg-danger': adminActionType === 'reject' || adminActionType === 'block_instructor', 
+                     'bg-danger': adminActionType === 'reject' || adminActionType === 'block_instructor',
                      'bg-warning': adminActionType === 'revision'
                  }">
                 <h5 class="modal-title fs-6 fw-bold d-flex align-items-center gap-2">
                     <i class='bx' [ngClass]="{
                         'bx-block': adminActionType === 'block_instructor',
-                        'bx-x-circle': adminActionType === 'reject', 
+                        'bx-x-circle': adminActionType === 'reject',
                         'bx-revision': adminActionType === 'revision'
-                    }"></i> 
+                    }"></i>
                     {{ adminActionType === 'block_instructor' ? 'Eğitmeni Kilitle' : (adminActionType === 'reject' ? 'Talebi Reddet' : 'Revizyon İste') }}
                 </h5>
                 <button type="button" class="btn-close btn-close-white" (click)="closeAdminModal()"></button>
             </div>
             <div class="modal-body">
                 <p class="mb-2 text-muted small">
-                    {{ adminActionType === 'block_instructor' 
-                        ? 'Bu işlem eğitmeni pasife çeker ve yeni kurs oluşturmasını engeller. Lütfen sebep belirtiniz:' 
+                    {{ adminActionType === 'block_instructor'
+                        ? 'Bu işlem eğitmeni pasife çeker ve yeni kurs oluşturmasını engeller. Lütfen sebep belirtiniz:'
                         : 'Bu not, işlem sonucunda talep sahibine (Eğitmene) iletilecektir:' }}
                 </p>
                 <textarea [(ngModel)]="adminActionNote" class="form-control" rows="4" placeholder="Açıklama giriniz..."></textarea>
             </div>
             <div class="modal-footer bg-light border-0">
                 <button type="button" class="btn btn-outline-secondary btn-sm" (click)="closeAdminModal()">İptal</button>
-                <button type="button" class="btn btn-sm text-white px-4" 
+                <button type="button" class="btn btn-sm text-white px-4"
                         [ngClass]="{
-                            'btn-danger': adminActionType === 'reject' || adminActionType === 'block_instructor', 
+                            'btn-danger': adminActionType === 'reject' || adminActionType === 'block_instructor',
                             'btn-warning': adminActionType === 'revision'
                         }"
                         (click)="submitAdminAction()" [disabled]="isProcessingAdminAction">
@@ -362,17 +372,15 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4 bg-light">
-                
                 <div *ngIf="isLoadingScore" class="text-center py-5">
                     <div class="spinner-border text-primary"></div>
                     <p class="mt-2 text-muted">Analiz ediliyor...</p>
                 </div>
-
                 <div *ngIf="!isLoadingScore && qualityScoreData">
                     <div class="row">
                         <div class="col-md-4 text-center border-end">
                             <div class="circular-chart mb-3 mx-auto">
-                                <div class="display-3 fw-bold" 
+                                <div class="display-3 fw-bold"
                                      [ngClass]="{
                                          'text-success': qualityScoreData.totalScore >= 80,
                                          'text-warning': qualityScoreData.totalScore >= 50 && qualityScoreData.totalScore < 80,
@@ -385,17 +393,15 @@
                             <h6 class="fw-bold text-dark">Genel Puan</h6>
                             <p class="text-muted tiny-text">Son Hesaplama: {{ qualityScoreData.lastCalculatedDate | date:'dd.MM.yyyy HH:mm' }}</p>
                         </div>
-
                         <div class="col-md-8">
                             <h6 class="fw-bold mb-3 border-bottom pb-2">Puan Detayları</h6>
                             <ul class="list-group list-group-flush mb-4">
-                                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-2" 
+                                <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 py-2"
                                     *ngFor="let item of qualityScoreData.scoreDetails | keyvalue">
                                     <span class="text-secondary"><i class='bx bx-check-circle text-success me-2'></i> {{ item.key }}</span>
                                     <span class="fw-bold badge bg-secondary">{{ item.value }} Puan</span>
                                 </li>
                             </ul>
-
                             <div *ngIf="qualityScoreData.suggestions?.length">
                                 <h6 class="fw-bold text-danger mb-2"><i class='bx bx-bulb'></i> İyileştirme Önerileri</h6>
                                 <div class="alert alert-warning border-warning shadow-sm">
