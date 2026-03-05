@@ -68,9 +68,12 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
   totalPageTime: number = 0; 
   isTimerGreen: boolean = false;
 
-  // 🔥 YOUTUBE API İÇİN DEĞİŞKENLER
+  // 🔥 YOUTUBE VE İLERİ SARMA (SEEK) KONTROLLERİ İÇİN DEĞİŞKENLER
   isYoutubeApiReady: boolean = false;
   ytPlayer: any = null;
+  maxWatchedSecond: number = 0;
+  youtubeTrackerInterval: any;
+  isShowingSeekWarning: boolean = false; // Toastr spamını önlemek için
 
   private destroy$ = new Subject<void>();
 
@@ -88,7 +91,7 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.initYoutubeAPI(); // 🔥 YOUTUBE SCRIPT'İNİ YÜKLE
+    this.initYoutubeAPI();
 
     combineLatest([this.route.params, this.route.queryParams])
       .pipe(takeUntil(this.destroy$))
@@ -119,6 +122,7 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
     this.stopTimer();
     this.stopHeartbeat();
+    this.stopYoutubeMonitor(); // 🔥 Temizlik
     if(this.ytPlayer) { this.ytPlayer.destroy(); }
   }
 
@@ -231,6 +235,10 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
           this.sendBeaconLog();
           this.stopHeartbeat();
       }
+      
+      this.maxWatchedSecond = 0; // 🔥 Yeni ders, sayacı sıfırla
+      this.stopYoutubeMonitor(); // 🔥 Temizle
+
       this.isContentLoading = true;
       this.pdfSrc = null; 
       this.isExamRunnerVisible = false;
@@ -261,8 +269,6 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
                   this.currentContent = playableContent;
                   this.updateSidebarActiveState(playableContent.id);
                   this.detectViewType();
-                  
-                  // İçerik ne olursa olsun (sınav dahil) sadece view'ı hazırla, otomatik başlatma!
                   this.setupPlayerAfterFetch();
               }
           },
@@ -274,13 +280,11 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
       });
   }
 
-  updateSidebarActiveState(activeId: number) {
-      // (İleride tıklanan dersi menüde otomatik scroll yaptırmak için kullanılacak)
-  }
+  updateSidebarActiveState(activeId: number) {}
 
   setupPlayerAfterFetch() {
       if (this.viewType === 'exam') {
-          this.isExamRunnerVisible = false; // Sınav modalı açılmasın, buton beklesin
+          this.isExamRunnerVisible = false;
       }
       else if (this.viewType === 'pdf') {
           this.isPdfModalOpen = false;
@@ -340,6 +344,8 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
           seekTime = this.currentContent.lastWatchedPart;
       }
 
+      this.maxWatchedSecond = seekTime; // 🔥 Başlangıç zamanını max olarak belirle
+
       if (this.ytPlayer && typeof this.ytPlayer.loadVideoById === 'function') {
           if (seekTime > 0) {
               this.ytPlayer.loadVideoById({ videoId: videoId, startSeconds: seekTime });
@@ -369,16 +375,19 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
 
   onYoutubeStateChange(event: any) {
       const state = event.data;
-      if (state === 1) { 
+      if (state === 1) { // PLAYING
           this.startHeartbeat();
+          this.startYoutubeMonitor(); // 🔥 İzlemeye başla
           this.logProgress('Play');
       } 
-      else if (state === 2) { 
+      else if (state === 2) { // PAUSED
           this.stopHeartbeat();
+          this.stopYoutubeMonitor(); // 🔥 İzlemeyi durdur
           this.logProgress('Pause');
       } 
-      else if (state === 0) { 
+      else if (state === 0) { // ENDED
           this.stopHeartbeat();
+          this.stopYoutubeMonitor();
           this.logProgress('Complete');
           this.toastr.success('Ders tamamlandı. Sonrakine geçiliyor...');
           setTimeout(() => this.loadAndPlayContent(undefined, 'AutoNext'), 2000);
@@ -388,6 +397,48 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
   extractYoutubeId(url: string): string {
       const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
       return (match && match[1]) ? match[1] : '';
+  }
+
+  // 🔥 YOUTUBE İLERİ SARMA (SEEK) KORUMASI 
+  startYoutubeMonitor() {
+      this.stopYoutubeMonitor();
+      if (this.isPreviewMode) return;
+
+      this.youtubeTrackerInterval = setInterval(() => {
+          if (this.ytPlayer && typeof this.ytPlayer.getCurrentTime === 'function') {
+              try {
+                  const currentTime = this.ytPlayer.getCurrentTime();
+                  // Null ise true kabul et (eski veriler için), false ise false al.
+                  const allowSeeking = this.currentContent?.allowSeeking !== false; 
+                  const canSeek = allowSeeking || this.currentContent?.isCompleted;
+
+                  // 1.5 Saniyelik tolerans payı (Buffer/Lag atlamaları için)
+                  if (!canSeek && currentTime > this.maxWatchedSecond + 1.5) {
+                      
+                      // İLERİ SARILDI! GERİ ÇEK!
+                      this.ytPlayer.seekTo(this.maxWatchedSecond, true);
+                      
+                      if (!this.isShowingSeekWarning) {
+                          this.isShowingSeekWarning = true;
+                          this.toastr.warning('İzlenmemiş kısımlara ileri saramazsınız.', 'Uyarı');
+                          setTimeout(() => this.isShowingSeekWarning = false, 3000);
+                      }
+                  } else {
+                      // Normal izleniyorsa rekor saniyeyi güncelle
+                      if (currentTime > this.maxWatchedSecond) {
+                          this.maxWatchedSecond = currentTime;
+                      }
+                  }
+              } catch (e) {}
+          }
+      }, 500); // Saniyede 2 kez kontrol et (Anında yakalamak için)
+  }
+
+  stopYoutubeMonitor() {
+      if (this.youtubeTrackerInterval) {
+          clearInterval(this.youtubeTrackerInterval);
+          this.youtubeTrackerInterval = null;
+      }
   }
   // ==========================================
 
@@ -491,6 +542,10 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
     this.logApi.logProgressBeacon(payload);
   }
 
+
+  // ==========================================
+  // 🔥 YEREL VIDEO (MP4) İLERİ SARMA KORUMASI 
+  // ==========================================
   onVideoLoadedMetadata() {
     let seekTime = 0;
     if (this.resumeContext && this.currentContent?.id === this.resumeContext.contentId) {
@@ -500,9 +555,36 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
     else if (this.currentContent?.lastWatchedPart > 0 && !this.currentContent?.isCompleted) {
         seekTime = this.currentContent.lastWatchedPart;
     }
+    
+    this.maxWatchedSecond = seekTime; // 🔥 Başlangıç zamanını max olarak belirle
+
     if (seekTime > 0 && this.videoPlayerRef?.nativeElement) {
         this.videoPlayerRef.nativeElement.currentTime = seekTime;
     }
+  }
+
+  onVideoTimeUpdate() {
+      if (!this.videoPlayerRef?.nativeElement || this.isPreviewMode) return;
+
+      const currentTime = this.videoPlayerRef.nativeElement.currentTime;
+      const allowSeeking = this.currentContent?.allowSeeking !== false; 
+      const canSeek = allowSeeking || this.currentContent?.isCompleted;
+
+      // Eğer saramazsa ve izlediği max süreden 1.5 sn ileri atladıysa GERİ ÇEK!
+      if (!canSeek && currentTime > this.maxWatchedSecond + 1.5) {
+          this.videoPlayerRef.nativeElement.currentTime = this.maxWatchedSecond;
+
+          if (!this.isShowingSeekWarning) {
+              this.isShowingSeekWarning = true;
+              this.toastr.warning('İzlenmemiş kısımlara ileri saramazsınız.', 'Uyarı');
+              setTimeout(() => this.isShowingSeekWarning = false, 3000);
+          }
+      } else {
+          // Normal izliyorsa max süreyi güncelle
+          if (currentTime > this.maxWatchedSecond) {
+              this.maxWatchedSecond = currentTime;
+          }
+      }
   }
 
   onVideoPlay() { this.startHeartbeat(); this.logProgress('Play'); }
@@ -556,27 +638,25 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
     }
   }
 
-updateSidebarStatus(contentId: number, isCompleted: boolean) {
+  updateSidebarStatus(contentId: number, isCompleted: boolean) {
       if (!this.course?.trainingSections) return;
       
-      let unlockNext = false; // Sıradaki dersin kilidini açmak için bayrak
+      let unlockNext = false; 
 
       for (const section of this.course.trainingSections) {
           if (!section.trainingContents) continue;
 
           for (const content of section.trainingContents) {
               
-              // Eğer bir önceki döngüde dersi tamamladıysak, bu dersin kilidini aç
               if (unlockNext) {
                   content.isLocked = false;
-                  unlockNext = false; // Sadece bir sonrakini açması yeterli
+                  unlockNext = false; 
               }
 
               if (content.id === contentId) {
                   content.isChecked = isCompleted;
-                  content.isLocked = false; // Kendisi zaten açık
+                  content.isLocked = false; 
                   
-                  // Eğer bu ders tamamlandıysa, bir sonraki dersin kilidini açması için komut ver
                   if (isCompleted) {
                       unlockNext = true; 
                   }

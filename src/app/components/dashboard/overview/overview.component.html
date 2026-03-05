@@ -1,4 +1,4 @@
-<div class="overview-container p-4">
+<div class="overview-container p-4 fade-in">
     
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -7,77 +7,91 @@
         </div>
         <div class="d-flex align-items-center gap-3">
             <div class="btn-group p-1 bg-white rounded-pill border shadow-sm">
-                <button class="btn btn-sm rounded-pill px-3" 
-                        [class.btn-dark]="viewMode === 'list'" 
+                <button class="btn btn-sm rounded-pill px-3 fw-bold" 
+                        [class.btn-primary]="viewMode === 'list'" 
                         [class.btn-light]="viewMode !== 'list'"
+                        [class.text-muted]="viewMode !== 'list'"
                         (click)="viewMode = 'list'">
                     <i class='bx bx-list-ul me-1'></i> Liste
                 </button>
-                <button class="btn btn-sm rounded-pill px-3" 
-                        [class.btn-dark]="viewMode === 'calendar'" 
+                <button class="btn btn-sm rounded-pill px-3 fw-bold" 
+                        [class.btn-primary]="viewMode === 'calendar'" 
                         [class.btn-light]="viewMode !== 'calendar'"
+                        [class.text-muted]="viewMode !== 'calendar'"
                         (click)="viewMode = 'calendar'">
                     <i class='bx bx-calendar me-1'></i> Takvim
                 </button>
             </div>
             
             <div class="text-end border-start ps-3 ms-2 d-none d-md-block">
-                <h5 class="m-0 fw-bold text-primary">{{ today | date:'dd MMMM yyyy' }}</h5>
-                <small class="text-muted">{{ today | date:'EEEE' }}</small>
+                <h5 class="m-0 fw-bold text-dark">{{ todayString }}</h5>
+                <small class="text-primary fw-bold">{{ dayString }}</small>
             </div>
         </div>
     </div>
 
-    <div class="row g-4 mb-5" *ngIf="stats">
+    <div class="row g-4 mb-5" *ngIf="stats && !loading">
         <div class="col-md-4">
-            <div class="stat-card card border-0 shadow-sm p-4 border-start border-primary border-5">
+            <div class="stat-card card border-0 shadow-sm p-4 border-start border-primary border-5 rounded-4 h-100">
                 <div class="d-flex align-items-center">
-                    <div class="icon-box bg-primary-light text-primary me-3"><i class='bx bx-play-circle fs-1'></i></div>
+                    <div class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 60px; height: 60px;">
+                        <i class='bx bx-play-circle fs-1'></i>
+                    </div>
                     <div>
-                        <h3 class="mb-0 fw-bold">{{stats.inProgressTrainingsCount}}</h3>
-                        <small class="text-muted fw-bold">Devam Eden</small>
+                        <h2 class="mb-0 fw-bold text-dark">{{stats.inProgressTrainingsCount}}</h2>
+                        <small class="text-muted fw-bold text-uppercase" style="letter-spacing: 1px;">Devam Eden Eğitim</small>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stat-card card border-0 shadow-sm p-4 border-start border-success border-5">
+            <div class="stat-card card border-0 shadow-sm p-4 border-start border-success border-5 rounded-4 h-100">
                 <div class="d-flex align-items-center">
-                    <div class="icon-box bg-success-light text-success me-3"><i class='bx bx-check-double fs-1'></i></div>
+                    <div class="icon-box bg-success bg-opacity-10 text-success rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 60px; height: 60px;">
+                        <i class='bx bx-check-double fs-1'></i>
+                    </div>
                     <div>
-                        <h3 class="mb-0 fw-bold">{{stats.completedTrainingsCount}}</h3>
-                        <small class="text-muted fw-bold">Tamamlanan</small>
+                        <h2 class="mb-0 fw-bold text-dark">{{stats.completedTrainingsCount}}</h2>
+                        <small class="text-muted fw-bold text-uppercase" style="letter-spacing: 1px;">Tamamlanan Eğitim</small>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="stat-card card border-0 shadow-sm p-4 border-start border-warning border-5">
+            <div class="stat-card card border-0 shadow-sm p-4 border-start border-warning border-5 rounded-4 h-100 cursor-pointer" routerLink="/dashboard/certificates">
                 <div class="d-flex align-items-center">
-                    <div class="icon-box bg-warning-light text-warning me-3"><i class='bx bx-medal fs-1'></i></div>
+                    <div class="icon-box bg-warning bg-opacity-10 text-warning rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 60px; height: 60px;">
+                        <i class='bx bx-medal fs-1'></i>
+                    </div>
                     <div>
-                        <h3 class="mb-0 fw-bold">{{stats.totalCertificates}}</h3>
-                        <small class="text-muted fw-bold">Sertifikalar</small>
+                        <h2 class="mb-0 fw-bold text-dark">{{stats.totalCertificates}}</h2>
+                        <small class="text-muted fw-bold text-uppercase" style="letter-spacing: 1px;">Sertifikalar</small>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div [ngSwitch]="viewMode">
+    <div *ngIf="loading" class="text-center py-5 my-5">
+        <div class="spinner-border text-primary border-3" style="width: 3rem; height: 3rem;"></div>
+        <p class="text-muted mt-3 fw-bold">Kontrol paneliniz hazırlanıyor...</p>
+    </div>
+
+    <div [ngSwitch]="viewMode" *ngIf="!loading">
         
         <div *ngSwitchCase="'list'" class="animate__animated animate__fadeIn">
             
             <div class="row g-4">
                 <div class="col-lg-12">
                     
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-white border-0 py-3">
-                            <h5 class="fw-bold m-0"><i class='bx bx-pin text-danger me-2'></i>Sana Atanan Zorunlu Eğitimler</h5>
+                    <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold m-0 text-dark"><i class='bx bx-pin text-danger me-2'></i>Sana Atanan Eğitimler</h5>
+                            <a routerLink="/dashboard/my-trainings" class="btn btn-sm btn-light text-primary fw-bold rounded-pill px-3">Tümünü Gör</a>
                         </div>
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="bg-light">
+                            <table class="table table-hover align-middle mb-0 custom-table">
+                                <thead class="bg-light text-secondary small text-uppercase">
                                     <tr>
                                         <th class="ps-4">Eğitim</th>
                                         <th>Eğitmen</th>
@@ -86,43 +100,54 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let item of assignedTrainings">
-                                        <td class="ps-4">
+                                    <tr *ngFor="let item of assignedTrainings" class="bg-white">
+                                        <td class="ps-4 py-3">
                                             <div class="d-flex align-items-center">
-                                                <img [src]="item.imageUrl || item.headerImage" 
-                                                     (error)="handleMissingImage($event, item)"
-                                                     class="rounded me-3" width="40" height="40" style="object-fit: cover;">
-                                                <span class="fw-bold small">{{item.title}}</span>
+                                                <img [src]="item.picturePath || item.headerImage || 'assets/images/defaults/default.jpg'" 
+                                                     (error)="handleMissingImage($event)"
+                                                     class="rounded shadow-sm me-3 border" width="60" height="40" style="object-fit: cover;">
+                                                <div>
+                                                    <span class="fw-bold text-dark d-block" style="line-height: 1.2;">{{item.title}}</span>
+                                                    <span class="text-muted small">{{item.categoryName}}</span>
+                                                </div>
                                             </div>
                                         </td>
-                                        <td class="small text-muted">{{item.instructorName}}</td>
+                                        <td class="small text-muted fw-medium"><i class='bx bx-user-voice me-1'></i>{{item.instructorName}}</td>
                                         <td>
-                                            <span *ngIf="item.accessStatus === 'Active'" class="badge bg-success-light text-success">Aktif</span>
-                                            <span *ngIf="item.accessStatus === 'NotStarted'" class="badge bg-secondary-light text-secondary">Başlamadı</span>
-                                            <span *ngIf="item.accessStatus === 'Expired'" class="badge bg-danger-light text-danger">Süresi Doldu</span>
+                                            <div class="d-flex flex-column gap-1" style="width: 100px;">
+                                                <span class="badge" [ngClass]="item.progressPercentage === 0 ? 'bg-secondary' : 'bg-primary'">
+                                                    {{ item.progressPercentage === 0 ? 'Başlamadı' : 'Devam Ediyor' }}
+                                                </span>
+                                                <div class="progress" style="height: 5px;">
+                                                    <div class="progress-bar bg-success" [style.width.%]="item.progressPercentage"></div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="text-end pe-4">
-                                            <button *ngIf="item.accessStatus !== 'Expired'" class="btn btn-outline-dark btn-sm" [routerLink]="['/course-details', item.id]">Detay</button>
-                                            <button *ngIf="item.accessStatus === 'Expired'" class="btn btn-danger btn-sm shadow-sm">
-                                                <i class='bx bx-time-five me-1'></i> Süre Uzat
+                                            <button class="btn btn-primary btn-sm fw-bold px-3 shadow-sm rounded-pill" (click)="goToPlayer(item.id)">
+                                                <i class='bx bx-play-circle me-1'></i> {{ item.progressPercentage > 0 ? 'Devam Et' : 'Başla' }}
                                             </button>
                                         </td>
                                     </tr>
                                     <tr *ngIf="assignedTrainings.length === 0">
-                                        <td colspan="4" class="text-center py-4 text-muted small">Atanmış zorunlu eğitim bulunmamaktadır.</td>
+                                        <td colspan="4" class="text-center py-5">
+                                            <i class='bx bx-check-shield text-success display-4 mb-2 opacity-50'></i>
+                                            <p class="text-muted fw-bold mb-0">Atanmış tüm eğitimlerinizi tamamladınız!</p>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-header bg-white border-0 py-3">
-                            <h5 class="fw-bold m-0"><i class='bx bx-medal text-warning me-2'></i>Kazanılan Sertifikalar</h5>
+                    <div class="card border-0 shadow-sm mb-4 rounded-4 overflow-hidden">
+                        <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold m-0 text-dark"><i class='bx bx-medal text-warning me-2'></i>Kazanılan Sertifikalar</h5>
+                            <a routerLink="/dashboard/certificates" class="btn btn-sm btn-light text-primary fw-bold rounded-pill px-3">Tümünü Gör</a>
                         </div>
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="bg-light">
+                            <table class="table table-hover align-middle mb-0 custom-table">
+                                <thead class="bg-light text-secondary small text-uppercase">
                                     <tr>
                                         <th class="ps-4">Eğitim Adı</th>
                                         <th>Sertifika Tipi</th>
@@ -132,21 +157,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let cert of myCertificates">
-                                        <td class="ps-4 fw-bold small text-dark">{{cert.trainingName}}</td>
-                                        <td>
-                                            <span class="badge bg-light text-dark border">{{cert.templateTitle}}</span>
-                                        </td>
-                                        <td class="small text-muted">{{cert.trainerName}}</td>
-                                        <td class="small text-muted">{{cert.certificateDate | date:'dd.MM.yyyy'}}</td>
+                                    <tr *ngFor="let cert of myCertificates" class="bg-white">
+                                        <td class="ps-4 py-3 fw-bold text-dark">{{cert.trainingName}}</td>
+                                        <td><span class="badge bg-dark border">{{cert.templateTitle || 'Başarı Sertifikası'}}</span></td>
+                                        <td class="small text-muted"><i class='bx bx-user me-1'></i>{{cert.trainerName}}</td>
+                                        <td class="small fw-bold text-secondary">{{ (cert.certificateDate || cert.createdDate) | date:'dd.MM.yyyy'}}</td>
                                         <td class="text-end pe-4">
-                                            <a *ngIf="cert.verificationURL" [href]="cert.verificationURL" target="_blank" class="btn btn-primary btn-sm shadow-sm">
+                                            <button class="btn btn-outline-dark btn-sm fw-bold px-3 rounded-pill" (click)="openCertificate(cert.generatedFilePath)">
                                                 <i class='bx bx-download me-1'></i> İndir
-                                            </a>
+                                            </button>
                                         </td>
                                     </tr>
                                     <tr *ngIf="myCertificates.length === 0">
-                                        <td colspan="5" class="text-center py-4 text-muted small">Henüz kazanılmış bir sertifika yok.</td>
+                                        <td colspan="5" class="text-center py-5">
+                                            <i class='bx bx-award text-muted display-4 mb-2 opacity-25'></i>
+                                            <p class="text-muted fw-bold mb-0">Henüz kazanılmış bir sertifikanız bulunmuyor.</p>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -163,19 +189,19 @@
 
     </div>
 
-    <div class="row mt-5">
+    <div class="row mt-4" *ngIf="!loading">
         <div class="col-12">
-            <div class="card border-0 shadow-sm bg-white">
-                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="fw-bold m-0"><i class='bx bx-star text-primary me-2'></i>Senin İçin Önerilenler</h5>
-                    <a routerLink="/dashboard/active-courses" class="text-primary small text-decoration-none">Tümünü Gör</a>
+            <div class="card border-0 shadow-sm bg-white rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold m-0 text-dark"><i class='bx bx-star text-warning me-2'></i>Senin İçin Önerilenler</h5>
+                    <a routerLink="/courses" class="btn btn-sm btn-light text-primary fw-bold rounded-pill px-3">Tüm Kataloğu Gör</a>
                 </div>
-                <div class="card-body p-4 position-relative">
+                <div class="card-body p-4 position-relative bg-light">
                     
                     <div *ngIf="recommendedTrainings.length > 0; else noData">
                         <owl-carousel-o [options]="customOptions">
                             <ng-template carouselSlide *ngFor="let item of recommendedTrainings">
-                                <div class="p-1 h-100">
+                                <div class="p-2 h-100">
                                     <app-course-card [training]="item"></app-course-card>
                                 </div>
                             </ng-template>
@@ -183,8 +209,10 @@
                     </div>
 
                     <ng-template #noData>
-                        <div class="alert alert-light text-center border">
-                            <i class='bx bx-info-circle me-2'></i>Şu an için önerilecek yeni eğitim bulunmamaktadır.
+                        <div class="text-center py-5">
+                            <i class='bx bx-info-circle text-muted display-4 mb-2 opacity-50'></i>
+                            <h6 class="fw-bold text-dark">Şu an için öneri bulunamadı.</h6>
+                            <p class="text-muted small mb-0">Kataloğu inceleyerek yeni eğitimler keşfedebilirsiniz.</p>
                         </div>
                     </ng-template>
 

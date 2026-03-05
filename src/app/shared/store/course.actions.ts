@@ -3,7 +3,7 @@ import { createAction, props } from '@ngrx/store';
 // 🔥 DÜZELTME: courseId tekrar optional (?) yapıldı. previewToken eklendi.
 export const loadCourse = createAction(
   '[Course Page] Load Course',
-  props<{ courseId?: number; previewToken?: string }>() 
+  props<{ courseId?: number;}>() 
 );
 export const loadCourseSuccess = createAction(
     '[Course] Load Course Success',

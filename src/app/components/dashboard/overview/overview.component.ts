@@ -1,26 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router'; // Router eklendi
 import { OwlOptions } from 'ngx-owl-carousel-o'; 
+import { Subscription } from 'rxjs';
 import { TrainingApiService } from 'src/app/shared/api/training-api.service';
-import { ContinueTraining, DashboardStats, TrainingCard, UserCertificateDto } from 'src/app/shared/models/dashboard.model';
+import { CertificateApiService } from 'src/app/shared/api/certificate-api.service'; // Sertifika servisi eklendi
+import { ContinueTraining, DashboardStats, TrainingCard } from 'src/app/shared/models/dashboard.model';
 
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss']
 })
-export class OverviewComponent implements OnInit {
+export class OverviewComponent implements OnInit, OnDestroy {
   
   viewMode: 'list' | 'calendar' = 'list';
   
-  assignedTrainings: TrainingCard[] = []; 
-  recommendedTrainings: TrainingCard[] = []; 
-  myCertificates: UserCertificateDto[] = []; 
+  assignedTrainings: any[] = []; 
+  recommendedTrainings: any[] = []; 
+  myCertificates: any[] = []; 
   
   stats: DashboardStats | null = null;
   continueData: ContinueTraining | null = null;
   
-  today = new Date();
+  todayString: string = '';
+  dayString: string = '';
   loading = true;
+
+  private subs = new Subscription();
 
   customOptions: OwlOptions = {
     loop: false, 
@@ -42,52 +48,72 @@ export class OverviewComponent implements OnInit {
     }
   };
 
-  constructor(private trainingService: TrainingApiService) { }
+  constructor(
+    private trainingService: TrainingApiService,
+    private certApi: CertificateApiService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
+    this.setTurkishDate();
     this.loadDashboardData();
+  }
+
+  // 1. SORUNUN ÇÖZÜMÜ: TÜRKÇE TARİH
+  setTurkishDate() {
+      const date = new Date();
+      this.todayString = new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: 'long', year: 'numeric' }).format(date);
+      this.dayString = new Intl.DateTimeFormat('tr-TR', { weekday: 'long' }).format(date);
   }
 
   loadDashboardData(): void {
     this.loading = true;
     
-    this.trainingService.getUserStats().subscribe(res => this.stats = res);
+    // İstatistikler
+    this.subs.add(this.trainingService.getUserStats().subscribe(res => this.stats = res));
     
-    this.trainingService.getLastActiveTraining().subscribe(res => {
-         this.continueData = res;
-    });
+    // Son İzlenen Eğitim
+    this.subs.add(this.trainingService.getLastActiveTraining().subscribe(res => this.continueData = res));
     
-    this.trainingService.getAssignedTrainings().subscribe(res => {
-        this.assignedTrainings = res || [];
-    });
+    // Bana Atanan (Zorunlu) Eğitimler - MyTrainings endpoint'i daha dolu veri döner
+    this.subs.add(this.trainingService.getMyTrainings().subscribe((res: any) => {
+        // Genelde atanan eğitimleri "NotStarted" veya "Active" olanlar olarak filtreleyebilirsin.
+        // Biz burada henüz bitmemiş olan aktif eğitimleri gösterelim
+        const all = res.body || res.data || res || [];
+        this.assignedTrainings = all.filter((t: any) => !t.isCompleted).slice(0, 5); // İlk 5'ini göster
+    }));
+
+    // 2. SORUNUN ÇÖZÜMÜ: SERTİFİKALARI GETİR
+    this.subs.add(this.certApi.getMyCertificates().subscribe({
+        next: (res: any) => {
+            this.myCertificates = res.body || res.data || res || [];
+        }
+    }));
     
-    this.trainingService.getRecommendedTrainings().subscribe(res => {
+    // Önerilenler
+    this.subs.add(this.trainingService.getRecommendedTrainings().subscribe(res => {
         this.recommendedTrainings = res || [];
-        this.loading = false; // Yükleme bitti
-    });
+        this.loading = false; // Son işlem bitince loading kalksın
+    }));
   }
 
-  // --- EKSİK OLAN METOT BURAYA EKLENDİ ---
+  // --- İŞLEVSEL BUTON AKSİYONLARI ---
+
+  goToPlayer(trainingId: number) {
+      this.router.navigate(['/course-player', trainingId]);
+  }
+
+  openCertificate(url: string | null) {
+      if (url) window.open(url, '_blank');
+  }
+
   handleMissingImage(event: Event, item?: any) {
     const imgElement = event.target as HTMLImageElement;
-    
-    // Sonsuz döngü koruması
     if (imgElement.src.includes('default.jpg')) return;
+    imgElement.src = 'assets/images/defaults/default.jpg';
+  }
 
-    // Eğer item geldiyse ve kategori ID'si varsa kategori resmini dene
-    if (item && (item.categoryId || item.parentCategoryId)) {
-        const id = item.categoryId || item.parentCategoryId;
-        const categoryImg = `assets/images/defaults/category${id}.png`;
-        
-        // Eğer zaten kategori resmini deniyorsa ve o da yoksa default'a dön
-        if (imgElement.src.includes(`category${id}.png`)) {
-            imgElement.src = 'assets/images/defaults/default.jpg';
-        } else {
-            imgElement.src = categoryImg;
-        }
-    } else {
-        // Hiçbir bilgi yoksa direkt default
-        imgElement.src = 'assets/images/defaults/default.jpg';
-    }
+  ngOnDestroy(): void {
+      this.subs.unsubscribe();
   }
 }

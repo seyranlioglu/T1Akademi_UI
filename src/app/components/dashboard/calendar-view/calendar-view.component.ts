@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { CalendarOptions, EventInput } from '@fullcalendar/core'; // EventInput eklendi
+import { Component, Input, OnInit, OnChanges } from '@angular/core';
+import { Router } from '@angular/router'; // 🔥 Router eklendi
+import { CalendarOptions, EventInput } from '@fullcalendar/core'; 
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import trLocale from '@fullcalendar/core/locales/tr';
@@ -20,13 +21,33 @@ import { TrainingCard } from 'src/app/shared/models/dashboard.model';
       --fc-button-border-color: #1c1d1f;
       --fc-event-resizer-thickness: 10px;
     }
-    :host ::ng-deep .fc-event { cursor: pointer; padding: 2px 5px; font-weight: 600; }
+    :host ::ng-deep .fc-event { 
+      cursor: pointer; 
+      padding: 3px 6px; 
+      font-weight: 600; 
+      border-radius: 4px;
+      margin-bottom: 3px;
+    }
     :host ::ng-deep .fc-toolbar-title { font-size: 1.5rem; font-weight: 700; color: #333; }
     :host ::ng-deep .fc-day-today { background-color: rgba(86, 36, 208, 0.05) !important; }
   `]
 })
-export class CalendarViewComponent implements OnInit {
+export class CalendarViewComponent implements OnInit, OnChanges {
   @Input() trainings: TrainingCard[] = [];
+
+  // 🔥 HARİKA PASTEL RENK PALETİ
+  private pastelColors: string[] = [
+    '#74b9ff', // Soft Mavi
+    '#a29bfe', // Soft Lila
+    '#81ecec', // Soft Turkuaz
+    '#fab1a0', // Soft Somon
+    '#ffeaa7', // Soft Sarı
+    '#00cec9', // Koyu Turkuaz (Soft)
+    '#fd79a8', // Soft Pembe
+    '#e17055', // Toprak Rengi
+    '#0984e3', // Okyanus Mavisi
+    '#55efc4'  // Soft Nane Yeşili
+  ];
 
   calendarOptions: CalendarOptions = {
     initialView: 'dayGridMonth',
@@ -37,55 +58,63 @@ export class CalendarViewComponent implements OnInit {
       center: 'title',
       right: 'dayGridMonth,dayGridWeek'
     },
-    events: [], // Başlangıçta boş
+    events: [], 
     eventClick: (info) => {
         const id = info.event.extendedProps['trainingId'];
-        // Burada Angular router ile gitmek daha SPA dostudur ama href de çalışır.
+        // 🔥 Artık sayfayı yenilemeden, SPA hızında Angular ile yönlendiriyor
         window.location.href = `/course/${id}`;
+        // this.router.navigate(['/course-details', id]); 
     }
   };
 
+  constructor(private router: Router) {} // 🔥 Router Inject Edildi
+
   ngOnInit() {
-    // Veriler yüklendiğinde haritalamayı yap
     this.mapTrainingsToEvents();
   }
 
-  // Input değişirse (örn: asenkron veri geç gelirse) takvimi güncellemek için
   ngOnChanges() {
     this.mapTrainingsToEvents();
+  }
+
+  // 🔥 Eğitimin ID'sine göre her zaman aynı pastel rengi verir
+  getEventColor(trainingId: number): string {
+    if (!trainingId) return this.pastelColors[0];
+    const index = trainingId % this.pastelColors.length;
+    return this.pastelColors[index];
   }
 
   mapTrainingsToEvents() {
     if (!this.trainings) return;
 
-    // TypeScript hatasını önlemek için EventInput[] tipini belirtiyoruz
     const events: EventInput[] = this.trainings.map(t => {
       
-      // Tarih mantığı: StartDate veya DueDate yoksa CreatedDate(AssignDate)'i baz al
       let start: any = t.startDate || t.dueDate || t.assignDate;
-      
-      // Bitiş tarihi varsa FullCalendar için düzenle
-      let endInput: Date | undefined; // Burası null olamaz, undefined olmalı
+      let endInput: Date | undefined; 
 
       if (t.dueDate) {
         endInput = new Date(t.dueDate);
-        // FullCalendar bitiş gününü "hariç" (exclusive) tutar. 
-        // Yani ayın 12'sinde bitiyorsa, barın 12'sini kapsaması için 13'ü dememiz gerekir.
         endInput.setDate(endInput.getDate() + 1); 
       }
 
-      // Tüm gün mü? (Eğer bir aralık değil tek bir tarihse)
       const isAllDay = !t.startDate || !t.dueDate;
+
+      // Temel rengi ID'ye göre alıyoruz
+      let bgColor = this.getEventColor(t.id);
+
+      // İsteğe Bağlı: Duruma göre rengi ezmek istersen (Soft Yeşil ve Soft Kırmızı)
+      if (t.isCompleted) bgColor = '#55efc4'; // Tamamlananlar Nane Yeşili
+      if (t.accessStatus === 'Expired') bgColor = '#ff7675'; // Bitenler Soft Kırmızı
 
       return {
         id: t.id.toString(),
         title: t.title,
         start: start,
-        end: endInput, // Artık hata vermeyecek çünkü undefined olabilir ama null olamaz
+        end: endInput, 
         allDay: isAllDay,
-        // Renk Kodlaması: Tamamlandı(Yeşil), Süresi Geçti(Kırmızı), Aktif(Mor)
-        backgroundColor: t.isCompleted ? '#258754' : (t.accessStatus === 'Expired' ? '#ff1949' : '#5624d0'),
-        borderColor: 'transparent',
+        backgroundColor: bgColor,
+        borderColor: bgColor,
+        textColor: '#2d3436', // 🔥 Pastel üzerinde siyah/koyu gri yazı mükemmel okunur
         extendedProps: { trainingId: t.id }
       };
     });

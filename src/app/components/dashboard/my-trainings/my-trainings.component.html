@@ -1,0 +1,140 @@
+<div class="my-trainings-container py-4 px-3 px-md-5">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Eğitimlerim</h3>
+            <p class="text-muted small mb-0">Tarafınıza atanan ve satın aldığınız tüm eğitimleri buradan yönetebilirsiniz.</p>
+        </div>
+    </div>
+
+    <div class="filter-card bg-white rounded shadow-sm border p-3 mb-4 d-flex flex-column flex-md-row gap-3 align-items-center">
+        <div class="search-box position-relative flex-grow-1" style="max-width: 400px;">
+            <i class='bx bx-search position-absolute top-50 translate-middle-y text-muted ms-3'></i>
+            <input type="text" class="form-control ps-5" placeholder="Eğitim adı, eğitmen veya kategori ara..." 
+                   [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()">
+        </div>
+
+        <div class="status-filter">
+            <select class="form-select text-secondary cursor-pointer" [(ngModel)]="selectedStatus" (ngModelChange)="onStatusChange($event)">
+                <option value="all">Tüm Durumlar</option>
+                <option value="active">Devam Edenler</option>
+                <option value="completed">Tamamlananlar</option>
+                <option value="notstarted">Henüz Başlamayanlar</option>
+                <option value="expired">Süresi Dolanlar</option>
+            </select>
+        </div>
+    </div>
+
+    <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="text-muted mt-2 small">Eğitimleriniz getiriliyor...</p>
+    </div>
+
+    <div *ngIf="!isLoading && displayedTrainings.length === 0" class="text-center py-5 bg-white rounded border shadow-sm">
+        <img src="assets/images/defaults/empty-state.svg" alt="Boş" width="150" class="mb-3 opacity-50" onerror="this.style.display='none'">
+        <h5 class="fw-bold text-dark">Kayıt Bulunamadı</h5>
+        <p class="text-muted small">Arama kriterlerinize uygun veya size atanmış bir eğitim bulunmuyor.</p>
+    </div>
+
+    <div class="table-responsive bg-white rounded shadow-sm border" *ngIf="!isLoading && displayedTrainings.length > 0">
+        <table class="table table-hover align-middle custom-table mb-0">
+            <thead class="table-light text-secondary small">
+                <tr>
+                    <th scope="col" class="ps-4" style="width: 40%;">EĞİTİM BİLGİSİ</th>
+                    <th scope="col">KATEGORİ / EĞİTMEN</th>
+                    <th scope="col">TARİHLER</th>
+                    <th scope="col">DURUM</th>
+                    <th scope="col" class="text-end pe-4">İŞLEMLER</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of displayedTrainings">
+                    
+                    <td class="ps-4 py-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="course-thumbnail rounded overflow-hidden flex-shrink-0 border">
+                                <img [src]="item.picturePath" alt="Kapak" class="w-100 h-100 object-fit-cover" onerror="this.src='/assets/images/defaults/default.jpg'">
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1 course-title" [title]="item.title">{{ item.title }}</h6>
+                                <div class="d-flex align-items-center gap-2 tiny-text text-muted">
+                                    <span><i class='bx bx-layer'></i> {{ item.completedContentCount }} / {{ item.totalContentCount }} Ders</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge bg-light text-dark border fw-normal">{{ item.categoryName }}</span>
+                        </div>
+                        <div class="small text-muted d-flex align-items-center gap-1">
+                            <i class='bx bx-user-voice'></i> {{ item.instructorName }}
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="date-info">
+                            <div class="tiny-text text-muted mb-1">
+                                <i class='bx bx-calendar'></i> Planlanan: 
+                                <span class="text-dark fw-medium">
+                                    {{ item.startDate ? (item.startDate | date:'dd.MM.yy') : 'Hemen' }} - 
+                                    {{ item.dueDate ? (item.dueDate | date:'dd.MM.yy') : 'Sınırsız' }}
+                                </span>
+                            </div>
+                            <div class="tiny-text text-muted">
+                                <i class='bx bx-time-five'></i> Son Erişim: 
+                                <span class="text-dark">{{ item.lastAccessDate ? (item.lastAccessDate | date:'dd.MM.yy HH:mm') : 'Hiç izlenmedi' }}</span>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="d-flex flex-column gap-2" style="width: 120px;">
+                            <span class="custom-badge" [ngClass]="getStatusBadgeClass(item)">
+                                {{ getStatusText(item) }}
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="progress flex-grow-1" style="height: 6px;">
+                                    <div class="progress-bar" [ngClass]="item.isCompleted ? 'bg-success' : 'bg-primary'" 
+                                         role="progressbar" [style.width.%]="item.progressPercentage"></div>
+                                </div>
+                                <span class="tiny-text fw-bold text-dark">%{{ item.progressPercentage }}</span>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td class="text-end pe-4 mobile-actions">
+                        
+                        <div class="btn-group shadow-sm w-100-mobile" ngbDropdown placement="bottom-right" container="body">
+                            <button type="button" class="btn btn-sm btn-primary fw-bold px-3 d-flex align-items-center justify-content-center gap-1 flex-grow-1"
+                                    (click)="goToPlayer(item)"
+                                    [disabled]="item.accessStatus === 'Expired' || item.accessStatus === 'NotStarted'">
+                                <i class='bx' [ngClass]="item.progressPercentage > 0 ? (item.isCompleted ? 'bx-revision' : 'bx-play-circle') : 'bx-play'"></i>
+                                {{ item.progressPercentage > 0 ? (item.isCompleted ? 'Tekrar İzle' : 'Devam Et') : 'Başla' }}
+                            </button>
+                            
+                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle dropdown-toggle-split" ngbDropdownToggle>
+                                <span class="visually-hidden">Toggle Dropdown</span>
+                            </button>
+                            
+                            <div class="dropdown-menu border-0 shadow p-2" ngbDropdownMenu>
+                                <button ngbDropdownItem class="dropdown-item small py-2 d-flex align-items-center gap-2 rounded cursor-pointer" (click)="goToPreview(item.id)">
+                                    <i class='bx bx-info-circle text-secondary fs-5'></i> Eğitim Detayı
+                                </button>
+                                <div class="dropdown-divider my-1"></div>
+                                <button ngbDropdownItem class="dropdown-item small py-2 d-flex align-items-center gap-2 rounded cursor-pointer" 
+                                   [disabled]="!item.isCompleted"
+                                   (click)="downloadCertificate(item)">
+                                    <i class='bx bxs-certification fs-5' [ngClass]="item.isCompleted ? 'text-warning' : 'text-muted'"></i> 
+                                    Sertifika Görüntüle
+                                </button>
+                            </div>
+                        </div>
+
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

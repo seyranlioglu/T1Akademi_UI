@@ -1,0 +1,192 @@
+.my-trainings-container {
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 70px);
+}
+
+.filter-card {
+    .search-box input {
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+        &:focus {
+            background-color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.1);
+        }
+    }
+    .status-filter select {
+        border-radius: 8px;
+        min-width: 200px;
+        border: 1px solid #e9ecef;
+        background-color: #f8f9fa;
+    }
+}
+
+.custom-table {
+    th {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #edf2f9;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    
+    td {
+        border-bottom: 1px solid #f1f3f5;
+        vertical-align: middle;
+    }
+
+    tbody tr {
+        transition: all 0.2s ease;
+        &:hover {
+            background-color: #fcfdfe;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            z-index: 1;
+            position: relative;
+        }
+    }
+}
+
+.course-thumbnail {
+    width: 100px;
+    height: 60px;
+    background-color: #f1f3f5;
+}
+
+.course-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.2;
+}
+
+.tiny-text {
+    font-size: 0.75rem;
+}
+
+.custom-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.35em 0.65em;
+    border-radius: 4px;
+    text-align: center;
+    letter-spacing: 0.5px;
+    
+    &.badge-completed {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border: 1px solid rgba(25, 135, 84, 0.2);
+    }
+    
+    &.badge-active {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+        border: 1px solid rgba(13, 110, 253, 0.2);
+    }
+    
+    &.badge-waiting {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #b38500;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
+    &.badge-expired {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+        border: 1px solid rgba(220, 53, 69, 0.2);
+    }
+
+    &.badge-not-started {
+            background-color: rgba(108, 117, 125, 0.1);
+            color: #6c757d;
+            border: 1px solid rgba(108, 117, 125, 0.2);
+        }
+}
+
+.btn-group {
+    .dropdown-menu {
+        border-radius: 8px;
+        min-width: 180px;
+        .dropdown-item {
+            transition: background-color 0.2s;
+            &:hover {
+                background-color: #f8f9fa;
+                color: var(--bs-primary);
+            }
+            &.disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+        }
+    }
+}
+
+// ==========================================
+// MOBİL (RESPONSIVE) KART GÖRÜNÜMÜ SİHRİ
+// ==========================================
+@media (max-width: 768px) {
+    .filter-card {
+        .search-box { max-width: 100% !important; width: 100%; }
+        .status-filter { width: 100%; select { width: 100%; } }
+    }
+
+    .table-responsive {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .custom-table {
+        thead {
+            display: none; // Mobilde tablo başlıklarını gizle
+        }
+        
+        tbody, tr, td {
+            display: block;
+            width: 100%;
+        }
+
+        tr {
+            background-color: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        td {
+            border-bottom: 1px dashed #f1f3f5;
+            padding: 0.75rem 0 !important;
+            
+            // Son hücrenin alt çizgisini kaldır
+            &:last-child {
+                border-bottom: none;
+                padding-bottom: 0 !important;
+            }
+        }
+
+        .ps-4, .pe-4 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        .course-thumbnail {
+            width: 80px; // Mobilde resmi hafif küçült
+            height: 50px;
+        }
+
+        .mobile-actions {
+            text-align: left !important;
+            margin-top: 0.5rem;
+            
+            .w-100-mobile {
+                width: 100%; // Butonu mobilde tam genişlik yap
+            }
+        }
+    }
+}
+

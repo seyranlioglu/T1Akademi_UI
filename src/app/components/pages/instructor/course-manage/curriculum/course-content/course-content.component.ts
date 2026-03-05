@@ -22,7 +22,6 @@ export class CourseContentComponent {
   isEditing: boolean = false;
   ref: DynamicDialogRef | undefined;
 
-  // Geçici Sınav Seçimi (Kaydet diyene kadar burada tutulur)
   tempSelectedExamId: number | null = null;
 
   constructor(
@@ -32,7 +31,22 @@ export class CourseContentComponent {
     private store: Store
   ) {}
 
-  // --- 1. İKON BELİRLEME ---
+  // 🔥 YENİ: İçerik tipini dinamik olarak tespit etme
+  get fileCategory(): 'video' | 'document' | 'exam' {
+      if (this.data.contentType?.code === 'exm') return 'exam';
+      
+      const name = (this.data.newLibraryItem?.fileName 
+                    || this.data.contentLibrary?.fileName 
+                    || this.data.contentLibrary?.FileName 
+                    || this.data.trainingContentLibraryDto?.trainingContentLibraryFileName 
+                    || '').toLowerCase();
+      
+      if (name.match(/\.(mp4|avi|mov|mkv|webm)$/) || name.includes('youtube')) return 'video';
+      if (name.match(/\.(pdf|jpg|jpeg|png|gif|webp)$/)) return 'document';
+      
+      return 'video'; // Fallback
+  }
+
   getIconClass(item: any): string {
     if (!item) return 'bx-error text-muted';
     if (item.contentType?.code === 'exm') return 'bx-task text-warning';
@@ -47,10 +61,7 @@ export class CourseContentComponent {
     return 'bx-video text-primary'; 
   }
 
-  // --- 2. ÖNİZLEME ---
   openPreview() {
-    // Eğer sınav ise önizleme mantığı farklı olabilir veya sınav detayına gidebilir.
-    // Şimdilik sadece dosya önizlemeyi koruyoruz.
     if (this.data.contentType?.code === 'exm') {
         this.toastr.info('Sınav önizlemesi için düzenleme modunu kullanabilirsiniz.');
         return;
@@ -87,7 +98,6 @@ export class CourseContentComponent {
     });
   }
 
-  // --- 3. DOSYA İÇERİK DEĞİŞTİRME ---
   changeContent() {
     this.ref = this.dialogService.open(ContentLibrarySelectorComponent, {
         header: 'Yeni İçerik Seç',
@@ -106,34 +116,31 @@ export class CourseContentComponent {
     });
   }
 
-  // --- 4. SINAV SEÇİMİ (YENİ) ---
   onExamSelected(exam: any) {
-      // ExamSelector'dan gelen objeyi yakala
       if (exam && exam.examId) {
           this.tempSelectedExamId = exam.examId;
-          // UI'da başlığı güncellemek istersen: this.data.title = exam.title; (Opsiyonel)
       }
   }
 
   toggleEdit() {
     this.isEditing = !this.isEditing;
-    // İptal edilirse geçici seçimleri temizle
     if (!this.isEditing) {
         if (this.data.newLibraryItem) delete this.data.newLibraryItem;
         this.tempSelectedExamId = null;
+    } else {
+        if (this.data.minReadTimeThreshold == null) this.data.minReadTimeThreshold = 10;
+        if (this.data.completedRate == null) this.data.completedRate = 95;
     }
   }
 
   // --- 5. GÜNCELLEME (SAVE) ---
   saveChanges() {
-    // İçerik tipine göre ID belirle
     const isExam = this.data.contentType?.code === 'exm';
-    
-    // Eğer sınavsa ve yeni seçim yapıldıysa onu al, yoksa mevcut examId'yi koru
-    // Eğer dosya ise ve yeni seçim yapıldıysa onu al, yoksa mevcut contentLibraryId'yi koru
     const targetContentId = isExam 
         ? (this.tempSelectedExamId || this.data.examId) 
         : (this.data.newLibraryItem ? this.data.newLibraryItem.id : (this.data.contentLibraryId || 0));
+
+    const cat = this.fileCategory;
 
     const payload = {
         id: this.data.id,
@@ -141,25 +148,25 @@ export class CourseContentComponent {
         description: this.data.description,
         trainingSectionId: this.data.trainingSectionId,
         
-        // Backend DTO'su hangisini bekliyorsa onu doldur, diğerini null/0 gönder
         contentLibraryId: isExam ? null : targetContentId,
         examId: isExam ? targetContentId : null,
         
-        // Ayarlar
         mandatory: this.data.mandatory,
         isPreview: this.data.isPreview,
-        allowSeeking: this.data.allowSeeking,
-        completedRate: this.data.completedRate,
-        minReadTimeThreshold: this.data.minReadTimeThreshold || 5,
-        isActive: true
+        
+        // 🔥 İçerik Tipine Göre Alanları Yolla
+        allowSeeking: cat === 'video' ? this.data.allowSeeking : null,
+        completedRate: cat === 'video' ? this.data.completedRate : null,
+        minReadTimeThreshold: cat === 'document' ? this.data.minReadTimeThreshold : null,
+        
+        isActive: this.data.isActive // Backend Smart Update bunu yönetecek
     };
 
     this.trainingService.updateTrainingContent(payload).subscribe({
-        next: (res) => {
-            this.toastr.success('Ders başarıyla güncellendi.');
+        next: (res: any) => {
+            this.toastr.success(res.message || 'Ders başarıyla güncellendi.');
             this.isEditing = false;
             
-            // Geçici verileri temizle
             if(this.data.newLibraryItem) delete this.data.newLibraryItem;
             this.tempSelectedExamId = null;
 
@@ -172,15 +179,12 @@ export class CourseContentComponent {
     });
   }
 
-  // --- 6. SİLME ---
   deleteContent() {
     if(confirm('Bu içeriği silmek istediğinize emin misiniz?')) {
         this.trainingService.deleteTrainingContent(this.data.id).subscribe({
             next: () => {
                 this.toastr.success('İçerik silindi.');
-                this.store.dispatch(loadCourse({ 
-                    courseId: this.data.trainingId 
-                }));
+                this.store.dispatch(loadCourse({ courseId: this.data.trainingId }));
             },
             error: (err) => this.toastr.error('Silme hatası.')
         });

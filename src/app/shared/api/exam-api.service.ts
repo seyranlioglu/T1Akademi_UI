@@ -126,4 +126,9 @@ getNextQuestion(payload: {
   getExamListForLookup(payload: any): Observable<any> {
     return this.http.post<any>(`${API_EXAM_URL}/GetExamListForLookup`, payload);
   }
+
+  // Öğrencinin Sınav Geçmişini Getirir
+  getMyExamHistory(): Observable<any> {
+    return this.http.get<any>(`${API_EXAM_URL}/GetMyExamHistory`);
+  }
 }

@@ -121,7 +121,8 @@ import { TrainingApprovalComponent } from './components/admin/training-approval/
 import { CourseDashboardComponent } from './components/pages/instructor/course-manage/course-dashboard/course-dashboard.component';
 import { AssignTrainingComponent } from './components/pages/assign-training/assign-training.component';
 import { UserTrainingAssignModalComponent } from './components/pages/user-training-assign-modal/user-training-assign-modal.component';
-
+import { MyTrainingsComponent } from './components/dashboard/my-trainings/my-trainings.component';
+import { CertificatesComponent } from './components/dashboard/certificates/certificates.component';
 @NgModule({
     declarations: [
         AppComponent,
@@ -219,7 +220,9 @@ import { UserTrainingAssignModalComponent } from './components/pages/user-traini
         TrainingApprovalComponent,
         CourseDashboardComponent,
         AssignTrainingComponent,
-        UserTrainingAssignModalComponent
+        UserTrainingAssignModalComponent,
+        MyTrainingsComponent,
+        CertificatesComponent
     ],
     imports: [
         BrowserModule,

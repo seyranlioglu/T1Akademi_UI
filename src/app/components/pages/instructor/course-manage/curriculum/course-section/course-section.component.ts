@@ -32,7 +32,7 @@ export class CourseSectionComponent {
   // Ayarlar
   contentSettings = {
       mandatory: true, isPreview: false, allowSeeking: true, 
-      completedRate: 95, minReadTimeThreshold: 5   
+      completedRate: 95, minReadTimeThreshold: 10   
   };
 
   isSettingsDialogVisible = false;
@@ -49,6 +49,21 @@ export class CourseSectionComponent {
 
   toggleExpand() { this.isExpanded = !this.isExpanded; }
 
+  // 🔥 YENİ: Seçilen içeriğin tipini dinamik bulur
+  get selectedFileCategory(): 'video' | 'document' | 'exam' | 'none' {
+      if (this.newContentType === 'exam') return 'exam';
+      if (!this.selectedLibraryItem) return 'none';
+      const fileName = this.selectedLibraryItem.fileName?.toLowerCase() || '';
+      
+      if (fileName.match(/\.(mp4|avi|mov|mkv|webm)$/) || this.selectedLibraryItem.filePath?.includes('youtube')) {
+          return 'video';
+      }
+      if (fileName.match(/\.(pdf|jpg|jpeg|png|gif|webp)$/)) {
+          return 'document';
+      }
+      return 'document'; // Fallback
+  }
+
   // --- FORM İŞLEMLERİ ---
   toggleNewContentForm() {
     this.isNewContentFormVisible = !this.isNewContentFormVisible;
@@ -60,10 +75,9 @@ export class CourseSectionComponent {
     this.newContentType = 'material';
     this.selectedLibraryItem = null;
     this.selectedExamItem = null;
-    this.contentSettings = { mandatory: true, isPreview: false, allowSeeking: true, completedRate: 95, minReadTimeThreshold: 5 };
+    this.contentSettings = { mandatory: true, isPreview: false, allowSeeking: true, completedRate: 95, minReadTimeThreshold: 10 };
   }
 
-  // --- İÇERİK SEÇİMİ (KÜTÜPHANE) ---
   openLibrarySelector() {
     this.ref = this.dialogService.open(ContentLibrarySelectorComponent, {
       header: 'Kütüphaneden İçerik Seç',
@@ -82,10 +96,8 @@ export class CourseSectionComponent {
     });
   }
 
-  // --- SINAV SEÇİMİ (YENİ EKLENDİ) ---
   onExamSelected(exam: any) {
     this.selectedExamItem = exam;
-    // Eğer başlık henüz girilmemişse, sınavın başlığını otomatik doldur
     if (!this.newContentTitle && exam) {
         this.newContentTitle = exam.title;
     }
@@ -97,8 +109,6 @@ export class CourseSectionComponent {
         this.toastr.warning('Lütfen ders başlığı giriniz.');
         return;
     }
-    
-    // Validasyonlar
     if (this.newContentType === 'material' && !this.selectedLibraryItem) {
         this.toastr.warning('Lütfen kütüphaneden bir içerik seçiniz.');
         return;
@@ -109,6 +119,7 @@ export class CourseSectionComponent {
     }
 
     const sectionId = this.data.trainingSectionId || this.data.id;
+    const fileCat = this.selectedFileCategory;
 
     const payload = {
       trainingSectionId: sectionId, 
@@ -116,15 +127,18 @@ export class CourseSectionComponent {
       isActive: true,
       contentTypeCode: this.newContentType === 'exam' ? this.CONTENT_TYPE_EXAM_CODE : this.CONTENT_TYPE_LECTURE_CODE,
       
-      // ID Atamaları
       contentLibraryId: this.newContentType === 'material' ? this.selectedLibraryItem.id : null,
-      examId: this.newContentType === 'exam' ? this.selectedExamItem.examId : null, // ExamSummary'den examId alıyoruz
+      examId: this.newContentType === 'exam' ? this.selectedExamItem.examId : null,
       
       mandatory: this.contentSettings.mandatory,
       isPreview: this.contentSettings.isPreview,
-      allowSeeking: this.contentSettings.allowSeeking,
-      completedRate: this.contentSettings.completedRate,
-      minReadTimeThreshold: this.contentSettings.minReadTimeThreshold
+      
+      // 🔥 Sadece Video ise bu ayarları yolla
+      allowSeeking: fileCat === 'video' ? this.contentSettings.allowSeeking : null,
+      completedRate: fileCat === 'video' ? this.contentSettings.completedRate : null,
+      
+      // 🔥 Sadece Belge ise bu ayarı yolla
+      minReadTimeThreshold: fileCat === 'document' ? this.contentSettings.minReadTimeThreshold : null
     };
 
     this.trainingService.addTrainingContent(payload).subscribe({
@@ -140,10 +154,8 @@ export class CourseSectionComponent {
     });
   }
 
-  // --- BÖLÜM İŞLEMLERİ ---
   deleteSection() {
     const sectionId = this.data.trainingSectionId || this.data.id;
-
     if(confirm('Bu bölümü ve içindeki tüm dersleri silmek istediğinize emin misiniz?')) {
         this.trainingService.deleteTrainingSection(sectionId).subscribe({
             next: () => this.store.dispatch(loadCourse({})),
@@ -154,7 +166,6 @@ export class CourseSectionComponent {
 
   updateSectionTitle() {
       this.sectionTitleEdit = false;
-      
       const currentTitle = this.data.trainingSectionTitle || this.data.title;
       const sectionId = this.data.trainingSectionId || this.data.id;
       const rowNumber = this.data.trainingSectionRowNumber ?? this.data.rowNumber ?? this.index;

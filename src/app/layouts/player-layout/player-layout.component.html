@@ -73,7 +73,8 @@
 
                         <div *ngIf="viewType === 'video'" class="w-100 h-100">
                             <video #videoPlayer [src]="getFileUrl()" controls controlsList="nodownload" class="w-100 h-100" autoplay
-                                   (loadedmetadata)="onVideoLoadedMetadata()" (play)="onVideoPlay()" (pause)="onVideoPause()" (ended)="onVideoEnded()" (seeked)="onVideoSeeked()">
+                                (loadedmetadata)="onVideoLoadedMetadata()" (play)="onVideoPlay()" (pause)="onVideoPause()" (ended)="onVideoEnded()" (seeked)="onVideoSeeked()"
+                                (timeupdate)="onVideoTimeUpdate()">
                             </video>
                         </div>
 

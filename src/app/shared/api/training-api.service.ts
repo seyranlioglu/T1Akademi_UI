@@ -318,4 +318,10 @@ export class TrainingApiService {
   getPendingTrainings(): Observable<any> {
     return this.http.get<any>(`${API_TRAINING_URL}/GetPendingTrainings`);
   }
+
+  getTrainingForManage(id: number): Observable<GetTraining> {
+    return this.http.get<any>(`${API_TRAINING_URL}/GetForManage/${id}`).pipe(
+        map(res => res.data || res.body || res)
+    );
+  }
 }

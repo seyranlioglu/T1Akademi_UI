@@ -1,0 +1,131 @@
+.certificates-container {
+    background-color: #f8f9fa;
+    min-height: calc(100vh - 70px);
+}
+
+/* Sekme Tasarımı */
+.custom-pills {
+    .nav-link {
+        color: #6c757d;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        transition: all 0.2s;
+        
+        &.active {
+            background-color: var(--bs-primary);
+            color: #fff;
+        }
+        &:hover:not(.active) {
+            background-color: #f1f3f5;
+        }
+    }
+}
+
+/* Sertifika Kartları */
+.cert-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 12px;
+    
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    }
+
+    .cert-header {
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        background: linear-gradient(135deg, #1e293b 0%, #343a40 100%);
+        
+        .bg-pattern {
+            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+    }
+
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 2.4em; // Sabit yükseklik hizalamayı korur
+    }
+}
+
+/* Sınav Tablosu */
+.custom-table {
+    th {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #edf2f9;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    td {
+        border-bottom: 1px solid #f1f3f5;
+        vertical-align: middle;
+    }
+    tbody tr:hover {
+        background-color: #fcfdfe;
+    }
+}
+
+/* Ortak Rozet Sınıfları */
+.custom-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.4em 0.65em;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    
+    &.badge-success { background-color: rgba(25, 135, 84, 0.1); color: #198754; border: 1px solid rgba(25, 135, 84, 0.2); }
+    &.badge-danger { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.2); }
+    &.badge-warning { background-color: rgba(255, 193, 7, 0.15); color: #b38500; border: 1px solid rgba(255, 193, 7, 0.3); }
+}
+
+.tiny-text {
+    font-size: 0.7rem;
+}
+
+/* Mobil Tablo (Kart) Görünümü (Eğitimlerim sayfasındaki aynı mantık) */
+@media (max-width: 768px) {
+    .table-responsive {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    .custom-table {
+        thead { display: none; }
+        tbody, tr, td { display: block; width: 100%; }
+        tr {
+            background-color: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+        td {
+            border-bottom: 1px dashed #f1f3f5;
+            padding: 0.75rem 0 !important;
+            text-align: right;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            
+            &::before {
+                content: attr(data-label);
+                font-weight: 600;
+                font-size: 0.75rem;
+                color: #6c757d;
+                text-transform: uppercase;
+            }
+            
+            &:last-child { border-bottom: none; padding-bottom: 0 !important; }
+        }
+        .ps-4, .pe-4 { padding-left: 0 !important; padding-right: 0 !important; }
+    }
+}

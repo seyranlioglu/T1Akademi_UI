@@ -40,7 +40,7 @@ export class CourseEffects {
                 }
 
                 // 2. Servis Çağrısı: previewToken'ı da gönderiyoruz
-                return this.trainingService.getTrainingById(courseId, action.previewToken).pipe(
+                return this.trainingService.getTrainingForManage(courseId).pipe(
                     map((response: any) => {
                         // Backend Response<T> yapısına göre veriyi al
                         const data = response.data || response.body || response;

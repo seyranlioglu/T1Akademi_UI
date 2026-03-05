@@ -15,7 +15,7 @@
             <h6 class="mb-0 text-truncate small fw-bold" [title]="data.title">{{ data.title }}</h6>
             <div class="d-flex align-items-center gap-2 mt-1">
                 <span class="badge bg-light text-secondary border tiny-text">
-                    {{ data.contentType?.code === 'exm' ? 'SINAV' : 'MATERYAL' }}
+                    {{ fileCategory === 'exam' ? 'SINAV' : (fileCategory === 'document' ? 'BELGE' : 'VİDEO') }}
                 </span>
                 <span *ngIf="data.time" class="tiny-text text-muted">
                     <i class='bx bx-time-five'></i> {{ data.time }}
@@ -85,6 +85,9 @@
                     </button>
                 </div>
             </div>
+            <small class="text-danger mt-1 d-block" *ngIf="data.newLibraryItem">
+                <i class='bx bx-info-circle'></i> Uyarı: Dosyayı değiştirip kaydederseniz ders yeniden onaya gider.
+            </small>
         </ng-container>
 
         <ng-container *ngIf="data.contentType?.code === 'exm'">
@@ -93,6 +96,9 @@
                 [label]="'Bağlı Sınav'"
                 (onExamSelect)="onExamSelected($event)">
             </app-exam-selector>
+             <small class="text-danger mt-1 d-block" *ngIf="tempSelectedExamId && tempSelectedExamId !== data.examId">
+                <i class='bx bx-info-circle'></i> Uyarı: Sınavı değiştirip kaydederseniz ders yeniden onaya gider.
+            </small>
         </ng-container>
 
     </div>
@@ -100,26 +106,26 @@
     <div class="row g-3 mb-3">
         <div class="col-md-6">
             <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="mandatoryCheck" [(ngModel)]="data.mandatory">
-                <label class="form-check-label small cursor-pointer" for="mandatoryCheck">Zorunlu İçerik</label>
+                <input class="form-check-input" type="checkbox" id="mandatoryCheck_{{data.id}}" [(ngModel)]="data.mandatory">
+                <label class="form-check-label small cursor-pointer" for="mandatoryCheck_{{data.id}}">Zorunlu İçerik</label>
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="previewCheck" [(ngModel)]="data.isPreview">
-                <label class="form-check-label small cursor-pointer" for="previewCheck">Vitrin (Önizleme)</label>
+                <input class="form-check-input" type="checkbox" id="previewCheck_{{data.id}}" [(ngModel)]="data.isPreview">
+                <label class="form-check-label small cursor-pointer" for="previewCheck_{{data.id}}">Vitrin (Önizleme)</label>
             </div>
         </div>
         
-        <div class="col-md-6" *ngIf="data.contentType?.code !== 'exm'">
+        <div class="col-md-6" *ngIf="fileCategory === 'video'">
             <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="seekingCheck" [(ngModel)]="data.allowSeeking">
-                <label class="form-check-label small cursor-pointer" for="seekingCheck">İleri Sarma İzni</label>
+                <input class="form-check-input" type="checkbox" id="seekingCheck_{{data.id}}" [(ngModel)]="data.allowSeeking">
+                <label class="form-check-label small cursor-pointer" for="seekingCheck_{{data.id}}">İleri Sarma İzni</label>
             </div>
         </div>
     </div>
 
-    <div class="mb-3 pt-2 border-top" *ngIf="data.contentType?.code !== 'exm'">
+    <div class="mb-3 pt-2 border-top" *ngIf="fileCategory === 'video'">
         <div class="d-flex justify-content-between align-items-center mb-1">
             <label class="small fw-bold text-muted m-0">Tamamlandı Kabul Oranı</label>
             <span class="badge bg-primary rounded-pill small">%{{ data.completedRate || 95 }}</span>
@@ -128,7 +134,7 @@
         <input type="range" class="form-range custom-range" 
                [ngModel]="data.completedRate || 95" 
                (ngModelChange)="data.completedRate = $event"
-               min="1" max="100" step="1">
+               min="1" max="100" step="5">
                
         <div class="d-flex justify-content-between text-muted tiny-text px-1">
             <span>%0</span>
@@ -137,7 +143,15 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-end gap-2 mt-2">
+    <div class="mb-3 pt-2 border-top" *ngIf="fileCategory === 'document'">
+        <label class="small fw-bold text-muted m-0 d-block mb-1">Zorunlu Okuma Süresi (Saniye)</label>
+        <input type="number" class="form-control form-control-sm" [(ngModel)]="data.minReadTimeThreshold" min="0">
+        <small class="text-muted d-block mt-1 fst-italic" style="font-size: 0.7rem;">
+            Öğrenci dosyayı açtıktan sonra bu süre bitene kadar dersi geçemez. (Süresiz için 0 girin)
+        </small>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-3 pt-2 border-top">
         <button class="btn btn-light btn-sm" (click)="toggleEdit()">Kapat</button>
         <button class="btn btn-success btn-sm px-3" (click)="saveChanges()">
             <i class='bx bx-save'></i> Kaydet

@@ -69,6 +69,8 @@ import { ExamBuilderComponent } from './components/pages/instructor/course-manag
 import { ExamLibraryComponent } from './components/pages/instructor/exam-library/exam-library.component';
 import { TrainingApprovalComponent } from './components/admin/training-approval/training-approval.component';
 import { CourseDashboardComponent } from './components/pages/instructor/course-manage/course-dashboard/course-dashboard.component';
+import { MyTrainingsComponent } from './components/dashboard/my-trainings/my-trainings.component';
+import { CertificatesComponent } from './components/dashboard/certificates/certificates.component';
 
 // YENİ EKLENEN BİLEŞEN
 import { AssignTrainingComponent } from './components/pages/assign-training/assign-training.component';
@@ -141,6 +143,8 @@ const routes: Routes = [
                     { path: 'orders-list', component: OrdersListComponent },
                     { path: 'company-employees', component: CompanyEmployeesComponent },
                     { path: 'cart', component: CartComponent },
+                    { path: 'my-trainings', component: MyTrainingsComponent},
+                    { path: 'certificates', component: CertificatesComponent}
                 ]
             }
         ]

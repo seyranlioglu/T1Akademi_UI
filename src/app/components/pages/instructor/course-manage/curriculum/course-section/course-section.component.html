@@ -125,33 +125,45 @@
             </label>
             <input class="form-check-input" type="checkbox" id="previewSwitch" [(ngModel)]="contentSettings.isPreview">
         </div>
-
-        <div class="form-check form-switch d-flex justify-content-between align-items-center border-bottom pb-2">
-            <label class="form-check-label" for="seekingSwitch">
-                <span class="fw-bold d-block">İleri Sarma İzni</span>
-                <small class="text-muted">Video ileri sarılabilir mi?</small>
-            </label>
-            <input class="form-check-input" type="checkbox" id="seekingSwitch" [(ngModel)]="contentSettings.allowSeeking">
-        </div>
-
-        <div class="border-bottom pb-2">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <label class="fw-bold small m-0">Tamamlanma Kabul Oranı</label>
-                <span class="badge bg-primary rounded-pill">%{{ contentSettings.completedRate }}</span>
+        
+        <ng-container *ngIf="selectedFileCategory === 'video'">
+            <div class="form-check form-switch d-flex justify-content-between align-items-center border-bottom pb-2">
+                <label class="form-check-label" for="seekingSwitch">
+                    <span class="fw-bold d-block">İleri Sarma İzni</span>
+                    <small class="text-muted">Video ileri sarılabilir mi?</small>
+                </label>
+                <input class="form-check-input" type="checkbox" id="seekingSwitch" [(ngModel)]="contentSettings.allowSeeking">
             </div>
-            
-            <input type="range" 
-                   class="form-range custom-range" 
-                   [(ngModel)]="contentSettings.completedRate" 
-                   min="1" max="100" step="5"
-                   (mousedown)="$event.stopPropagation()"
-                   (touchstart)="$event.stopPropagation()"
-                   (click)="$event.stopPropagation()">
-            
-            <small class="text-muted d-block mt-1 text-center fst-italic" style="font-size: 0.7rem;">
-                Videonun <strong class="text-dark">%{{ contentSettings.completedRate }}</strong> kısmı izlenince tamamlandı sayılacak.
-            </small>
-        </div>
+
+            <div class="border-bottom pb-2 mt-2">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="fw-bold small m-0">Tamamlanma Kabul Oranı</label>
+                    <span class="badge bg-primary rounded-pill">%{{ contentSettings.completedRate }}</span>
+                </div>
+                
+                <input type="range" 
+                       class="form-range custom-range" 
+                       [(ngModel)]="contentSettings.completedRate" 
+                       min="1" max="100" step="5"
+                       (mousedown)="$event.stopPropagation()"
+                       (touchstart)="$event.stopPropagation()"
+                       (click)="$event.stopPropagation()">
+                
+                <small class="text-muted d-block mt-1 text-center fst-italic" style="font-size: 0.7rem;">
+                    Videonun <strong class="text-dark">%{{ contentSettings.completedRate }}</strong> kısmı izlenince tamamlandı sayılacak.
+                </small>
+            </div>
+        </ng-container>
+
+        <ng-container *ngIf="selectedFileCategory === 'document'">
+            <div class="border-bottom pb-2">
+                <label class="fw-bold small m-0 d-block mb-1">Zorunlu Okuma Süresi (Saniye)</label>
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="contentSettings.minReadTimeThreshold" min="0">
+                <small class="text-muted d-block mt-1 text-center fst-italic" style="font-size: 0.7rem;">
+                    Öğrenci dosyayı açtıktan sonra bu süre bitene kadar dersi geçemez. (Süresiz için 0 girin)
+                </small>
+            </div>
+        </ng-container>
 
     </div>
     <ng-template pTemplate="footer">
