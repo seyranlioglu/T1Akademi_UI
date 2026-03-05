@@ -99,10 +99,22 @@
                             </div>
                         </div>
 
-                        <div *ngIf="viewType === 'exam' && !isExamRunnerVisible" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 bg-white">
-                            <div class="text-center">
-                                <div class="spinner-border text-primary mb-3"></div>
-                                <p class="text-muted">Sınav Yükleniyor...</p>
+                        <div *ngIf="viewType === 'exam' && !isExamRunnerVisible" class="d-flex flex-column align-items-center justify-content-center w-100 h-100 p-4 bg-light">
+                            <div class="text-center p-5 bg-white rounded-4 shadow-lg border-0" style="max-width: 500px;">
+                                <div class="mb-4 mx-auto">
+                                    <div class="avatar-circle bg-warning bg-opacity-10 text-warning mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px; border-radius: 50%;">
+                                        <i class='bx bx-task fs-1'></i>
+                                    </div>
+                                </div>
+                                <h3 class="fw-bold text-dark mb-3">{{ currentContent.title }}</h3>
+                                <p class="text-muted mb-4 text-center">
+                                    Bu bölüm bir sınav içermektedir. Tam konsantrasyon sağlayabileceğiniz bir ortama geçtiğinizde sınava başlayabilirsiniz.<br><br>
+                                    Soru Sayısı: <strong class="text-dark">{{ currentContent.totalQuestionCount || 0 }} Soru</strong><br>
+                                    Sınav Süresi: <strong class="text-dark">{{ currentContent.examTime || 'Süresiz' }}</strong>
+                                </p>
+                                <button class="btn btn-warning btn-lg rounded-pill px-5 shadow fw-bold text-dark" (click)="startExamSession(currentContent)">
+                                    Sınav Ekranına Git <i class='bx bx-right-arrow-alt ms-2'></i>
+                                </button>
                             </div>
                         </div>
 
@@ -165,13 +177,13 @@
 
                             <div class="mb-4">
                                 <h6 class="fw-bold mb-3">Sayıya göre</h6>
-                                <div class="row small text-secondary g-3">
-                                    <div class="col-md-4">Yetkinlik düzeyi: <span class="text-dark">Başlangıç Düzeyi</span></div>
-                                    <div class="col-md-4">Öğrenci: <span class="text-dark">{{ course.studentCount || 0 }}</span></div>
-                                    <div class="col-md-4">Dil: <span class="text-dark">Türkçe</span></div>
-                                    <div class="col-md-4">Altyazılar: <span class="text-dark">Hayır</span></div>
-                                    <div class="col-md-4">Dersler: <span class="text-dark">{{ course.totalLectureCount || 0 }}</span></div>
-                                    <div class="col-md-4">Video: <span class="text-dark">Toplam {{ formatTotalDuration(course.totalDurationMinutes) }}</span></div>
+                                <div class="row small g-3">
+                                    <div class="col-md-4"><span class="fw-bold text-dark">Yetkinlik düzeyi: </span> <span class="text-muted">Başlangıç Düzeyi</span></div>
+                                    <div class="col-md-4"><span class="fw-bold text-dark">Öğrenci: </span> <span class="text-muted">{{ course.studentCount || 0 }}</span></div>
+                                    <div class="col-md-4"><span class="fw-bold text-dark">Dil: </span> <span class="text-muted">Türkçe</span></div>
+                                    <div class="col-md-4"><span class="fw-bold text-dark">Altyazılar: </span> <span class="text-muted">Hayır</span></div>
+                                    <div class="col-md-4"><span class="fw-bold text-dark">Dersler: </span> <span class="text-muted">{{ course.totalLectureCount || 0 }}</span></div>
+                                    <div class="col-md-4"><span class="fw-bold text-dark">Video: </span> <span class="text-muted">Toplam {{ formatTotalDuration(course.totalDurationMinutes) }}</span></div>
                                 </div>
                             </div>
 

@@ -4,7 +4,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute } from '@angular/router';
 import { ExamApiService } from 'src/app/shared/api/exam-api.service';
 import { ExamSecurityService } from 'src/app/shared/services/exam-security.service';
-import { ExamSidebarComponent } from './exam-sidebar/exam-sidebar.component'; // 🔥 Import Eklendi
+import { ExamSidebarComponent } from './exam-sidebar/exam-sidebar.component';
 
 @Component({
   selector: 'app-exam-runner',
@@ -14,33 +14,25 @@ import { ExamSidebarComponent } from './exam-sidebar/exam-sidebar.component'; //
 })
 export class ExamRunnerComponent implements OnInit, OnDestroy {
 
-  // 🔥 Sidebar'a erişim (İşaretleme için gerekli)
   @ViewChild(ExamSidebarComponent) sidebar!: ExamSidebarComponent;
 
   @Input() examId!: number;
   @Input() mode: 'student' | 'preview' = 'student';
-  
-  // PlayerLayout'tan "Bu son ders mi?" bilgisini alacağız
   @Input() isLastContent: boolean = false; 
 
   @Output() closeExam = new EventEmitter<boolean>();
 
-  // Token Yönetimi
   previewToken: string | null = null;
-
-  // Durumlar
   isLoading: boolean = true;
   isExamStarted: boolean = false;
   showResultScreen: boolean = false; 
-  examResult: any = null; // Backend'den dönen sonuç
-  examContext: any = null;
+  examResult: any = null; 
+  examContext: any = null; 
   
-  // Sayaç
   timeLeft: number = 0;
   timerDisplay: string = "00:00:00";
   private destroy$ = new Subject<void>();
   
-  // Navigasyon
   currentQuestionSeq: number = 1;
   totalQuestions: number = 0;
 
@@ -52,7 +44,6 @@ export class ExamRunnerComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    // URL'den Token Kontrolü
     this.route.queryParams.subscribe(params => {
       this.previewToken = params['previewToken'] || null;
       if (this.previewToken) {
@@ -60,14 +51,13 @@ export class ExamRunnerComponent implements OnInit, OnDestroy {
       }
 
       if (this.examId) {
-        this.initializeExam();
+        this.initializeExam(); // 🔥 API İSTEĞİ GERİ GELDİ
       } else {
         this.toastr.error("Sınav ID'si bulunamadı.");
         this.closeExam.emit(false);
       }
     });
 
-    // Güvenlik Dinleyicileri
     this.securityService.onViolation.subscribe(msg => this.toastr.warning(msg));
     this.securityService.onTerminate.subscribe(() => {
         this.toastr.error('Sınav sonlandırıldı.');
@@ -75,6 +65,7 @@ export class ExamRunnerComponent implements OnInit, OnDestroy {
     });
   }
 
+  // 🔥 SINAV BİLGİLERİNİ BACKEND'DEN ÇEKEN ASIL METOT (GERİ GELDİ)
   initializeExam() {
     this.isLoading = true;
 
@@ -112,6 +103,7 @@ export class ExamRunnerComponent implements OnInit, OnDestroy {
     if (this.mode === 'student') {
         this.securityService.startSecurity();
     }
+    
     if (this.examContext?.examTime) {
       this.startTimer(this.examContext.examTime);
     }
@@ -151,14 +143,12 @@ export class ExamRunnerComponent implements OnInit, OnDestroy {
     this.currentQuestionSeq = seqNumber;
   }
 
-  // 🔥 EKSİK OLAN METOD BUYDU: Sidebar'daki tiki yeşile çevirir
   onAnswerSaved() {
     if (this.sidebar) {
       this.sidebar.setQuestionAnswered(this.currentQuestionSeq);
     }
   }
 
-  // Sınavı Bitirme ve Sonuç Ekranı
   finishExam(autoSubmit: boolean = false) {
     if (!autoSubmit && !confirm('Sınavı bitirmek istiyor musunuz?')) return;
 
@@ -175,8 +165,8 @@ export class ExamRunnerComponent implements OnInit, OnDestroy {
             this.isLoading = false;
             if (res.header.result) {
                 this.examResult = res.body; 
-                this.showResultScreen = true; // Sonuç ekranını aç
-                this.securityService.stopSecurity(); // Güvenliği kapat
+                this.showResultScreen = true; 
+                this.securityService.stopSecurity(); 
             } else {
                 this.toastr.error('Sonuç hesaplanamadı.');
                 this.exitRunner(false);
@@ -189,7 +179,6 @@ export class ExamRunnerComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Sonuç Ekranındaki "Devam Et" Butonu
   continueAfterExam() {
       this.exitRunner(true);
   }

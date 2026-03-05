@@ -253,7 +253,6 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
               const playableContent = res.body?.content || res.data?.content || res.content || res;
               
               if (playableContent) {
-                  // 🔥 GÜVENLİK SIZINTISI İÇİN İKİNCİ KONTROL (API'den gelse bile Frontend'den engelle)
                   if(playableContent.canView === false) {
                       this.toastr.warning(playableContent.blockMessage || 'Bu içeriği göremezsiniz.', 'Erişim Hatası');
                       return; 
@@ -263,8 +262,8 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
                   this.updateSidebarActiveState(playableContent.id);
                   this.detectViewType();
                   
-                  if (this.viewType === 'exam') this.startExamSession(playableContent);
-                  else this.setupPlayerAfterFetch();
+                  // İçerik ne olursa olsun (sınav dahil) sadece view'ı hazırla, otomatik başlatma!
+                  this.setupPlayerAfterFetch();
               }
           },
           error: (err: any) => {
@@ -278,20 +277,22 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
   updateSidebarActiveState(activeId: number) {
       // (İleride tıklanan dersi menüde otomatik scroll yaptırmak için kullanılacak)
   }
+
   setupPlayerAfterFetch() {
-      if (this.viewType === 'pdf') {
+      if (this.viewType === 'exam') {
+          this.isExamRunnerVisible = false; // Sınav modalı açılmasın, buton beklesin
+      }
+      else if (this.viewType === 'pdf') {
           this.isPdfModalOpen = false;
           this.pdfSrc = this.getFileUrl();
           this.resetTimer();
           this.startHeartbeat();
       }
       else if (this.viewType === 'image') {
-          // İmaj için sayaç beklemiyoruz, manuel butonla geçilecek. Sadece log başlatıyoruz.
           this.isTimerGreen = false; 
           this.startHeartbeat();
       }
       else if (this.viewType === 'youtube') {
-          // HTML'in DOM'u render etmesi için küçük bir gecikme verip YT API'yi tetikliyoruz.
           setTimeout(() => { 
               this.loadYoutubeVideo(); 
               window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -321,46 +322,41 @@ export class PlayerLayoutComponent implements OnInit, OnDestroy {
       }
   }
 
-loadYoutubeVideo() {
+  loadYoutubeVideo() {
       if (!this.isYoutubeApiReady) {
-          setTimeout(() => this.loadYoutubeVideo(), 500); // API yüklenmediyse bekle
+          setTimeout(() => this.loadYoutubeVideo(), 500); 
           return;
       }
 
       const videoId = this.extractYoutubeId(this.getFileUrl());
       if (!videoId) return;
 
-      // 🔥 1. ADIM: Kaldığımız saniyeyi bul (ResumeContext veya LastWatchedPart)
       let seekTime = 0;
       if (this.resumeContext && this.currentContent?.id === this.resumeContext.contentId) {
           seekTime = this.resumeContext.lastWatchedSecond;
-          this.resumeContext = null; // Bir kere kullanıldı, temizle
+          this.resumeContext = null; 
       } 
       else if (this.currentContent?.lastWatchedPart > 0 && !this.currentContent?.isCompleted) {
           seekTime = this.currentContent.lastWatchedPart;
       }
 
-      // 🔥 2. ADIM: YouTube Player'ı Başlat veya Güncelle (Kaldığı Saniye İle)
       if (this.ytPlayer && typeof this.ytPlayer.loadVideoById === 'function') {
-          // Player zaten varsa ve ders değiştiyse yeni videoyu saniyesinden yükle
           if (seekTime > 0) {
               this.ytPlayer.loadVideoById({ videoId: videoId, startSeconds: seekTime });
           } else {
               this.ytPlayer.loadVideoById(videoId);
           }
       } else {
-          // Player ilk defa oluşturuluyorsa
           this.ytPlayer = new (window as any).YT.Player('youtube-player-container', {
               videoId: videoId,
               playerVars: { 
                   autoplay: 1, 
                   modestbranding: 1, 
                   rel: 0,
-                  start: seekTime > 0 ? seekTime : 0 // Direkt kaldığı saniyeden başlatır
+                  start: seekTime > 0 ? seekTime : 0 
               },
               events: {
                   'onReady': (event: any) => {
-                      // Bazen playerVars start parametresini ezebilir, garanti olsun diye Ready olunca da o saniyeye sar
                       if (seekTime > 0) {
                           event.target.seekTo(seekTime, true);
                       }
@@ -373,15 +369,15 @@ loadYoutubeVideo() {
 
   onYoutubeStateChange(event: any) {
       const state = event.data;
-      if (state === 1) { // PLAYING
+      if (state === 1) { 
           this.startHeartbeat();
           this.logProgress('Play');
       } 
-      else if (state === 2) { // PAUSED
+      else if (state === 2) { 
           this.stopHeartbeat();
           this.logProgress('Pause');
       } 
-      else if (state === 0) { // ENDED
+      else if (state === 0) { 
           this.stopHeartbeat();
           this.logProgress('Complete');
           this.toastr.success('Ders tamamlandı. Sonrakine geçiliyor...');
@@ -520,7 +516,6 @@ loadYoutubeVideo() {
     setTimeout(() => this.loadAndPlayContent(undefined, 'AutoNext'), 2000);
   }
 
-  // 🔥 GÖRSEL İÇİN MANUEL TAMAMLAMA BUTONU FONKSİYONU
   markImageAsCompleted() {
       this.isTimerGreen = true;
       this.logProgress('Complete');
@@ -561,13 +556,31 @@ loadYoutubeVideo() {
     }
   }
 
-  updateSidebarStatus(contentId: number, isCompleted: boolean) {
+updateSidebarStatus(contentId: number, isCompleted: boolean) {
       if (!this.course?.trainingSections) return;
+      
+      let unlockNext = false; // Sıradaki dersin kilidini açmak için bayrak
+
       for (const section of this.course.trainingSections) {
-          const content = section.trainingContents?.find(c => c.id === contentId);
-          if (content) {
-              content.isChecked = isCompleted;
-              content.isLocked = false;
+          if (!section.trainingContents) continue;
+
+          for (const content of section.trainingContents) {
+              
+              // Eğer bir önceki döngüde dersi tamamladıysak, bu dersin kilidini aç
+              if (unlockNext) {
+                  content.isLocked = false;
+                  unlockNext = false; // Sadece bir sonrakini açması yeterli
+              }
+
+              if (content.id === contentId) {
+                  content.isChecked = isCompleted;
+                  content.isLocked = false; // Kendisi zaten açık
+                  
+                  // Eğer bu ders tamamlandıysa, bir sonraki dersin kilidini açması için komut ver
+                  if (isCompleted) {
+                      unlockNext = true; 
+                  }
+              }
           }
       }
   }
@@ -609,7 +622,6 @@ loadYoutubeVideo() {
   }
 
   openPdfModal() { this.isPdfModalOpen = true; 
-      // 🔥 PDF SÜRESİ İÇİN FALLBACK (YEDEK) EKLENDİ
       const t = this.currentContent?.minReadTimeThreshold || 15; 
       this.setupTimer(t); 
       this.startTimer(); 
@@ -658,7 +670,6 @@ loadYoutubeVideo() {
       }, 1000);
   }
 
-  // ... (Admin Actions kodları aynı) ...
   approveTraining() {
     if(!this.requestId) return;
     if(!confirm("Bu eğitimi yayınlamak istediğinize emin misiniz?")) return;
